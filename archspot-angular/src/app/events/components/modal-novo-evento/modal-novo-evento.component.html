@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <h1 class="modal-title fs-4 font-logo">Criar Novo Evento</h1>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss('close')"></button>
+</div>
+
+<div class="modal-body">
+  <form class="container-fluid fw-medium">
+    <div class="mb-3">
+      <label for="campoNome" class="form-label">Nome do Evento:</label>
+      <input type="text" class="form-control" id="campoNome" />
+    </div>
+
+    <div class="mb-3">
+      <label for="campoData" class="form-label">Data:</label>
+      <input type="date" class="form-control" id="campoData" />
+    </div>
+
+    <div class="mb-3">
+      <label for="campoDescricao" class="form-label">Descrição:</label>
+      <textarea class="form-control" id="campoDescricao"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="campoEtapaPredecessora" class="form-label">Participantes:</label>
+      <select class="form-select" id="campoEtapaPredecessora">
+        <option selected>selecione</option>
+        <option value="1">Fernando</option>
+        <option value="2">Hélio</option>
+        <option value="3">Beatriz</option>
+      </select>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss('cancel')">Fechar</button>
+  <button type="button" class="btn btn-success" (click)="activeModal.close('create')">Criar Evento</button>
+</div>

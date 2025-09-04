@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="row mt-2">
+    <!-- condicionada largura do conteudo -->
+    <div [ngClass]="fullWidth ? 'col-12' : 'offset-1 col-10'">
+
+      <!-- Cabeçalho de Título -->
+      <div class="row">
+        <h1 class="fw-light fs-1 font-logo d-flex align-items-center">
+          <a *ngIf="showBackButton" (click)="goBack()" class="btn p-1">
+            <img src="/assets/img/icons/chevron-double-left.svg" alt="" width="30" height="30">
+          </a>
+          {{ title }}
+        </h1>
+        <hr>
+      </div>
+
+      <div class="row gx-3 mb-5">
+
+        <!-- condiciona exibição ou não do sidebar -->
+        <div class="col-3" *ngIf="showSidebar;">
+          <app-sidebar-menu></app-sidebar-menu>
+        </div>
+
+        <div [class.col-9]="showSidebar" [class.col]="!showSidebar">
+
+          <!-- condiciona exibição ou não do cronograma -->
+          <ng-container *ngIf="showStatusBar;">
+            <app-project-status-bar></app-project-status-bar>
+          </ng-container>
+
+          <!-- Condiciona o tamanho da coluna de conteúdo conforme exibe ou não -->
+          <div class="bg-white rounded-2 p-4">
+            <ng-content></ng-content>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>

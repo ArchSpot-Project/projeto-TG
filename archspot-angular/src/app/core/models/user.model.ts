@@ -1,0 +1,42 @@
+export type Role = 'ADMIN' | 'CUSTOMER' | 'MEMBER';
+
+export interface User {
+  id: number;
+  cpf: string;
+  name: string;
+  phone: string;
+  address: string;
+  profession: string;
+  email: string;
+  userRole: Role;
+}
+
+export interface UserDTO {
+  id: number;
+  cpf: string;
+  name: string;
+  phone: string;
+  address: string;
+  profession: string;
+  email: string;
+  userRole: Role;
+  password: string;
+}
+
+export interface UserCreateDTO {
+  cpf: string;
+  name: string;
+  phone: string;
+  address: string;
+  profession: string;
+  email: string;
+  userRole: Role;
+  password: string;
+}
+
+// Interface opcional só para criação/login (sugestao GPT):
+// TODO: Tirar essa senha daqui logo logo...
+export interface UserCredentials {
+  email: string;
+  password: string;
+}

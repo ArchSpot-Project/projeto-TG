@@ -1,0 +1,57 @@
+<app-page-layout [title]="'Perfil'" [showSidebar]="true" [showBackButton]="true">
+
+  <!-- Título e botão de editar -->
+  <div class="row d-flex justify-content-between">
+    <div class="col fs-4 fw-medium">Dados da Conta</div>
+    <div class="col-auto mb-2">
+      <button class="btn" type="button" (click)="openEditModal()">
+        <img src="/assets/img/icons/pencil-square.svg" alt="Editar" width="25" height="25" />
+      </button>
+    </div>
+    <hr />
+  </div>
+
+  <!-- Conteúdo da conta -->
+  <div class="row gx-3 p-3 rounded-2">
+    <!-- Coluna 1 -->
+    <div class="col-8">
+      <div class="mb-3">
+        <h5>Nome:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">{{ user?.name }}</div>
+      </div>
+
+      <div class="mb-3">
+        <h5>E-mail:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">{{ user?.email }}</div>
+      </div>
+
+      <div class="mb-3">
+        <h5>Senha:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">*************</div>
+      </div>
+
+      <div class="mb-3">
+        <h5>Profissão / Cargo:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">{{ user?.profession }}</div>
+      </div>
+
+      <div class="mb-3">
+        <h5>Telefone:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">{{ user?.phone }}</div>
+      </div>
+
+      <div class="mb-3">
+        <h5>Endereço:</h5>
+        <div class="border p-2 rounded-2 shadow-sm">{{ user?.address }}</div>
+      </div>
+    </div>
+
+    <!-- Coluna 2 - Foto -->
+    <div class="col-4">
+      <div class="text-center">
+        <img src="/assets/img/personas/ana.jpeg" class="rounded-circle border" alt="Foto de perfil" width="220"
+          height="220" />
+      </div>
+    </div>
+  </div>
+</app-page-layout>

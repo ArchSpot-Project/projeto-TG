@@ -1,0 +1,164 @@
+<app-page-layout [title]="'Home'">
+
+  <!-- TODO: Avaliar criar componentes "Título de seção" para títulos dentro de uma página -->
+  <!-- TODO: Criar o componente para os Cards futuramente, e carregar de forma dinâmica -->
+
+  <!--ROW 1 - MEUS PROJETOS-->
+  <div class="row d-flex justify-content-between">
+    <div class="col fs-4 fw-medium">Meus Projetos</div>
+    <div class="col-auto mb-2">
+      <button class="btn" type="button">
+        <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" data-bs-toggle="modal"
+          data-bs-target="#modalCriarNovoProjeto">
+      </button>
+    </div>
+    <hr>
+  </div>
+
+  <div class="row row-cols-5 gx-3 bg-archspot p-3 rounded-2 text-center align-items-center mb-4">
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 01</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">
+              Projeto 02
+            </h6>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano3.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 03</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 04</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 05</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--ROW 2 - PROJETOS COMPARTILHADOS-->
+  <div class="row">
+    <div class="fs-4 fw-medium">Projetos Compartilhados</div>
+    <hr>
+  </div>
+
+  <div class="row gx-3 bg-archspot p-3 rounded-2 text-center mb-4">
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 01</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 02</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano3.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 03</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--ROW 3 - PROJETOS RECENTES-->
+  <div class="row">
+    <div class="fs-4 fw-medium">Abertos Recentemente</div>
+    <hr>
+  </div>
+
+  <div class="row gx-3 bg-archspot p-3 rounded-2 text-center mb-4">
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 01</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 02</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card h-100 bg-transparent rounded-3 border-2" style="border-color: #78A58B;">
+        <img src="/assets/img/plano3.jpg" class="card-img-top" alt="...">
+        <div class="card-body p-2">
+          <a (click)="goToProjects(1)" class="btn p-0 stretched-link">
+            <h6 class="card-title mb-0">Projeto 03</h6>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</app-page-layout>

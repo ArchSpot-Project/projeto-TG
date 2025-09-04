@@ -1,0 +1,31 @@
+.week-day {
+  font-weight: 700;
+  padding: 6px;
+}
+
+.day {
+  font-weight: 500;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 6px;
+  font-size: .9rem;
+  background-color:#f8f9fa;
+} 
+
+.day-off {
+  background-color:#dee2e6;
+}
+
+.day-evento {
+  background-color: #b5d4c2;
+}
+.day-available:hover {
+  cursor: pointer;
+  background-color: #3a63a0;
+  color: white;
+}
+
+.day-selected {  
+  background-color:#187c4e;
+  color: white;
+}

@@ -1,0 +1,66 @@
+<div class="container py-5 mt-4">
+  <div class="row mt-2">
+    <h1 class="fw-light fs-1 font-logo d-flex align-items-center">
+      <a href="" class="btn p-1">
+        <img src="assets/img/icons/chevron-double-left.svg" alt="" width="30" height="30">
+      </a>
+      ArchSpot
+    </h1>
+    <hr>
+    <p class="fs-4">Sua plataforma de <span class="fw-medium">integração</span> entre profissionais de Arquitetura e
+      clientes.</p>
+  </div>
+
+  <div class="row mb-5">
+    <div class="col">
+      <div class="bg-white rounded-2 p-4">
+
+        <div class="row d-flex justify-content-between">
+          <div class="col fs-4 fw-medium">Login</div>
+          <hr>
+        </div>
+
+        <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4 pb-3">
+          <div class="col col-xl-4">
+
+            <form (ngSubmit)="login()">
+              <div class="mb-3">
+                <label for="inputEmail" class="form-label">E-mail:</label>
+                <input type="email" [(ngModel)]="email" name="email" class="form-control shadow-sm" id="inputEmail"
+                  aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label for="inputPassword" class="form-label">Senha:</label>
+                <input type="password" [(ngModel)]="password" name="password" class="form-control shadow-sm"
+                  id="inputPassword">
+                <div id="emailHelp" class="form-text">Esqueceu seu senha?</div>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Mantenha-me logado</label>
+              </div>
+              <button type="submit" class="btn btn-success shadow">Entrar</button>
+
+              <div *ngIf="error" class="text-danger mt-2">
+                E-mail ou senha inválidos.
+              </div>
+            </form>
+            
+            <div class="row d-flex justify-content-between mt-5">
+              <div class="col fs-5 fw-medium mb-2">Não tem conta? Cadastre-se!</div>
+            </div>
+            <button (click)="openRegisterModal()" class="btn btn-success shadow">Cadastrar</button>
+
+          </div>
+
+          <div class="col col-xl-8">
+            <img src="assets/img/capa.jpeg" alt="..." class="img-fluid float-end">
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

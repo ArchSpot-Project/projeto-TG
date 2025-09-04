@@ -1,0 +1,15 @@
+.dropdown-menu {
+  background-color: #78A58B !important; /* mesma cor da navbar */
+  border: none;
+}
+
+.dropdown-item:hover {
+  background-color: #78A58B; /* tom mais escuro para hover */
+  color: #fff;
+}
+
+.btn-login {
+  background-color: #FBECDA;
+  border-color: #19535F;
+  color: #19535F
+}

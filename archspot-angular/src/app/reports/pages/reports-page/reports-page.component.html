@@ -1,0 +1,35 @@
+<app-page-layout [title]="'Relatórios'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
+
+  <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs mb-3 fs-5 justify-content-between">
+    <li [ngbNavItem]="'cronograma-geral'">
+      <a ngbNavLink>Cronograma Geral</a>
+      <ng-template ngbNavContent>
+        <app-report-cronograma-geral></app-report-cronograma-geral>
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="'cronograma-projeto'">
+      <a ngbNavLink>Cronograma por Projeto</a>
+      <ng-template ngbNavContent>
+        <app-report-cronograma-projeto></app-report-cronograma-projeto>
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="'financeiro-geral'">
+      <a ngbNavLink>Financeiro Geral</a>
+      <ng-template ngbNavContent>
+        <app-report-financeiro-geral></app-report-financeiro-geral>
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="'financeiro-projeto'">
+      <a ngbNavLink>Financeiro por Projeto</a>
+      <ng-template ngbNavContent>
+        <app-report-financeiro-projeto></app-report-financeiro-projeto>
+      </ng-template>
+    </li>
+  </ul>
+
+  <div [ngbNavOutlet]="nav"></div>
+
+</app-page-layout>

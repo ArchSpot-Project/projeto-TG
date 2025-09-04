@@ -1,0 +1,102 @@
+body {
+    background-color: #FBECDA;
+    font-family: "Josefin Sans", serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+  }
+  .font-logo {
+    font-family: "Josefin Slab", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+  
+  .bg-archspot {
+    background-color: #FBECDA;
+  }
+  .bg-archspot-samambaia {
+    background-color: #78A58B;
+  }
+  .bg-archspot-coral {
+    background-color: #E0968F;
+  }
+  .bg-archspot-ceramica {
+    background-color: #B4585D;
+  }
+  .bg-archspot-petroleo {
+    background-color: #19535F;
+  }
+  .bg-archspot-berinjela {
+    background-color: #3C2A35;
+  }
+  
+  .bc-archspot-samambaia {
+    border-color: #78A58B;
+  }
+  .bc-archspot-coral {
+    border-color: #E0968F;
+  }
+  
+  .txt-archspot-samambaia {
+    color: #78A58B;
+  }
+  
+  .image-square {
+    aspect-ratio: 1 / 1; /* Mantém a proporção 1:1 */
+    overflow: hidden;
+  }
+  
+  .btn-success {
+    background-color: #78A58B;
+    border: none;
+  }
+  .btn-success:hover {
+    background-color: #19535F;
+  }
+  
+  .btn-warning {
+    background-color: #E0968F;
+    color: white;
+    border: none;
+  }
+  .btn-warning:hover {
+    background-color: #B4585D;
+    color: white;
+  }
+  
+  .btn-danger {
+    background-color: #B4585D;
+    border: none;
+  }
+  .btn-danger:hover {
+    background-color: #8d4549;
+  }
+  
+  .nav-link {
+    color: lightgray;
+  }
+  
+  .start-10 {
+    left: 10%;
+  }
+  .start-20 {
+    left: 20%;
+  }
+  .start-30 {
+    left: 30%;
+  }
+  .start-40 {
+    left: 40%;
+  }
+  .start-60 {
+    left: 60%;
+  }
+  .start-70 {
+    left: 70%;
+  }
+  .start-80 {
+    left: 80%;
+  }
+  .start-90 {
+    left: 90%;
+  }

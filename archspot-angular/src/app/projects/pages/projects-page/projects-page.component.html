@@ -1,0 +1,132 @@
+<app-page-layout [title]="'Projetos'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
+
+  <!--ROW 1 - PROJETOS ABERTOS-->
+  <div class="row d-flex justify-content-between">
+    <div class="col fs-4 fw-medium">Projetos em aberto</div>
+    <div class="col-auto mb-2">
+      <a class="btn">
+        <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" data-bs-toggle="modal"
+          data-bs-target="#modalCriarNovoProjeto">
+      </a>
+    </div>
+
+    <hr>
+  </div>
+
+  <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-5 pb-3">
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-3" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 01</h5>
+          <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vitae, asperiores.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-success">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-3" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 02</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id!</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-success">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-3" style="border-color: #78A58B;">
+        <img src="/assets/img/plano3.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 03</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-success">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-3" style="border-color: #78A58B;">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 04</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, sed.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-success">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-3" style="border-color: #78A58B;">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 05</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-success">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--ROW 2 - PROJETOS FECHADOS-->
+  <div class="row mt-5">
+    <div class="fs-4 fw-medium">Projetos Fechados</div>
+    <hr>
+  </div>
+
+  <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-6">
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2 border-secondary">
+        <img src="/assets/img/plano1.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 01</h5>
+          <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vitae, asperiores.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-secondary text-white">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2 border-secondary">
+        <img src="/assets/img/plano2.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 02</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id!</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-secondary text-white">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 bg-transparent rounded-3 border-2 border-secondary">
+        <img src="/assets/img/plano3.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Projeto 03</h5>
+          <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        </div>
+        <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+          <a (click)="goToProjects(1)" class="btn btn-secondary text-white">Abrir Projeto</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</app-page-layout>
