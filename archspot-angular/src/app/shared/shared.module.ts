@@ -4,13 +4,15 @@ import { ModalCadastroComponent } from './modal-cadastro/modal-cadastro.componen
 import { FormsModule } from '@angular/forms';
 import { ProjectStatusBarComponent } from './components/project-status-bar/project-status-bar.component';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-
-
+import { ProjectCardComponent } from './project-card/project-card.component';
+import { SectionTitleComponent } from './section-title/section-title.component';
 
 @NgModule({
   declarations: [
     ModalCadastroComponent,
-    ProjectStatusBarComponent
+    ProjectStatusBarComponent,
+    ProjectCardComponent,
+    SectionTitleComponent
   ],
   imports: [
     CommonModule,
@@ -18,7 +20,9 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     NgxMaskDirective
   ],
   exports: [
-    ProjectStatusBarComponent
+    ProjectStatusBarComponent,
+    ProjectCardComponent,
+    SectionTitleComponent
   ],
   providers: [
     provideNgxMask()

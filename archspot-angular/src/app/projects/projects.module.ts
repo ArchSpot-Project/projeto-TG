@@ -5,6 +5,7 @@ import { ProjectsRoutingModule } from './projects-routing.module';
 import { ProjectsPageComponent } from './pages/projects-page/projects-page.component';
 import { ProjectDetailsPageComponent } from './pages/project-details-page/project-details-page.component';
 import { LayoutModule } from "../layout/layout.module";
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { LayoutModule } from "../layout/layout.module";
   imports: [
     CommonModule,
     ProjectsRoutingModule,
-    LayoutModule
+    LayoutModule,
+    SharedModule
 ],
   exports: [
   ]
