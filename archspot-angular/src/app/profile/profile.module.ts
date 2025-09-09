@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ProfileRoutingModule } from './profile-routing.module';
 import { ProfilePageComponent } from './pages/profile-page/profile-page.component';
 import { LayoutModule } from '../layout/layout.module';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { LayoutModule } from '../layout/layout.module';
   imports: [
     CommonModule,
     ProfileRoutingModule,
-    LayoutModule
+    LayoutModule,
+    SharedModule
   ]
 })
 export class ProfileModule { }

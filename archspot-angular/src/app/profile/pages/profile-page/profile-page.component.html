@@ -1,15 +1,11 @@
 <app-page-layout [title]="'Perfil'" [showSidebar]="true" [showBackButton]="true">
 
   <!-- Título e botão de editar -->
-  <div class="row d-flex justify-content-between">
-    <div class="col fs-4 fw-medium">Dados da Conta</div>
-    <div class="col-auto mb-2">
-      <button class="btn" type="button" (click)="openEditModal()">
-        <img src="/assets/img/icons/pencil-square.svg" alt="Editar" width="25" height="25" />
-      </button>
-    </div>
-    <hr />
-  </div>
+  <app-section-title title="Dados da Conta">
+    <button class="btn" type="button" (click)="openEditModal()">
+      <img src="/assets/img/icons/pencil-square.svg" alt="Editar" width="25" height="25" />
+    </button>
+  </app-section-title>
 
   <!-- Conteúdo da conta -->
   <div class="row gx-3 p-3 rounded-2">

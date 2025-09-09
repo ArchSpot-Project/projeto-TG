@@ -1,0 +1,35 @@
+<div class="card h-100 bg-transparent rounded-3"
+  [ngClass]="{ 'border-2': variant === 'compact', 'border-3': variant === 'detailed' }"
+  [style.border-color]="project.buttonStyle === 'secondary' ? '#6c757d' : (project.borderColor || '#78A58B')">
+
+  <img [src]="project.imageUrl" class="card-img-top img-fluid" [alt]="project.title">
+
+  <!-- Versão compacta -->
+  <ng-container *ngIf="variant === 'compact'">
+    <div class="card-body p-2 d-flex flex-column align-items-center text-center">
+      <a (click)="goToProjects()" 
+         class="btn p-0 stretched-link w-100 d-flex flex-column align-items-center">
+        <h6 class="card-title mb-0 text-truncate w-100 
+                   fs-6 fs-sm-6 fs-md-5 fs-lg-5 fs-xl-4"
+            [attr.title]="project.title">
+          {{ project.title }}
+        </h6>
+      </a>
+    </div>
+  </ng-container>
+
+  <!-- Versão detalhada -->
+  <ng-container *ngIf="variant === 'detailed'">
+    <div class="card-body text-center text-md-start">
+      <h5 class="card-title">{{ project.title }}</h5>
+      <p class="card-text">{{ project.description }}</p>
+    </div>
+    <div class="card-footer d-grid bg-transparent border-0 text-center mb-2">
+      <a (click)="goToProjects()" 
+         class="btn"
+         [ngClass]="'btn-' + (project.buttonStyle || 'success')">
+        Abrir Projeto
+      </a>
+    </div>
+  </ng-container>
+</div>
