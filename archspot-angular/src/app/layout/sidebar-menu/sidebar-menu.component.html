@@ -1,73 +1,70 @@
-<!--MENU LATERAL-->
 <nav class="bg-white rounded-2 p-4">
   <ul class="list-unstyled">
 
-    <!-- TODO: O conteúdo dos menus serão alimentados dinamicamente no futuro -->
-
-    <li class="mb-3">
-      <a (click)="goToProjects()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+    <!-- se nenhum projeto estiver ativo, mostrar lista de projetos -->
+    <li *ngIf="!activeProject" class="mb-3">
+      <a (click)="toggleProjectsMenu()" role="button"
+        class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
         <img src="assets/img/icons/houses.svg" alt="" class="me-2 mb-1" width="20" height="20">
         Projetos
       </a>
-      <div class="list-group list-group-flush mt-2">
-        <!-- TODO: Os projetos serão carregados de forma dinâmica no futuro -->
-        <a (click)="goToProjects(1)" role="button" class="list-group-item list-group-item-action">Projeto 1</a>
-        <a (click)="goToProjects(2)" role="button" class="list-group-item list-group-item-action">Projeto 2</a>
+
+      <!-- se o menu de projetos estiver aberto, mostrar a lista de projetos -->
+      <div *ngIf="isProjectsMenuOpen" class="list-group list-group-flush mt-2">
+        <a *ngFor="let project of projects" (click)="goToProjectDetails(project.id)" role="button"
+          class="list-group-item list-group-item-action">
+          {{ project.name }}
+        </a>
       </div>
     </li>
 
+    <!-- se um projeto estiver ativo, mostrar subitens do projeto -->
+    <li *ngIf="activeProject" class="mb-3">
+      <ng-container *ngFor="let item of projectMenuItems">
     <li class="mb-3">
-      <a (click)="goToEvents()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/calendar2-event.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Eventos
+      <a (click)="goToProjectSubItem(item.key)" role="button"
+        class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+        <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+        {{ item.label }}
       </a>
+    </li>
+    </ng-container>
+    <hr>
     </li>
 
-    <li class="mb-3">
-      <a (click)="goTorReports()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/file-richtext.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Relatórios
-      </a>
-    </li>
+    <!-- se nenhum projeto estiver ativo, mostrar itens gerais -->
+    <hr *ngIf="!activeProject">
+    <ng-container *ngIf="!activeProject">
+      <li class="mb-3" *ngFor="let item of generalMenuItems">
+        <a (click)="item.action()" role="button"
+          class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+          <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+          {{ item.label }}
+        </a>
+      </li>
+    </ng-container>
+
+    <ng-container *ngFor="let item of profileMenuItems">
+      <li class="mb-3">
+        <a (click)="item.action()" role="button"
+          class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+          <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+          {{ item.label }}
+        </a>
+      </li>
+    </ng-container>
 
     <hr>
 
-    <li class="mb-3">
-      <a (click)="goToProfile()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/04-perfil.png" alt="" class="me-2 mb-1" width="20" height="20">
-        Perfil
-      </a>
-    </li>
-
-    <li class="mb-3">
-      <a (click)="goToMaintenance()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/person-add.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Cadastros
-      </a>
-    </li>
-
-    <li class="mb-3">
-      <a (click)="goToSettings()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/gear.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Configurações
-      </a>
-    </li>
-
-    <hr>
-
-    <li class="mb-3">
-      <a (click)="goToHelp()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/question-circle.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Ajuda
-      </a>
-    </li>
-
-    <li class="mb-3">
-      <a (click)="logout()" role="button" class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-        <img src="assets/img/icons/box-arrow-right.svg" alt="" class="me-2 mb-1" width="20" height="20">
-        Sair
-      </a>
-    </li>
+    <ng-container *ngFor="let item of helpMenuItems">
+      <li class="mb-3">
+        <a (click)="item.action()" role="button"
+          class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+          <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+          {{ item.label }}
+        </a>
+      </li>
+    </ng-container>
 
   </ul>
 </nav>

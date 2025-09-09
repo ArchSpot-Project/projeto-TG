@@ -3,7 +3,7 @@ Plataforma de Gerenciamento de Projetos Arquitetônicos
 
 > Repositório para a disciplina Trabalho de Graduação - FATEC-SO - 2025/2
 > <br>A primeira versão para esse projeto pode ser encontrada no repositório [proj-engSoftware2](https://github.com/ArchSpot-Project/projeto-EngSoftware2)
-> <br>A segunda versão para esse projeto pode ser encontrada no repositório [proj-engSoftware2](https://github.com/ArchSpot-Project/projeto-EngSoftware3)
+> <br>A segunda versão para esse projeto pode ser encontrada no repositório [proj-engSoftware3](https://github.com/ArchSpot-Project/projeto-EngSoftware3)
 
 ## Membros do Projeto
 
