@@ -1,6 +1,8 @@
 <nav class="bg-white rounded-2 p-4">
   <ul class="list-unstyled">
 
+    <!-- TODO: Adicionar responsividade (o conteudo do texto ultrapassa a sidebar) -->
+
     <!-- se nenhum projeto estiver ativo, mostrar lista de projetos -->
     <li *ngIf="!activeProject" class="mb-3">
       <a (click)="toggleProjectsMenu()" role="button"

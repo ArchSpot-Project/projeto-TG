@@ -3,34 +3,34 @@
   <!--ROW 1 - MEUS PROJETOS-->
   <app-section-title title="Meus Projetos">
     <button class="btn" type="button">
-      <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" data-bs-toggle="modal"
-        data-bs-target="#modalCriarNovoProjeto">
+      <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" 
+           data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
     </button>
   </app-section-title>
 
-
-  <div class="row row-cols-5 gx-3 bg-archspot p-3 rounded-2 text-center align-items-center mb-4">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 
+              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
     <div class="col" *ngFor="let project of myProjects">
       <app-project-card [project]="project" variant="compact"></app-project-card>
     </div>
   </div>
 
   <!--ROW 2 - PROJETOS COMPARTILHADOS-->
-  <app-section-title title="Projetos Compartilhados">
-  </app-section-title>
+  <app-section-title title="Projetos Compartilhados"></app-section-title>
 
-  <div class="row gx-3 bg-archspot p-3 rounded-2 text-center mb-4">
-    <div class="col-md-2" *ngFor="let project of sharedProjects">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 
+              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
+    <div class="col" *ngFor="let project of sharedProjects">
       <app-project-card [project]="project" variant="compact"></app-project-card>
     </div>
   </div>
 
   <!--ROW 3 - PROJETOS RECENTES-->
-  <app-section-title title="Abertos Recentemente">
-  </app-section-title>
+  <app-section-title title="Abertos Recentemente"></app-section-title>
 
-  <div class="row gx-3 bg-archspot p-3 rounded-2 text-center mb-4">
-    <div class="col-md-2" *ngFor="let project of recentProjects">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 
+              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
+    <div class="col" *ngFor="let project of recentProjects">
       <app-project-card [project]="project" variant="compact"></app-project-card>
     </div>
   </div>
