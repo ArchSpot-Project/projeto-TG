@@ -24,7 +24,7 @@ export class SidebarMenuComponent implements OnInit {
 
   //listas de itens do menu para simplificar o HTML
   projectMenuItems = [
-    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos' },
+    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos', action: () => this.goToProjectSubItem('drawings') },
     { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos' },
     { key: 'financial', icon: 'assets/img/icons/13-financeiro.png', label: 'Financeiro' },
     { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
@@ -40,11 +40,11 @@ export class SidebarMenuComponent implements OnInit {
   profileMenuItems = [
     { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() },
     { icon: 'assets/img/icons/person-add.svg', label: 'Cadastros', action: () => this.goToMaintenance() },
-    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToSettings() }
+    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToMaintenance() }
   ];
 
   helpMenuItems = [
-    { icon: 'assets/img/icons/question-circle.svg', label: 'Ajuda', action: () => this.goToHelp() },
+    { icon: 'assets/img/icons/question-circle.svg', label: 'Ajuda', action: () => this.goToMaintenance() },
     { icon: 'assets/img/icons/box-arrow-right.svg', label: 'Sair', action: () => this.logout() }
   ];
 
@@ -118,16 +118,6 @@ export class SidebarMenuComponent implements OnInit {
     this.router.navigate(['/maintenance']);
     this.activeProject = null;
   }
-  goToSettings() {
-    this.router.navigate(['/settings']);
-    this.activeProject = null;
-  }
-
-  goToHelp() {
-    this.router.navigate(['/help']);
-    this.activeProject = null;
-  }
-
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);

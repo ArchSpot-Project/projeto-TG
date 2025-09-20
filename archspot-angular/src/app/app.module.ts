@@ -17,6 +17,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { EventsModule } from './events/events.module';
 import { ReportsModule } from './reports/reports.module';
 import { ProfileModule } from './profile/profile.module';
+import { DrawingsModule } from './drawings/drawings.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,7 @@ import { ProfileModule } from './profile/profile.module';
     BrowserModule,
     AppRoutingModule,
     NgbModule,
-
+    DrawingsModule,
     AuthModule,
     CoreModule,
     HomeModule,
