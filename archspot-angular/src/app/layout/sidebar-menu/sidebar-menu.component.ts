@@ -24,14 +24,14 @@ export class SidebarMenuComponent implements OnInit {
 
   //listas de itens do menu para simplificar o HTML
   projectMenuItems = [
-    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos', action: () => this.goToProjectSubItem('drawings') },
-    { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos' },
-    { key: 'financial', icon: 'assets/img/icons/13-financeiro.png', label: 'Financeiro' },
-    { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
-    { key: 'timeline', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma' },
-    { key: 'events', icon: 'assets/img/icons/calendar2-event.svg', label: 'Eventos' }
+    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos'},
+    { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos'},
+    { key: 'financial', icon: 'assets/img/icons/13-financeiro.png', label: 'Financeiro'},
+    { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos'},
+    { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma'},
+    { key: 'events', icon: 'assets/img/icons/calendar2-event.svg', label: 'Eventos'},
   ];
-
+  
   generalMenuItems = [
     { icon: 'assets/img/icons/calendar2-event.svg', label: 'Eventos', action: () => this.goToEvents() },
     { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() }

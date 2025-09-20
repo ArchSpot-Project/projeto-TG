@@ -18,6 +18,11 @@ import { EventsModule } from './events/events.module';
 import { ReportsModule } from './reports/reports.module';
 import { ProfileModule } from './profile/profile.module';
 import { DrawingsModule } from './drawings/drawings.module';
+import { DocumentsModule } from './documents/documents.module';
+import { FinancialModule } from './financial/financial.module';
+import { PhotosModule } from './photos/photos.module';
+import { ScheduleComponent } from './schedule/schedule.component';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +33,10 @@ import { DrawingsModule } from './drawings/drawings.module';
     AppRoutingModule,
     NgbModule,
     DrawingsModule,
+    DocumentsModule,
+    FinancialModule,
+    PhotosModule,
+    ScheduleModule,
     AuthModule,
     CoreModule,
     HomeModule,
@@ -36,12 +45,9 @@ import { DrawingsModule } from './drawings/drawings.module';
     ReportsModule,
     ProfileModule,
     MaintenanceModule,
-
     PublicModule,
     LayoutModule,
     SharedModule,
-
-
     HttpClientModule
   ],
   providers: [],
