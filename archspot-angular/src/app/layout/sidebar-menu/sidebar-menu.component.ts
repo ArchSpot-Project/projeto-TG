@@ -69,10 +69,8 @@ export class SidebarMenuComponent implements OnInit {
 
     if (urlSegments[1] === 'projects' && projectIdString) {
       const projectId = parseInt(projectIdString, 10);
-      this.activeProject = this.projects.find(p => p.id === projectId) || null;
-      if (this.activeProject) {
-        this.isProjectsMenuOpen = false;
-      }
+      this.activeProject = { id: projectId, name: `Projeto ${projectId}` };
+      this.isProjectsMenuOpen = false;
     } else {
       this.activeProject = null;
       this.isProjectsMenuOpen = true;
