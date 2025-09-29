@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { AuthModule } from './auth/auth.module';
 import { CoreModule } from './core/core.module';
 import { HomeModule } from './home/home.module';
@@ -21,7 +19,6 @@ import { DrawingsModule } from './drawings/drawings.module';
 import { DocumentsModule } from './documents/documents.module';
 import { FinancialModule } from './financial/financial.module';
 import { PhotosModule } from './photos/photos.module';
-import { ScheduleComponent } from './schedule/schedule.component';
 import { ScheduleModule } from './schedule/schedule.module';
 
 @NgModule({

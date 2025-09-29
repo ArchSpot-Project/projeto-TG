@@ -6,13 +6,15 @@ import { ProjectStatusBarComponent } from './components/project-status-bar/proje
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ProjectCardComponent } from './project-card/project-card.component';
 import { SectionTitleComponent } from './section-title/section-title.component';
+import { TableComponent } from './table/table.component';
 
 @NgModule({
   declarations: [
     ModalCadastroComponent,
     ProjectStatusBarComponent,
     ProjectCardComponent,
-    SectionTitleComponent
+    SectionTitleComponent,
+    TableComponent
   ],
   imports: [
     CommonModule,
@@ -22,7 +24,8 @@ import { SectionTitleComponent } from './section-title/section-title.component';
   exports: [
     ProjectStatusBarComponent,
     ProjectCardComponent,
-    SectionTitleComponent
+    SectionTitleComponent,
+    TableComponent
   ],
   providers: [
     provideNgxMask()
