@@ -1,17 +1,66 @@
-<h5>{{title}}</h5>
+<h5>{{ title }}</h5>
 <table class="table table-hover mt-4 align-middle">
     <thead class="table-light">
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Proprietário</th>
-            <th scope="col">Última modif.</th>
-            <th scope="col">Tamanho</th>
-            <th scope="col">
-                <a class="row btn">
-                    <img src="assets/img/icons/upload.svg" class="p-0" alt="" width="15" height="15">
-                </a>
-            </th>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Proprietário</th>
+            <th>Última modif.</th>
+            <th>Tamanho</th>
+            <th>Ações</th>
         </tr>
     </thead>
+
+    <tbody>
+        <tr *ngFor="let doc of documents; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ doc.name }}</td>
+            <td>{{ doc.owner }}</td>
+            <td>{{ doc.modifiedTime | date:'short' }}</td>
+            <td>{{ doc.size }} MB</td>
+            
+            <!-- dropdown editar arquivo -->
+            <td>
+                <div class="dropdown">
+                    <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle" role="button"
+                        id="dropdownMenuButton{{i}}" data-bs-toggle="dropdown" aria-expanded="false" width="20"
+                        height="20">
+
+                    <ul class="dropdown-menu align-middle me-2">
+                        <li>
+                            <a class="dropdown-item" (click)="abrirDoc(doc)">
+                                <img src="assets/img/icons/envelope-open.svg" width="15" height="15">
+                                Abrir
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" (click)="downloadDoc(doc)">
+                                <img src="assets/img/icons/download.svg" width="15" height="15">
+                                Baixar uma cópia
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" (click)="substituirDoc(doc)">
+                                <img src="assets/img/icons/upload.svg" width="15" height="15">
+                                Substituir nova versão
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" (click)="renomearDoc(doc)">
+                                <img src="assets/img/icons/pencil.svg" width="15" height="15">
+                                Renomear
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" (click)="deletarDoc(doc)">
+                                <img src="assets/img/icons/trash3.svg" width="15" height="15">
+                                Deletar
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+
+        </tr>
+    </tbody>
 </table>
