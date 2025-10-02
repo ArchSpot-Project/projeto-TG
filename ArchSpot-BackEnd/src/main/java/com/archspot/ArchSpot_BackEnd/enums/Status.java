@@ -1,9 +1,10 @@
 package com.archspot.ArchSpot_BackEnd.enums;
 
 public enum Status {
-    EM_ANDAMENTO("Em andamento"),
-    CONCLUIDO("Concluído"),
-    CANCELADO("Cancelado");
+    PLANNED("Planned"),          // planejado, ainda não iniciado
+    IN_PROGRESS("In progress"),  // em andamento
+    COMPLETED("Completed"),      // concluído
+    CANCELLED("Cancelled");      // cancelado
 
     private final String label;
 
