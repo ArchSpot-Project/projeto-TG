@@ -32,7 +32,7 @@ public class Phase {
   private Integer duration;
 
   // referência simples para predecessora (para teste inicial)
-  // TODO: futuramente, previousPhase poderá ser substituído ou complementado por PhaseDependency.
+  // TODO: futuramente, previousPhase poderá ser substituído ou complementado por PhaseDependency (classe de associção).
   @ManyToOne
   @JoinColumn(name = "previous_phase_id")
   @JsonIgnore

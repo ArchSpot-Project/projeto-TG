@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
 import com.archspot.ArchSpot_BackEnd.services.ProjectService;
+import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,9 @@ public class ProjectController {
 
   @Autowired
   private PhaseService phaseService;
+
+  @Autowired
+  private UserProjectService userProjectService;
 
   @GetMapping
   public ResponseEntity<List<ProjectResponseDTO>> getAll() {
@@ -50,6 +55,12 @@ public class ProjectController {
   public ResponseEntity<List<PhaseDTO>> getPhasesByProject(@PathVariable Long projectId) {
     List<PhaseDTO> phases = phaseService.findByProject(projectId);
     return ResponseEntity.ok(phases);
+  }
+
+  // endpoint para recuperar usuários em um projeto
+  @GetMapping("/{projectId}/users")
+  public ResponseEntity<List<UserProjectResponseDTO>> getUsersByProject(@PathVariable Long projectId) {
+    return ResponseEntity.ok(userProjectService.getByProject(projectId));
   }
 
   @PostMapping

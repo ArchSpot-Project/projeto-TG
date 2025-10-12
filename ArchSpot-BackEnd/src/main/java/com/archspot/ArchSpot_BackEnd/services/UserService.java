@@ -44,7 +44,6 @@ public class UserService {
 		obj.setAddress(dto.address());
 		obj.setProfession(dto.profession());
 		obj.setEmail(dto.email());
-		obj.setUserRole(dto.userRole());
 		obj.setPassword(dto.password());
 		return repository.save(obj);
 	}
@@ -73,7 +72,6 @@ public class UserService {
 			user.setAddress(dto.address());
 			user.setProfession(dto.profession());
 			user.setEmail(dto.email());
-			user.setUserRole(dto.userRole());
 			user.setPassword(dto.password());
 			return repository.save(user);
 		} catch (EntityNotFoundException e) {
@@ -90,7 +88,7 @@ public class UserService {
 	public Optional<UserDTO> authenticate(LoginRequestDTO creds) {
 		return repository
 				.findByEmailAndPassword(creds.email(), creds.password())
-				.map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail(), u.getUserRole()));
+				.map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail()));
 	}
 
 }

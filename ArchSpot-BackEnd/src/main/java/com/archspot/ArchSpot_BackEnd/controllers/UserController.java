@@ -21,8 +21,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.archspot.ArchSpot_BackEnd.dtos.LoginRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
 import com.archspot.ArchSpot_BackEnd.services.UserService;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,9 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private UserProjectService userProjectService;
 
     // Para consultar todos os usuarios
     @GetMapping
@@ -49,7 +54,13 @@ public class UserController {
         return ResponseEntity.ok().body(obj);
     }
 
-    // Para criar novo usuario 
+    // endpoint para recuperar projetos de um usuário
+    @GetMapping("/{userId}/projects")
+    public ResponseEntity<List<UserProjectResponseDTO>> getProjectsByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(userProjectService.getByUser(userId));
+    }
+
+    // Para criar novo usuario
     @PostMapping(value = "/create")
     public ResponseEntity<User> create(@Valid @RequestBody UserCreateDTO dto) {
         User obj = new User();
@@ -77,7 +88,7 @@ public class UserController {
     public ResponseEntity<UserDTO> login(@RequestBody LoginRequestDTO creds) {
         Optional<UserDTO> user = service.authenticate(creds);
         return user
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
