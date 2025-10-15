@@ -22,15 +22,15 @@ public class UserProjectController {
     return ResponseEntity.ok(userProjectService.getAll());
   }
 
-    @PostMapping
-    public ResponseEntity<UserProjectResponseDTO> assign(@RequestBody UserProjectRequestDTO dto) {
-        var saved = userProjectService.assignUserToProject(dto);
-        return ResponseEntity.ok(saved);
-    }
+  @PostMapping // no futuro migrar para projects (p. ex.: POST /projects/{projectId}/users/{userId}?role=STAFF) 
+  public ResponseEntity<UserProjectResponseDTO> assign(@RequestBody UserProjectRequestDTO dto) {
+    var saved = userProjectService.assignUserToProject(dto);
+    return ResponseEntity.ok(saved);
+  }
 
-    @DeleteMapping
-    public ResponseEntity<Void> remove(@RequestParam Long userId, @RequestParam Long projectId) {
-        userProjectService.removeUserFromProject(userId, projectId);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping // no futuro migrar para projects (p. ex.: DELETE /projects/{projectId}/users/{userId})
+  public ResponseEntity<Void> remove(@RequestParam Long userId, @RequestParam Long projectId) {
+    userProjectService.removeUserFromProject(userId, projectId);
+    return ResponseEntity.noContent().build();
+  }
 }

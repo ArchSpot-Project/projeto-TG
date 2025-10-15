@@ -3,6 +3,7 @@ package com.archspot.ArchSpot_BackEnd.services;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
+import com.archspot.ArchSpot_BackEnd.exceptions.AssociationNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,7 @@ public class UserProjectService {
   @Transactional
   public void removeUserFromProject(Long userId, Long projectId) {
     var association = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
-        .orElseThrow(() -> new RuntimeException(
-            "Association between user " + userId + " and project " + projectId + " not found."));
+        .orElseThrow(() -> new AssociationNotFoundException(userId, projectId));
 
     userProjectRepository.delete(association);
   }
