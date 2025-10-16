@@ -13,6 +13,12 @@ import java.util.List;
 @RequestMapping("/user-projects")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserProjectController {
+  
+  /*
+   * Esse controller pode ser eliminado futuramente!
+   * Os métodos estão aninhados em ProjectController
+   * Mantendo aqui só para eventuais testes e conferêcias...
+   */
 
   @Autowired
   private UserProjectService userProjectService;
@@ -22,13 +28,13 @@ public class UserProjectController {
     return ResponseEntity.ok(userProjectService.getAll());
   }
 
-  @PostMapping // no futuro migrar para projects (p. ex.: POST /projects/{projectId}/users/{userId}?role=STAFF) 
+  @PostMapping // migrado para projects (POST /projects/{projectId}/users/{userId}?role=STAFF) 
   public ResponseEntity<UserProjectResponseDTO> assign(@RequestBody UserProjectRequestDTO dto) {
     var saved = userProjectService.assignUserToProject(dto);
     return ResponseEntity.ok(saved);
   }
 
-  @DeleteMapping // no futuro migrar para projects (p. ex.: DELETE /projects/{projectId}/users/{userId})
+  @DeleteMapping // migrado para projects (DELETE /projects/{projectId}/users/{userId})
   public ResponseEntity<Void> remove(@RequestParam Long userId, @RequestParam Long projectId) {
     userProjectService.removeUserFromProject(userId, projectId);
     return ResponseEntity.noContent().build();

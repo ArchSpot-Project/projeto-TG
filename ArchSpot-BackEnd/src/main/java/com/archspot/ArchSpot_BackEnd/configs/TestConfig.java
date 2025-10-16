@@ -39,15 +39,17 @@ public class TestConfig implements CommandLineRunner {
         public void run(String... args) throws Exception {
 
                 // ==== USERS ====
-                User user1 = new User(null, "520.834.160-31", "Ana", "9999-9999", "Avenida General Carneiro, 1560",
+                User user1 = new User(null, "439.779.870-20", "Ana", "9999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta",
                                 "ana@email.com", "123");
-                User user2 = new User(null, "268.647.710-59", "Fernando", "9888-9999", "Rua da Penha, 56", "Arquiteto",
+                User user2 = new User(null, "847.381.614-58", "Fernando", "9888-9999", "Rua da Penha, 56", "Arquiteto",
                                 "fernando@email.com", "456");
-                User user3 = new User(null, "572.761.830-41", "Beatriz", "9777-9999", "Avenida Barão de Tatuí, 104",
+                User user3 = new User(null, "887.832.723-99", "Beatriz", "9777-9999", "Avenida Barão de Tatuí, 104",
                                 "Designer Gráfica", "beatriz@email.com", "789");
+                User user4 = new User(null, "397.983.748-35", "Hélio", "9666-8888", "Rua das Palmeiras, 220",
+                                "Engenheiro Civil", "helio@email.com", "101112");
 
-                userRepository.saveAll(Arrays.asList(user1, user2, user3));
+                userRepository.saveAll(Arrays.asList(user1, user2, user3, user4));
 
                 // ==== PROJECTS ====
                 Project project1 = new Project();

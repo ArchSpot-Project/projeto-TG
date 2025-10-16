@@ -24,6 +24,7 @@ import com.archspot.ArchSpot_BackEnd.dtos.UserDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
 import com.archspot.ArchSpot_BackEnd.services.UserService;
 
@@ -52,6 +53,12 @@ public class UserController {
     public ResponseEntity<User> find(@PathVariable Long id) {
         User obj = service.findById(id);
         return ResponseEntity.ok().body(obj);
+    }
+
+    // retorna as roles disponíveis
+    @GetMapping("/roles")
+    public ResponseEntity<UserRole[]> getAllRoles() {
+        return ResponseEntity.ok(UserRole.values());
     }
 
     // endpoint para recuperar projetos de um usuário
