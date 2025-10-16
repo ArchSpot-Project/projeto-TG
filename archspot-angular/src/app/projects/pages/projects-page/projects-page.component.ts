@@ -1,44 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { ProjectService, ProjectResponse } from '../../../services/project.service';
 import { Router } from '@angular/router';
-
-interface Project {
-  id: number;
-  title: string;
-  imageUrl: string;
-  description?: string;
-  borderColor?: string;
-  buttonStyle?: string;
-}
 
 @Component({
   selector: 'app-projects-page',
   templateUrl: './projects-page.component.html',
   styleUrls: ['./projects-page.component.css']
 })
-export class ProjectsPageComponent {
-  openProjects: Project[] = [];
-  closedProjects: Project[] = [];
+export class ProjectsPageComponent implements OnInit {
+  openProjects: ProjectResponse[] = [];
+  closedProjects: ProjectResponse[] = [];
 
-  constructor(private router: Router) {}
+  constructor(@Inject(ProjectService) private projectService: ProjectService, private router: Router) {}
 
-  //TODO: Futuramente, buscar a situação do projeto (aberto ou fechado) a partir do backend para mudar a lógica de exibição
   ngOnInit(): void {
-    this.openProjects = [
-      { id: 1, title: 'Projeto 01', imageUrl: '/assets/img/plano1.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'success' },
-      { id: 2, title: 'Projeto 02', imageUrl: '/assets/img/plano2.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'success' },
-      { id: 3, title: 'Projeto 03', imageUrl: '/assets/img/plano3.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'success' },
-      { id: 4, title: 'Projeto 04', imageUrl: '/assets/img/plano1.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'success' },
-      { id: 5, title: 'Projeto 05', imageUrl: '/assets/img/plano2.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'success' },
-    ];
-
-    this.closedProjects = [
-      { id: 6, title: 'Projeto 06', imageUrl: '/assets/img/plano1.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'secondary' },
-      { id: 7, title: 'Projeto 07', imageUrl: '/assets/img/plano2.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'secondary' },
-      { id: 8, title: 'Projeto 08', imageUrl: '/assets/img/plano3.jpg', description: 'Lorem ipsum dolor sit amet...', buttonStyle: 'secondary' },
-    ];
+    this.loadProjects();
   }
 
-  goToProjects(projectId: number): void {
+  //carregando projetos planned/in progress e completed/cancelled
+  loadProjects(): void {
+    this.projectService.getAll().subscribe({
+      next: (projects) => {
+        this.openProjects = projects.filter(p => p.status === 'PLANNED' || p.status === 'IN_PROGRESS');
+        this.closedProjects = projects.filter(p => p.status === 'COMPLETED' || p.status === 'CANCELLED');
+      },
+      error: (err) => console.error('Erro ao carregar projetos', err)
+    });
+  }
+
+  goToProject(projectId: number): void {
     this.router.navigate(['/projects', projectId]);
   }
 }

@@ -1,28 +1,58 @@
 <app-page-layout [title]="'Projetos'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
 
-  <!--ROW 1 - PROJETOS ABERTOS-->
+  <!-- ROW 1 - PROJETOS ABERTOS -->
   <app-section-title title="Projetos em Aberto">
-    <button class="btn" type="button">
-      <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" data-bs-toggle="modal"
-        data-bs-target="#modalCriarNovoProjeto">
+    <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
+      <img src="/assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
     </button>
   </app-section-title>
 
   <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-5 pb-3">
     <div class="col" *ngFor="let project of openProjects">
-      <app-project-card [project]="project" variant="detailed">
-      </app-project-card>
+      <div class="card h-100" (click)="goToProject(project.id)" style="cursor: pointer;">
+        <img
+          [src]="project.phases?.[0]?.imageUrl || ''"
+          class="card-img-top"
+          alt="{{ project.name }}"
+        >
+        <div class="card-body">
+          <h5 class="card-title">{{ project.name }}</h5>
+          <p class="card-text">{{ project.description }}</p>
+          <p class="mb-1"><strong>Status:</strong> {{ project.status }}</p>
+          <p class="mb-1"><strong>Valor total:</strong> {{ project.totalValue | currency:'BRL' }}</p>
+          <p class="mb-0" *ngIf="project.estimatedStartDate && project.estimatedEndDate">
+            <strong>Datas estimadas:</strong><br>
+            <strong>Inicio: {{ project.estimatedStartDate }}</strong><br>
+            <strong>Fim: {{ project.estimatedEndDate }}</strong>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!--ROW 2 - PROJETOS FECHADOS-->
-  <app-section-title title="Projetos Fechados">
-  </app-section-title>
+  <!-- ROW 2 - PROJETOS FECHADOS -->
+  <app-section-title title="Projetos Fechados"></app-section-title>
 
   <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-5 pb-3">
     <div class="col" *ngFor="let project of closedProjects">
-      <app-project-card [project]="project" variant="detailed">
-      </app-project-card>
+      <div class="card h-100" (click)="goToProject(project.id)" style="cursor: pointer; opacity: 0.8;">
+        <img
+          [src]="project.phases?.[0]?.imageUrl || '/assets/img/default-project.jpg'"
+          class="card-img-top"
+          alt="{{ project.name }}"
+        >
+        <div class="card-body">
+          <h5 class="card-title">{{ project.name }}</h5>
+          <p class="card-text">{{ project.description }}</p>
+          <p class="mb-1"><strong>Status:</strong> {{ project.status }}</p>
+          <p class="mb-1"><strong>Valor total:</strong> {{ project.totalValue | currency:'BRL' }}</p>
+          <p class="mb-0" *ngIf="project.estimatedStartDate && project.estimatedEndDate">
+            <strong>Datas estimadas:</strong><br>
+            <strong>Inicio: {{ project.estimatedStartDate }}</strong><br>
+            <strong>Fim: {{ project.estimatedEndDate }}</strong>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 

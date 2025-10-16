@@ -58,7 +58,14 @@ public class TestConfig implements CommandLineRunner {
         project2.setDescription("Projeto comercial de loja esportiva");
         project2.setStatus(Status.PLANNED);
 
-        projectRepository.saveAll(Arrays.asList(project1, project2));
+        Project project3 = new Project();
+        project3.setName("Loja Dimas Assistencia Tecnica");
+        project3.setEstimatedStartDate(LocalDate.of(2025, 3, 21));
+        project3.setEstimatedEndDate(LocalDate.of(2025, 5, 17));
+        project3.setDescription("Projeto comercial de assistência técnica");
+        project3.setStatus(Status.COMPLETED);
+
+        projectRepository.saveAll(Arrays.asList(project1, project2, project3));
 
         // ==== PROJECT PHASES ====
         Phase phase1 = new Phase(null, "Estudo Preliminar", "Plantas e volumetria",
@@ -77,7 +84,11 @@ public class TestConfig implements CommandLineRunner {
                 LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15),
                 null, null, 15, null, project2);
 
-        phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4));
+        Phase phase5 = new Phase(null, "Nome da Fase 5", "Definição da Fase 5",
+        LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15),
+        null, null, 15, null, project3);
+
+        phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4, phase5));
     }
 
 }
