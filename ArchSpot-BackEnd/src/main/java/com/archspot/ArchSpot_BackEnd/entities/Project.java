@@ -1,6 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.entities;
 
 import com.archspot.ArchSpot_BackEnd.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -34,9 +35,14 @@ public class Project {
     // valor total do projeto (será calculado a partir das parcelas)
     private BigDecimal totalValue;
 
-    // relacionamento com fases
+    // associação com fases
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Phase> phases = new ArrayList<>();
+
+    // associação com users
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // evita loop no JSON; exposição via DTOs
+    private List<UserProject> userProjects = new ArrayList<>();
 
     // Métodos de negócio
     public void finalizeProject() {
