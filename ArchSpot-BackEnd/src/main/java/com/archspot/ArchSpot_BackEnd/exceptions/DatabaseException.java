@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.services.exceptions;
+package com.archspot.ArchSpot_BackEnd.exceptions;
 
 public class DatabaseException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
