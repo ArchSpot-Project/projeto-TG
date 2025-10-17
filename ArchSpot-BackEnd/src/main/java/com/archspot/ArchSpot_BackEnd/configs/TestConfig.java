@@ -113,8 +113,11 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up5 = new UserProject(user2, project2, UserRole.STAFF);
                 UserProject up6 = new UserProject(user1, project3, UserRole.ADMIN);
                 UserProject up7 = new UserProject(user2, project4, UserRole.ADMIN);
+                UserProject up8 = new UserProject(user4, project3, UserRole.ADMIN);
+                UserProject up9 = new UserProject(user4, project4, UserRole.STAFF);
+                UserProject up10 = new UserProject(user1, project4, UserRole.ADMIN);
 
-                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7));
+                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7, up8, up9, up10));
         }
 
 }

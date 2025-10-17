@@ -7,6 +7,7 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ProjectCardComponent } from './project-card/project-card.component';
 import { SectionTitleComponent } from './section-title/section-title.component';
 import { TableComponent } from './table/table.component';
+import { StatusTranslatePipe } from '../pipes/project-status.pipe';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { TableComponent } from './table/table.component';
     ProjectStatusBarComponent,
     ProjectCardComponent,
     SectionTitleComponent,
-    TableComponent
+    TableComponent,
+    StatusTranslatePipe
   ],
   imports: [
     CommonModule,
@@ -25,7 +27,8 @@ import { TableComponent } from './table/table.component';
     ProjectStatusBarComponent,
     ProjectCardComponent,
     SectionTitleComponent,
-    TableComponent
+    TableComponent,
+    StatusTranslatePipe
   ],
   providers: [
     provideNgxMask()

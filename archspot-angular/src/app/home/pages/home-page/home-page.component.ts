@@ -1,52 +1,55 @@
-import { Component, OnInit } from '@angular/core';
-import { User } from '../../../core/models/user.model';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface Project {
-  id: number;
-  title: string;
-  imageUrl: string;
-}
+import { AuthService } from '../../../core/services/auth.service';
+import { ProjectResponse, ProjectService } from '../../../services/project.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.css'
+  styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent implements OnInit {
+  openProjects: ProjectResponse[] = [];
+  closedProjects: ProjectResponse[] = [];
 
-  users: User[] = [];
-  myProjects: Project[] = [];
-  sharedProjects: Project[] = [];
-  recentProjects: Project[] = [];
+  constructor(
+    private projectService: ProjectService,
+    @Inject(AuthService) private authService: AuthService,
+    private router: Router
+  ) { }
 
-  cardBorderColor: { [key: string]: string } = {
-    'border-color': '#78A58B'
-  };
-
-  constructor(private router: Router) { };
-
-  //TODO: Futuramente, buscar os projetos a partir do backend
   ngOnInit(): void {
-    this.myProjects = [
-      { id: 1, title: 'Projeto 01', imageUrl: '/assets/img/plano1.jpg' },
-      { id: 2, title: 'Projeto 02', imageUrl: '/assets/img/plano2.jpg' },
-      { id: 3, title: 'Projeto 03', imageUrl: '/assets/img/plano3.jpg' },
-      { id: 4, title: 'Projeto 04', imageUrl: '/assets/img/plano1.jpg' },
-      { id: 5, title: 'Projeto 05', imageUrl: '/assets/img/plano2.jpg' },
-    ];
+    this.loadUserProjects();
+  }
 
-    this.sharedProjects = [
-      { id: 6, title: 'Projeto 06', imageUrl: '/assets/img/plano1.jpg' },
-      { id: 7, title: 'Projeto 07', imageUrl: '/assets/img/plano2.jpg' },
-      { id: 8, title: 'Projeto 08', imageUrl: '/assets/img/plano3.jpg' },
-    ];
+  loadUserProjects(): void {
+    const user = this.authService.getUser();
+    if (!user || !user.id) {
+      console.error('Usuário não logado');
+      return;
+    }
 
-    this.recentProjects = [
-      { id: 9, title: 'Projeto 09', imageUrl: '/assets/img/plano1.jpg' },
-      { id: 10, title: 'Projeto 10', imageUrl: '/assets/img/plano2.jpg' },
-      { id: 11, title: 'Projeto 11', imageUrl: '/assets/img/plano3.jpg' },
-    ];
+    this.projectService.getProjectsByUser(user.id).subscribe({
+      next: (userProjects) => {
+        const projectRequests = userProjects.map(up =>
+          this.projectService.getProjectsById(up.projectId)
+        );
+
+        forkJoin(projectRequests).subscribe({
+          next: (projects: ProjectResponse[]) => {
+            this.openProjects = projects.filter(
+              p => p.status === 'PLANNED' || p.status === 'IN_PROGRESS'
+            );
+            this.closedProjects = projects.filter(
+              p => p.status === 'COMPLETED' || p.status === 'CANCELLED'
+            );
+          },
+          error: err => console.error('Erro ao carregar detalhes dos projetos', err)
+        });
+      },
+      error: err => console.error('Erro ao carregar projetos do usuário', err)
+    });
   }
 
   goToProjects(projectId: number): void {
