@@ -106,9 +106,12 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/frappe-gantt/dist/frappe-gantt.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/vendor/frappe-gantt/frappe-gantt.umd.js"
+            ]
           }
         }
       }

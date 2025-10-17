@@ -33,7 +33,7 @@ export class ProjectService {
     return this.http.get<ProjectResponse[]>(this.apiUrl);
   }
 
-  getProjectsById(id: number): Observable<ProjectResponse> {
+  getProjectById(id: number): Observable<ProjectResponse> {
     return this.http.get<ProjectResponse>(`${this.apiUrl}/${id}`);
   }
 

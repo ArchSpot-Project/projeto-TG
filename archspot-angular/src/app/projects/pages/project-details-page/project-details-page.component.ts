@@ -29,7 +29,7 @@ export class ProjectDetailsPageComponent {
       return;
     }
 
-    this.projectService.getProjectsById(id).subscribe({
+    this.projectService.getProjectById(id).subscribe({
       next: (project) => {
         this.project = project;
         this.loading = false;

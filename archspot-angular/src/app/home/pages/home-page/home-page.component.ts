@@ -33,7 +33,7 @@ export class HomePageComponent implements OnInit {
     this.projectService.getProjectsByUser(user.id).subscribe({
       next: (userProjects) => {
         const projectRequests = userProjects.map(up =>
-          this.projectService.getProjectsById(up.projectId)
+          this.projectService.getProjectById(up.projectId)
         );
 
         forkJoin(projectRequests).subscribe({
