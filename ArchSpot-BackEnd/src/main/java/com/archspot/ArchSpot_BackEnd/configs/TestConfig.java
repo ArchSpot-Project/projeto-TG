@@ -66,7 +66,21 @@ public class TestConfig implements CommandLineRunner {
                 project2.setDescription("Projeto comercial de loja esportiva");
                 project2.setStatus(Status.PLANNED);
 
-                projectRepository.saveAll(Arrays.asList(project1, project2));
+                Project project3 = new Project();
+                project3.setName("Dimas Assistência Técnica");
+                project3.setEstimatedStartDate(LocalDate.of(2025, 5, 2));
+                project3.setEstimatedEndDate(LocalDate.of(2025, 6, 19));
+                project3.setDescription("Projeto de loja de assistência técnica");
+                project3.setStatus(Status.COMPLETED);
+
+                Project project4 = new Project();
+                project4.setName("Munari Coworking");
+                project4.setEstimatedStartDate(LocalDate.of(2025, 1, 2));
+                project4.setEstimatedEndDate(LocalDate.of(2025, 3, 2));
+                project4.setDescription("Projeto de escritório compartilhado");
+                project4.setStatus(Status.CANCELLED);
+
+                projectRepository.saveAll(Arrays.asList(project1, project2, project3, project4));
 
                 // ==== PROJECT PHASES ====
                 Phase phase1 = new Phase(null, "Estudo Preliminar", "Plantas e volumetria",
@@ -85,7 +99,11 @@ public class TestConfig implements CommandLineRunner {
                                 LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15),
                                 null, null, 15, null, project2);
 
-                phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4));
+                Phase phase5 = new Phase(null, "Fase 5", "Definição fase 5",
+                                LocalDate.of(2025, 3, 1), LocalDate.of(2025, 5, 15),
+                                null, null, 15, null, project3);
+
+                phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4, phase5));
 
                 // ==== USER-PROJECT ASSOCIATIONS ====
                 UserProject up1 = new UserProject(user1, project1, UserRole.ADMIN);
@@ -93,8 +111,10 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up3 = new UserProject(user3, project1, UserRole.CUSTOMER);
                 UserProject up4 = new UserProject(user1, project2, UserRole.ADMIN);
                 UserProject up5 = new UserProject(user2, project2, UserRole.STAFF);
+                UserProject up6 = new UserProject(user1, project3, UserRole.ADMIN);
+                UserProject up7 = new UserProject(user2, project4, UserRole.ADMIN);
 
-                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5));
+                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7));
         }
 
 }
