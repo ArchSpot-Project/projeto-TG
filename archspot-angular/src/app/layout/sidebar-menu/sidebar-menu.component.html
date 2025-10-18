@@ -5,20 +5,11 @@
 
     <!-- se nenhum projeto estiver ativo, mostrar lista de projetos -->
     <li *ngIf="!activeProject" class="mb-3">
-      <a (click)="toggleProjectsMenu()" role="button"
+      <a (click)="goToProjects()" role="button"
         class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
         <img src="assets/img/icons/houses.svg" alt="" class="me-2 mb-1" width="20" height="20">
         Projetos
       </a>
-
-      <!-- se o menu de projetos estiver aberto, mostrar a lista de projetos -->
-      <div *ngIf="isProjectsMenuOpen" class="list-group list-group-flush mt-2">
-        <a *ngFor="let project of projects" (click)="goToProjectDetails(project.id)" role="button"
-          class="list-group-item list-group-item-action">
-          {{ project.name }}
-        </a>
-      </div>
-    </li>
 
     <!-- se um projeto estiver ativo, mostrar subitens do projeto -->
     <li *ngIf="activeProject" class="mb-3">

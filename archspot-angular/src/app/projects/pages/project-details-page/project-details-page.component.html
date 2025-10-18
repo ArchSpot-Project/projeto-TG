@@ -1,4 +1,5 @@
-<app-page-layout [title]="project?.name || 'Carregando projeto...'" [showBackButton]="true" [showStatusBar]="true">
+<app-page-layout [title]="project?.name || 'Carregando projeto...'" [showBackButton]="true" [showStatusBar]="true"
+  [projectId]="project?.id">
 
   <div *ngIf="loading" class="text-center py-5 text-muted">
     <div class="spinner-border" role="status"></div>

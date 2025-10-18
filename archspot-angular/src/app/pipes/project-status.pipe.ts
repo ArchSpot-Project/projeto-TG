@@ -8,11 +8,11 @@ export class StatusTranslatePipe implements PipeTransform {
     if (!value) return '—';
     switch (value.toUpperCase()) {
       case 'IN_PROGRESS':
-        return 'Em progresso';
+        return 'Em andamento';
       case 'CANCELED':
         return 'Cancelado';
       case 'COMPLETED':
-        return 'Completo';
+        return 'Finalizado';
       case 'PLANNED':
         return 'Em planejamento';
       case 'CANCELLED':

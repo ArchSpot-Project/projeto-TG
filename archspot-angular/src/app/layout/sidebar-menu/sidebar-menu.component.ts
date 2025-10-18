@@ -77,10 +77,6 @@ export class SidebarMenuComponent implements OnInit {
     }
   }
 
-  toggleProjectsMenu(): void {
-    this.isProjectsMenuOpen = !this.isProjectsMenuOpen;
-  }
-
   goToProjects(): void {
     this.router.navigate(['/projects']);
     this.activeProject = null;

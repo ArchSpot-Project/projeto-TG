@@ -24,8 +24,8 @@
         <div [class.col-9]="showSidebar" [class.col]="!showSidebar">
 
           <!-- condiciona exibição ou não do cronograma -->
-          <ng-container *ngIf="showStatusBar;">
-            <app-project-status-bar></app-project-status-bar>
+          <ng-container *ngIf="showStatusBar && projectId">
+            <app-project-status-bar [projectId]="projectId"></app-project-status-bar>
           </ng-container>
 
           <!-- Condiciona o tamanho da coluna de conteúdo conforme exibe ou não -->
