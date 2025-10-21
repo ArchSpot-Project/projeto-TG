@@ -48,8 +48,29 @@ public class TestConfig implements CommandLineRunner {
                                 "Designer Gráfica", "beatriz@email.com", "789");
                 User user4 = new User(null, "397.983.748-35", "Hélio", "9666-8888", "Rua das Palmeiras, 220",
                                 "Engenheiro Civil", "helio@email.com", "101112");
+                User user5 = new User(null, "439.779.870-20", "Diego", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "diego@email.com", "123");
+                User user6 = new User(null, "439.779.870-20", "Elisa", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "elisa@email.com", "123");
+                User user7 = new User(null, "439.779.870-20", "Felipe", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "felipe@email.com", "123");
+                User user8 = new User(null, "439.779.870-20", "Gabriela", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "gabriela@email.com", "123");
+                User user9 = new User(null, "439.779.870-20", "Henrique", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "henrique@email.com", "123");
+                User user10 = new User(null, "439.779.870-20", "Isabela", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "isabela@email.com", "123");
+                User user11 = new User(null, "439.779.870-20", "João", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "joao@email.com", "123");
+                User user12 = new User(null, "439.779.870-20", "Larissa", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "larissa@email.com", "123");
+                User user13 = new User(null, "439.779.870-20", "Marcos", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "marcos@email.com", "123");
+                User user14 = new User(null, "439.779.870-20", "Natália", "9999-9999", "Avenida General Carneiro, 1560",
+                                "Arquiteta", "natalia@email.com", "123");
 
-                userRepository.saveAll(Arrays.asList(user1, user2, user3, user4));
+                userRepository.saveAll(Arrays.asList(user1, user2, user3, user4, user5, user6, user7, user8, user9,
+                                user10, user11, user12, user13, user14));
 
                 // ==== PROJECTS ====
                 Project project1 = new Project();
@@ -106,7 +127,7 @@ public class TestConfig implements CommandLineRunner {
                 phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4, phase5));
 
                 // ==== USER-PROJECT ASSOCIATIONS ====
-                UserProject up1 = new UserProject(user1, project1, UserRole.ADMIN);
+                UserProject up1 = new UserProject(user1, project1, UserRole.STAFF);
                 UserProject up2 = new UserProject(user2, project1, UserRole.STAFF);
                 UserProject up3 = new UserProject(user3, project1, UserRole.CUSTOMER);
                 UserProject up4 = new UserProject(user1, project2, UserRole.ADMIN);

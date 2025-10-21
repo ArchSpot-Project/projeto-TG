@@ -43,35 +43,10 @@
       </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <div class="modal-overlay" *ngIf="showAddModal" (click)="cancelAdd()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <h4 class="modal-title mt-4">Adicionar colaborador</h4>
+    <!-- modal -->
+    <app-add-user-modal [roles]="roles" [show]="showAddModal" [existingUsers]="users" (close)="cancelAdd()"
+      (addUser)="handleAddUser($event)">
+    </app-add-user-modal>
 
-        <label class="modal-label">Pesquisar usuário</label>
-        <input type="text" placeholder="Digite nome ou email" class="modal-input p-2" [(ngModel)]="searchTerm"
-          (ngModelChange)="searchUsers($event)" />
-
-        <ul class="search-results" *ngIf="searchResults.length > 0">
-          <li *ngFor="let user of searchResults" (click)="selectUser(user)"
-            [class.selected]="selectedUser?.id === user.id">
-            ID {{ user.id }} - {{ user.name }} ({{ user.email }})
-          </li>
-        </ul>
-
-        <label class="modal-label mt-2">Função</label>
-        <select class="modal-select p-2" [(ngModel)]="selectedRole">
-          <option [ngValue]="null" disabled>Selecione uma função</option>
-          <option *ngFor="let role of roles" [ngValue]="role">{{ role | roleTranslate }}</option>
-        </select>
-
-        <div class="modal-actions mt-2 flex justify-end gap-2">
-          <button class="btn btn-outline" (click)="cancelAdd()">Cancelar</button>
-          <button class="btn btn-success" (click)="confirmAdd()" [disabled]="!selectedUser || !selectedRole">
-            Adicionar
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </app-page-layout>

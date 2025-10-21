@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { UserProjectService, UserProjectResponse, UserProjectRequest } from '../../../core/services/user-project.service';
-import { SearchUserService, UserResponse } from '../../../core/services/search-user.service';
-import { ProjectResponse, ProjectService } from '../../../core/services/project.service';
+import { UserProjectService, UserProjectResponse } from '../../../core/services/user-project.service';
+import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
+import { UserResponse } from '../../../core/services/search-user.service';
 
 @Component({
   selector: 'app-users-project-page',
@@ -14,19 +14,13 @@ export class UsersProjectPageComponent implements OnInit {
   users: UserProjectResponse[] = [];
   loading = false;
 
-  // modal de cadastro
   showAddModal = false;
-  searchTerm = '';
-  searchResults: UserResponse[] = [];
-  selectedUser: UserResponse | null = null;
-  selectedRole = 'STAFF';
   roles = ['ADMIN', 'STAFF', 'CUSTOMER'];
 
   constructor(
     private route: ActivatedRoute,
     private userProjectService: UserProjectService,
-    private projectService: ProjectService,
-    private searchUserService: SearchUserService
+    private projectService: ProjectService
   ) { }
 
   ngOnInit(): void {
@@ -64,54 +58,25 @@ export class UsersProjectPageComponent implements OnInit {
     }
   }
 
-  /** abrir modal */
   openAddUserModal(): void {
     this.showAddModal = true;
-    this.searchTerm = '';
-    this.searchResults = [];
-    this.selectedUser = null;
-    this.selectedRole = 'STAFF';
-  }
-
-  selectUser(user: UserResponse) {
-    this.selectedUser = user;
-    this.searchTerm = user.name; 
-    this.searchResults = []; 
   }
 
   cancelAdd(): void {
     this.showAddModal = false;
   }
 
-  searchUsers(term: string): void {
-    this.searchTerm = term;
-
-    if (!term.trim()) {
-      this.searchResults = [];
-      return;
-    }
-
-    this.searchUserService.search(term.trim()).subscribe({
-      next: res => this.searchResults = res || [],
-      error: err => { console.error('Erro ao buscar usuários', err); this.searchResults = []; }
-    });
-  }
-
-  confirmAdd(): void {
-    if (!this.selectedUser || !this.selectedRole) return;
-
-    const payload: any = {
-      userId: this.selectedUser.id,
+  handleAddUser(event: { user: UserResponse; role: string }): void {
+    const payload = {
+      userId: event.user.id,
       projectId: this.projectId,
-      role: this.selectedRole
+      role: event.role
     };
 
     this.userProjectService.addUserToProject(payload).subscribe({
       next: () => {
-        this.showAddModal = false;
         this.loadUsers();
-        this.selectedUser = null;
-        this.selectedRole = 'STAFF';
+        this.showAddModal = false;
       },
       error: err => console.error('Erro ao adicionar usuário', err)
     });
