@@ -3,11 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { ScheduleComponent } from './schedule.component';
 
 const routes: Routes = [
-  { path: 'projects/:projectId/schedule', component: ScheduleComponent } 
-];  
+  {
+    path: 'projects/:id/schedule',
+    component: ScheduleComponent
+  }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ScheduleRoutingModule { }
+export class ScheduleRoutingModule {}

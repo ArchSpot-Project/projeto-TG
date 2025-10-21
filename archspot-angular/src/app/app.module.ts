@@ -7,12 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { CoreModule } from './core/core.module';
 import { HomeModule } from './home/home.module';
 import { LayoutModule } from './layout/layout.module';
-import { MaintenanceModule } from './maintenance/maintenance.module';
+import { UsersProjectModule } from './users-project/users-project.module';
 import { SharedModule } from './shared/shared.module';
 import { PublicModule } from './public/public.module';
 import { HttpClientModule } from '@angular/common/http';
 import { ProjectsModule } from './projects/projects.module';
-import { EventsModule } from './events/events.module';
 import { ReportsModule } from './reports/reports.module';
 import { ProfileModule } from './profile/profile.module';
 import { DrawingsModule } from './drawings/drawings.module';
@@ -38,14 +37,13 @@ import { ScheduleModule } from './schedule/schedule.module';
     CoreModule,
     HomeModule,
     ProjectsModule,
-    EventsModule,
     ReportsModule,
     ProfileModule,
-    MaintenanceModule,
+    UsersProjectModule,
     PublicModule,
     LayoutModule,
     SharedModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
