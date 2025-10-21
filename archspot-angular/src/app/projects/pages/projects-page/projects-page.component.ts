@@ -12,19 +12,20 @@ import { AuthService } from '../../../core/services/auth.service';
 export class ProjectsPageComponent implements OnInit {
   openProjects: ProjectResponse[] = [];
   closedProjects: ProjectResponse[] = [];
+  showModal = false;
 
   constructor(
     private projectService: ProjectService,
     @Inject(AuthService) private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserProjects();
   }
 
   loadUserProjects(): void {
-    const user = this.authService.getUser(); 
+    const user = this.authService.getUser();
     if (!user || !user.id) {
       console.error('Usuário não logado');
       return;
@@ -54,5 +55,9 @@ export class ProjectsPageComponent implements OnInit {
 
   goToProject(projectId: number): void {
     this.router.navigate(['/projects', projectId]);
+  }
+
+  openModal(): void {
+    this.showModal = true;
   }
 }

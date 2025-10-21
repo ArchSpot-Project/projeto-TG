@@ -12,6 +12,7 @@ import { forkJoin } from 'rxjs';
 export class HomePageComponent implements OnInit {
   openProjects: ProjectResponse[] = [];
   closedProjects: ProjectResponse[] = [];
+  showModal = false;
 
   constructor(
     private projectService: ProjectService,
@@ -54,5 +55,9 @@ export class HomePageComponent implements OnInit {
 
   goToProjects(projectId: number): void {
     this.router.navigate(['/projects', projectId]);
+  }
+
+  openModal(): void {
+    this.showModal = true;
   }
 }

@@ -1,17 +1,21 @@
 <app-page-layout [title]="'Home'">
 
   <!-- ROW 1 - MEUS PROJETOS EM ABERTO -->
-  <app-section-title title="Meus Projetos - Em aberto">
-    <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
-      <img src="/assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
-    </button>
-  </app-section-title>
+<app-section-title title="Meus Projetos - Em aberto">
+  <!-- Botão com ícone -->
+  <button class="btn" type="button" (click)="showModal = true">
+    <img src="assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
+  </button>
+</app-section-title>
+
+<app-create-project-modal
+  [show]="showModal"
+  (close)="showModal = false">
+</app-create-project-modal>
 
   <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
     <div class="col" *ngFor="let project of openProjects">
-      <div
-        class="card shadow-sm text-center project-card"
-        (click)="goToProjects(project.id)">
+      <div class="card shadow-sm text-center project-card" (click)="goToProjects(project.id)">
 
         <div class="card-img-container">
           <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
@@ -30,9 +34,7 @@
 
   <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
     <div class="col" *ngFor="let project of closedProjects">
-      <div
-        class="card text-center project-card closed-project"
-        (click)="goToProjects(project.id)">
+      <div class="card text-center project-card closed-project" (click)="goToProjects(project.id)">
 
         <div class="card-img-container">
           <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">

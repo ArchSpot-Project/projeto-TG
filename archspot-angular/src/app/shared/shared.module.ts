@@ -9,6 +9,7 @@ import { SectionTitleComponent } from './section-title/section-title.component';
 import { TableComponent } from './table/table.component';
 import { StatusTranslatePipe } from '../core/pipes/project-status.pipe';
 import { RoleTranslatePipe } from '../core/pipes/user-roles.pipes';
+import { CreateProjectModalComponent } from '../projects/create-project-modal/create-project-modal.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { RoleTranslatePipe } from '../core/pipes/user-roles.pipes';
     ProjectStatusBarComponent,
     ProjectCardComponent,
     SectionTitleComponent,
+    CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
     RoleTranslatePipe,
@@ -29,6 +31,7 @@ import { RoleTranslatePipe } from '../core/pipes/user-roles.pipes';
     ProjectStatusBarComponent,
     ProjectCardComponent,
     SectionTitleComponent,
+    CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
     RoleTranslatePipe

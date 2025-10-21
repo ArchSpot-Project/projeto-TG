@@ -1,0 +1,41 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+input,
+select,
+textarea {
+    border: 2px solid #ccc;
+    border-radius: 0.5rem;
+    outline: none;
+    padding: 0.5rem;
+    width: 100%;
+    transition: border-color 0.2s;
+    resize: none;
+}
+
+.btn-outline:hover {
+    opacity: 0.95;
+    background-color: rgb(214, 214, 214);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #4caf50;
+}

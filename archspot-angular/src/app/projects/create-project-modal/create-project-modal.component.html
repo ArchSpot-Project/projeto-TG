@@ -1,0 +1,24 @@
+<div class="modal-overlay" *ngIf="show" (click)="cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h4 class="modal-title">Criar projeto</h4>
+
+    <hr>
+
+    <label class="fs-6 fw-semibold modal-label2">Nome</label>
+    <input type="text" class="form-control mt-1 mb-3">
+
+    <label class="fs-6 fw-semibold modal-label">Descrição</label>
+    <textarea type="text" class="form-control mt-1 mb-3"></textarea> 
+
+    <label class="fs-6 fw-semibold modal-label2">Previsão de início</label>
+    <input type="text" class="form-control mt-1 mb-3">
+
+    <label class="fs-6 fw-semibold modal-label2">Previsão de término</label>
+    <input type="text" class="form-control mt-1 mb-3">
+
+    <div class="modal-actions mt-2 flex justify-end gap-2">
+      <button class="btn btn-outline m-2" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-success">Criar projeto</button>
+    </div>
+  </div>
+</div>

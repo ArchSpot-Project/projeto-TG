@@ -1,11 +1,16 @@
 <app-page-layout [title]="'Projetos'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
 
   <!-- ROW 1 - PROJETOS ABERTOS -->
-  <app-section-title title="Projetos em Aberto">
-    <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
-      <img src="/assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
-    </button>
-  </app-section-title>
+  <app-section-title title="Meus Projetos - Em aberto">
+  <button class="btn" type="button" (click)="showModal = true">
+    <img src="assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
+  </button>
+</app-section-title>
+
+<app-create-project-modal
+  [show]="showModal"
+  (close)="showModal = false">
+</app-create-project-modal>
 
   <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4 pb-4">
     <div class="col" *ngFor="let project of openProjects">
