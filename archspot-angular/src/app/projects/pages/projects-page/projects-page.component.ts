@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ProjectService, ProjectResponse } from '../../../services/project.service';
+import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';

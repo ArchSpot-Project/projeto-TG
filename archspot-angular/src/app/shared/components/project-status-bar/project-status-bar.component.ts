@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { PhaseService } from '../../../services/phase.service';
+import { PhaseService } from '../../../core/services/phase.service';
 
 @Component({
   selector: 'app-project-status-bar',

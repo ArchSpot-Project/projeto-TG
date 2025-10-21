@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectResponse, ProjectService } from '../services/project.service';
-import { PhaseService } from '../services/phase.service';
+import { ProjectResponse, ProjectService } from '../core/services/project.service';
+import { PhaseService } from '../core/services/phase.service';
 import Gantt from 'frappe-gantt';
 
 @Component({
@@ -71,7 +71,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     }));
 
     this.gantt = new Gantt(this.ganttContainer.nativeElement, tasks, {
-      view_mode: 'Day',
+      view_mode: 'Month',
       date_format: 'YYYY-MM-DD',
       custom_popup_html: (task: any) => `
         <div class="p-2">

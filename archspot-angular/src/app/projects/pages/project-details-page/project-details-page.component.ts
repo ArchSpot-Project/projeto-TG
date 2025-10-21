@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectService, ProjectResponse } from '../../../services/project.service';
+import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
 
 @Component({
   selector: 'app-project-details-page',

@@ -1,0 +1,77 @@
+<app-page-layout [title]="'Cadastros'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
+  <div class="p-6 flex flex-col h-full">
+
+    <div class="mb-4">
+      <h3 class="fw-light">{{ project?.name || 'Carregando projeto...' }}</h3>
+      <hr>
+      <h3 class="font-semibold">Colaboradores do Projeto</h3>
+    </div>
+
+    <div *ngIf="!loading" class="flex-1 flex flex-col">
+
+      <div *ngIf="users.length > 0" class="overflow-x-auto flex-1">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Função</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users" class="hover:bg-gray-50">
+              <td>{{ user.userId }}</td>
+              <td>{{ user.userName }}</td>
+              <td>{{ user.role | roleTranslate }}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-error btn-outline" (click)="removeUser(user)" title="Remover usuário">
+                  <img src="assets/img/icons/trash3.svg" alt="Remover" class="w-4 h-4">
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="users.length === 0" class="py-10 text-center text-gray-500">
+        Nenhum colaborador associado a este projeto.
+      </div>
+
+      <div class="mt-2 flex justify-end">
+        <button class="btn btn-success" (click)="openAddUserModal()">Adicionar colaborador</button>
+      </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showAddModal" (click)="cancelAdd()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h4 class="modal-title mt-4">Adicionar colaborador</h4>
+
+        <label class="modal-label">Pesquisar usuário</label>
+        <input type="text" placeholder="Digite nome ou email" class="modal-input p-2" [(ngModel)]="searchTerm"
+          (ngModelChange)="searchUsers($event)" />
+
+        <ul class="search-results" *ngIf="searchResults.length > 0">
+          <li *ngFor="let user of searchResults" (click)="selectUser(user)"
+            [class.selected]="selectedUser?.id === user.id">
+            ID {{ user.id }} - {{ user.name }} ({{ user.email }})
+          </li>
+        </ul>
+
+        <label class="modal-label mt-2">Função</label>
+        <select class="modal-select p-2" [(ngModel)]="selectedRole">
+          <option [ngValue]="null" disabled>Selecione uma função</option>
+          <option *ngFor="let role of roles" [ngValue]="role">{{ role | roleTranslate }}</option>
+        </select>
+
+        <div class="modal-actions mt-2 flex justify-end gap-2">
+          <button class="btn btn-outline" (click)="cancelAdd()">Cancelar</button>
+          <button class="btn btn-success" (click)="confirmAdd()" [disabled]="!selectedUser || !selectedRole">
+            Adicionar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-page-layout>

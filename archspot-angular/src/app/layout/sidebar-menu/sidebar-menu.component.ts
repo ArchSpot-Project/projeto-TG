@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { UserProjectService } from '../../core/services/user-project.service';
 
 interface Project {
   id: number;
@@ -21,48 +22,45 @@ export class SidebarMenuComponent implements OnInit {
     { id: 2, name: 'Projeto 2' },
   ];
   activeProject: Project | null = null;
+  isStaffInProject: boolean = false;
 
-  //listas de itens do menu para simplificar o HTML
   projectMenuItems = [
     { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos'},
     { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos'},
     { key: 'financial', icon: 'assets/img/icons/13-financeiro.png', label: 'Financeiro'},
     { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos'},
     { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma'},
-    { key: 'events', icon: 'assets/img/icons/calendar2-event.svg', label: 'Eventos'},
   ];
   
   generalMenuItems = [
-    { icon: 'assets/img/icons/calendar2-event.svg', label: 'Eventos', action: () => this.goToEvents() },
     { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() }
   ];
 
   profileMenuItems = [
     { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() },
-    { icon: 'assets/img/icons/person-add.svg', label: 'Cadastros', action: () => this.goToMaintenance() },
-    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToMaintenance() }
+    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToSettings() }
   ];
 
   helpMenuItems = [
-    { icon: 'assets/img/icons/question-circle.svg', label: 'Ajuda', action: () => this.goToMaintenance() },
+    { icon: 'assets/img/icons/question-circle.svg', label: 'Ajuda', action: () => this.goToHelp() },
     { icon: 'assets/img/icons/box-arrow-right.svg', label: 'Sair', action: () => this.logout() }
   ];
 
   constructor(
     private authService: AuthService,
+    private userProjectService: UserProjectService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.checkActiveProject();
-    });
+    // Atualiza sempre que mudar de rota
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => this.checkActiveProject());
+
     this.checkActiveProject();
   }
 
-  //verifica se a URL atual corresponde a um projeto específico
+  /** Verifica se a URL atual corresponde a um projeto específico */
   checkActiveProject(): void {
     const urlSegments = this.router.url.split('/');
     const projectIdString = urlSegments[2];
@@ -71,10 +69,32 @@ export class SidebarMenuComponent implements OnInit {
       const projectId = parseInt(projectIdString, 10);
       this.activeProject = { id: projectId, name: `Projeto ${projectId}` };
       this.isProjectsMenuOpen = false;
+      this.checkIfUserIsStaff(projectId);
     } else {
       this.activeProject = null;
       this.isProjectsMenuOpen = true;
+      this.isStaffInProject = false;
     }
+  }
+
+  /** checar se role é STAFF */
+  private checkIfUserIsStaff(projectId: number): void {
+    const user = this.authService.getUser();
+    if (!user?.id) {
+      this.isStaffInProject = false;
+      return;
+    }
+
+    this.userProjectService.getUsersByProject(projectId).subscribe({
+      next: (users) => {
+        const match = users.find(u => u.userId === user.id && u.role === 'STAFF');
+        this.isStaffInProject = !!match;
+      },
+      error: (err) => {
+        console.error('Erro ao verificar role do usuário no projeto:', err);
+        this.isStaffInProject = false;
+      }
+    });
   }
 
   goToProjects(): void {
@@ -95,23 +115,17 @@ export class SidebarMenuComponent implements OnInit {
     }
   }
 
-  goToEvents() {
-    this.router.navigate(['/events']);
-    this.activeProject = null;
-  }
-  goToReports() {
-    this.router.navigate(['/reports']);
-    this.activeProject = null;
+  goToReports() { this.router.navigate(['/reports']); }
+  goToProfile() { this.router.navigate(['/profile']); }
+  goToSettings() { this.router.navigate(['/settings']); }
+  goToHelp() { this.router.navigate(['/help']); }
+
+  goToUsersProject() {
+    if (this.activeProject) {
+      this.router.navigate(['/projects', this.activeProject.id, 'users-project']);
+    }
   }
 
-  goToProfile() {
-    this.router.navigate(['/profile']);
-    this.activeProject = null;
-  }
-  goToMaintenance() {
-    this.router.navigate(['/maintenance']);
-    this.activeProject = null;
-  }
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);
