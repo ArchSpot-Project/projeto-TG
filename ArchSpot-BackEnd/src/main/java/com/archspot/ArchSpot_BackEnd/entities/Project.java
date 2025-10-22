@@ -44,6 +44,9 @@ public class Project {
     @JsonIgnore // evita loop no JSON; exposição via DTOs
     private List<UserProject> userProjects = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Installment> installments = new ArrayList<>();
+
     // Métodos de negócio
     public void finalizeProject() {
         this.realEndDate = LocalDate.now();

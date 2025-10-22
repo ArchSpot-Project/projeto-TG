@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.configs;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -9,11 +10,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.entities.Installment;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.entities.UserProject;
+import com.archspot.ArchSpot_BackEnd.enums.PaymentMethod;
+import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.enums.Status;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserProjectRepository;
@@ -34,6 +39,9 @@ public class TestConfig implements CommandLineRunner {
 
         @Autowired
         private UserProjectRepository userProjectRepository;
+
+        @Autowired
+        private InstallmentRepository installmentRepository;
 
         @Override
         public void run(String... args) throws Exception {
@@ -95,6 +103,38 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up5 = new UserProject(user2, project2, UserRole.STAFF);
 
                 userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5));
+
+                // ==== INSTALLMENTS ====
+                Installment ins1 = new Installment();
+                ins1.setProject(project1);
+                ins1.setEstimatedPaymentDate(LocalDate.of(2025, 2, 15));
+                ins1.setAmount(BigDecimal.valueOf(5000));
+                ins1.setPaymentStatus(PaymentStatus.PENDING);
+                ins1.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+                ins1.setDescription("Parcela inicial");
+
+                Installment ins2 = new Installment();
+                ins2.setProject(project1);
+                ins2.setEstimatedPaymentDate(LocalDate.of(2025, 3, 15));
+                ins2.setAmount(BigDecimal.valueOf(7000));
+                ins2.setPaymentStatus(PaymentStatus.PENDING);
+                ins2.setPaymentMethod(PaymentMethod.BOLETO);
+                ins2.setDescription("Segunda parcela");
+
+                Installment ins3 = new Installment();
+                ins3.setProject(project2);
+                ins3.setEstimatedPaymentDate(LocalDate.of(2025, 12, 10));
+                ins3.setAmount(BigDecimal.valueOf(8000));
+                ins3.setPaymentStatus(PaymentStatus.PENDING);
+                ins3.setPaymentMethod(PaymentMethod.DEBIT_CARD);
+                ins3.setDescription("Parcela única");
+
+                installmentRepository.saveAll(Arrays.asList(ins1, ins2, ins3));
+
+                // Associa as parcelas aos projetos (para garantir bidirecionalidade)
+                project1.getInstallments().addAll(Arrays.asList(ins1, ins2));
+                project2.getInstallments().add(ins3);
+                projectRepository.saveAll(Arrays.asList(project1, project2));
         }
 
 }
