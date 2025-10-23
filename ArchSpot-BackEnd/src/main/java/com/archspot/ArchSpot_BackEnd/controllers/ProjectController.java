@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.services.InstallmentService;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
 import com.archspot.ArchSpot_BackEnd.services.ProjectService;
 import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
@@ -43,6 +48,13 @@ public class ProjectController {
   @Autowired
   private UserProjectService userProjectService;
 
+  @Autowired
+  private InstallmentService installmentService;
+
+  /*
+   * CRUD BÁSICO DE PROJETO
+   */
+
   @GetMapping
   public ResponseEntity<List<ProjectResponseDTO>> getAll() {
     return ResponseEntity.ok(projectService.findAll());
@@ -53,14 +65,48 @@ public class ProjectController {
     return ResponseEntity.ok(projectService.findById(id));
   }
 
-  // endpoint para recuperar tudas as fases de um projeto
+  @PostMapping
+  public ResponseEntity<ProjectResponseDTO> create(@RequestBody @Valid ProjectRequestDTO dto) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(projectService.create(dto));
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<ProjectResponseDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectRequestDTO dto) {
+    return ResponseEntity.ok(projectService.update(id, dto));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
+    projectService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{id}/finalize")
+  public ResponseEntity<ProjectResponseDTO> finalizeProject(@PathVariable Long id) {
+    return ResponseEntity.ok(projectService.finalizeProject(id));
+  }
+
+  @PostMapping("/{id}/cancel")
+  public ResponseEntity<ProjectResponseDTO> cancelProject(@PathVariable Long id) {
+    return ResponseEntity.ok(projectService.cancelProject(id));
+  }
+
+  /*
+   * ENDPOINTS PARA FASES
+   */
+
+  // recuperar tudas as fases de um projeto
   @GetMapping("/{projectId}/phases")
   public ResponseEntity<List<PhaseDTO>> getPhasesByProject(@PathVariable Long projectId) {
     List<PhaseDTO> phases = phaseService.findByProject(projectId);
     return ResponseEntity.ok(phases);
   }
 
-  // endpoint para recuperar usuários em um projeto
+  /*
+   * ENDPOINTS PARA ASSOCIAÇÃO USUÁRIO-PROJETO
+   */
+
+  // recuperar usuários em um projeto
   @GetMapping("/{projectId}/users")
   public ResponseEntity<List<UserProjectResponseDTO>> getUsersByProject(@PathVariable Long projectId) {
     return ResponseEntity.ok(userProjectService.getByProject(projectId));
@@ -89,29 +135,46 @@ public class ProjectController {
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping
-  public ResponseEntity<ProjectResponseDTO> create(@RequestBody @Valid ProjectRequestDTO dto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(projectService.create(dto));
+  /*
+   * ENDPOINTS PARA PARCELAS
+   */
+
+  // Listar todas as parcelas do projeto (ou filtrar por status p. ex.: "endpoint
+  // + ?status=PENDING")
+  @GetMapping("/{projectId}/installments")
+  public ResponseEntity<List<InstallmentResponseDTO>> getInstallmentsByProject(
+      @PathVariable Long projectId,
+      @RequestParam(required = false) String status) {
+
+    if (status == null) {
+      return ResponseEntity.ok(installmentService.findByProject(projectId));
+    }
+
+    try {
+      PaymentStatus paymentStatus = PaymentStatus.valueOf(status.toUpperCase());
+      return ResponseEntity.ok(installmentService.findByProjectAndStatus(projectId, paymentStatus));
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status);
+    }
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<ProjectResponseDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectRequestDTO dto) {
-    return ResponseEntity.ok(projectService.update(id, dto));
+  // Totais financeiros por projeto (ou filtrar por status p. ex.: "endpoint +
+  // ?status=PENDING")
+  @GetMapping("/{projectId}/installments/total")
+  public ResponseEntity<BigDecimal> getTotal(
+      @PathVariable Long projectId,
+      @RequestParam(required = false) String status) {
+
+    if (status == null) {
+      return ResponseEntity.ok(installmentService.getTotalByProject(projectId));
+    }
+
+    try {
+      PaymentStatus paymentStatus = PaymentStatus.valueOf(status.toUpperCase());
+      return ResponseEntity.ok(installmentService.getTotalByProjectAndStatus(projectId, paymentStatus));
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status);
+    }
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
-    projectService.delete(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @PostMapping("/{id}/finalize")
-  public ResponseEntity<ProjectResponseDTO> finalizeProject(@PathVariable Long id) {
-    return ResponseEntity.ok(projectService.finalizeProject(id));
-  }
-
-  @PostMapping("/{id}/cancel")
-  public ResponseEntity<ProjectResponseDTO> cancelProject(@PathVariable Long id) {
-    return ResponseEntity.ok(projectService.cancelProject(id));
-  }
 }
