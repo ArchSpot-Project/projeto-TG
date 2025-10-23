@@ -24,4 +24,5 @@ public class ProjectResponseDTO {
     private BigDecimal totalValue;
     private Status status;
     private List<PhaseDTO> phases;
+    private List<InstallmentResponseDTO> installments;
 }

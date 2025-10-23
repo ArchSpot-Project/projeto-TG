@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
@@ -80,6 +81,36 @@ public class ProjectService {
 
   // mapeamento entidade -> DTO
   private ProjectResponseDTO toResponseDTO(Project project) {
+    List<PhaseDTO> phaseDTOs = project.getPhases() != null
+        ? project.getPhases().stream()
+            .map(phase -> new PhaseDTO(
+                phase.getId(),
+                phase.getName(),
+                phase.getDescription(),
+                phase.getEstimatedStartDate(),
+                phase.getEstimatedEndDate(),
+                phase.getRealStartDate(),
+                phase.getRealEndDate(),
+                phase.getDuration(),
+                phase.getPreviousPhase() != null ? phase.getPreviousPhase().getId() : null,
+                phase.getProject() != null ? phase.getProject().getId() : null))
+            .toList()
+        : List.of();
+
+    List<InstallmentResponseDTO> installmentDTOs = project.getInstallments() != null
+        ? project.getInstallments().stream()
+            .map(installment -> new InstallmentResponseDTO(
+                installment.getId(),
+                installment.getEstimatedPaymentDate(),
+                installment.getRealPaymentDate(),
+                installment.getPaymentMethod(),
+                installment.getPaymentStatus(),
+                installment.getAmount(),
+                installment.getDescription(),
+                installment.getProject() != null ? installment.getProject().getId() : null))
+            .toList()
+        : List.of();
+
     return new ProjectResponseDTO(
         project.getId(),
         project.getName(),
@@ -90,20 +121,7 @@ public class ProjectService {
         project.getDescription(),
         project.getTotalValue(),
         project.getStatus(),
-        project.getPhases() != null
-            ? project.getPhases().stream()
-                .map(phase -> new PhaseDTO(
-                    phase.getId(),
-                    phase.getName(),
-                    phase.getDescription(),
-                    phase.getEstimatedStartDate(),
-                    phase.getEstimatedEndDate(),
-                    phase.getRealStartDate(),
-                    phase.getRealEndDate(),
-                    phase.getDuration(),
-                    phase.getPreviousPhase() != null ? phase.getPreviousPhase().getId() : null,
-                    phase.getProject() != null ? phase.getProject().getId() : null))
-                .toList()
-            : List.of());
+        phaseDTOs,
+        installmentDTOs);
   }
 }
