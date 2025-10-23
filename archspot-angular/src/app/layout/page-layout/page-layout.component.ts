@@ -16,6 +16,8 @@ export class PageLayoutComponent {
 
   @Input() fullWidth: boolean = false; // padrão: offset-1 col-10
 
+  @Input() projectId?: number;
+
   constructor(private location: Location, private router: Router) { }
 
   goBack(): void {

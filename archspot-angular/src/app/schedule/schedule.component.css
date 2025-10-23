@@ -1,0 +1,25 @@
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.carousel-inner img {
+  height: 320px;
+  object-fit: cover;
+}
+
+#gantt {
+  width: 100%;
+  min-height: 350px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.phase-bar {
+  fill: #0d6efd !important;
+  opacity: 0.9;
+  stroke: none;
+}
+
+.gantt .bar-wrapper:hover .bar {
+  fill: #0b5ed7 !important;
+}

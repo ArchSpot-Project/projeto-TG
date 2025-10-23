@@ -1,37 +1,47 @@
 <app-page-layout [title]="'Home'">
 
-  <!--ROW 1 - MEUS PROJETOS-->
-  <app-section-title title="Meus Projetos">
-    <button class="btn" type="button">
-      <img src="/assets/img/icons/house-add.svg" alt="" width="25" height="25" 
-           data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
+  <!-- ROW 1 - MEUS PROJETOS EM ABERTO -->
+  <app-section-title title="Meus Projetos - Em aberto">
+    <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#modalCriarNovoProjeto">
+      <img src="/assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
     </button>
   </app-section-title>
 
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 
-              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
-    <div class="col" *ngFor="let project of myProjects">
-      <app-project-card [project]="project" variant="compact"></app-project-card>
+  <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
+    <div class="col" *ngFor="let project of openProjects">
+      <div
+        class="card shadow-sm text-center project-card"
+        (click)="goToProjects(project.id)">
+
+        <div class="card-img-container">
+          <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
+        </div>
+
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!--ROW 2 - PROJETOS COMPARTILHADOS-->
-  <app-section-title title="Projetos Compartilhados"></app-section-title>
+  <!-- ROW 2 - MEUS PROJETOS FECHADOS -->
+  <app-section-title title="Meus Projetos - Fechados">
+  </app-section-title>
 
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 
-              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
-    <div class="col" *ngFor="let project of sharedProjects">
-      <app-project-card [project]="project" variant="compact"></app-project-card>
-    </div>
-  </div>
+  <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
+    <div class="col" *ngFor="let project of closedProjects">
+      <div
+        class="card text-center project-card closed-project"
+        (click)="goToProjects(project.id)">
 
-  <!--ROW 3 - PROJETOS RECENTES-->
-  <app-section-title title="Abertos Recentemente"></app-section-title>
+        <div class="card-img-container">
+          <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
+        </div>
 
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 
-              g-3 bg-archspot p-3 rounded-2 text-center align-items-stretch mb-4">
-    <div class="col" *ngFor="let project of recentProjects">
-      <app-project-card [project]="project" variant="compact"></app-project-card>
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
+        </div>
+      </div>
     </div>
   </div>
 

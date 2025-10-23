@@ -1,1 +1,57 @@
 <app-page-layout [title]="'Cronograma'" [showSidebar]="false" [showBackButton]="true">
+  <div class="bg-white rounded-3 shadow-sm p-4">
+    <h3 class="fw-light mb-3">
+      {{ project?.name || 'Carregando projeto...' }}
+    </h3>
+
+    <div class="col-md-12">
+      <!-- Tabela de fases -->
+      <table class="table table-hover mb-0" *ngIf="phases.length > 0; else emptyState">
+        <thead class="table-light">
+          <tr>
+            <th></th>
+            <th>#</th>
+            <th>Etapa</th>
+            <th>Duração</th>
+            <th>Início estimado</th>
+            <th>Término estimado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let phase of phases; let i = index">
+            <td>
+              <button class="btn btn-sm p-0" data-bs-toggle="modal" data-bs-target="#modalEditarEtapa">
+                <img src="assets/img/icons/pencil-square.svg" alt="Editar" width="15" height="15">
+              </button>
+            </td>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ phase.name }}</td>
+            <td>{{ phase.duration }} dias</td>
+            <td>{{ phase.estimatedStartDate | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ phase.estimatedEndDate | date: 'dd/MM/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyState>
+        <p class="text-muted text-center my-3 fw-semibold fs-5">Nenhuma fase cadastrada neste projeto.</p>
+      </ng-template>
+
+      <!-- Link para adicionar nova fase -->
+      <div class="mt-3">
+        <a href="#"
+           class="link-dark link-opacity-50-hover link-underline-opacity-0 fs-6 d-inline-flex align-items-center"
+           data-bs-toggle="modal" data-bs-target="#modalNovaEtapa">
+          <img src="assets/img/icons/plus-circle.svg" class="me-2" alt="Adicionar" width="15" height="15">
+          Adicionar nova etapa
+        </a>
+      </div>
+
+      <!-- Gantt Chart -->
+      <div class="mt-5">
+        <h5 class="fw-semibold mb-3">Cronograma Visual</h5>
+        <div #ganttContainer id="gantt"></div>
+      </div>
+    </div>
+  </div>
+</app-page-layout>

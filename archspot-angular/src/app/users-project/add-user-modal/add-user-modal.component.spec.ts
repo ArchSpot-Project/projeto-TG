@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EventsPageComponent } from './events-page.component';
+import { AddUserModalComponent } from './add-user-modal.component';
 
-describe('EventsPageComponent', () => {
-  let component: EventsPageComponent;
-  let fixture: ComponentFixture<EventsPageComponent>;
+describe('AddUserModalComponent', () => {
+  let component: AddUserModalComponent;
+  let fixture: ComponentFixture<AddUserModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [EventsPageComponent]
+      declarations: [AddUserModalComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EventsPageComponent);
+    fixture = TestBed.createComponent(AddUserModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

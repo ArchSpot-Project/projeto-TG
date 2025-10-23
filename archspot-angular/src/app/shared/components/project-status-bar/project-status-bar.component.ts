@@ -1,10 +1,38 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { PhaseService } from '../../../core/services/phase.service';
 
 @Component({
   selector: 'app-project-status-bar',
   templateUrl: './project-status-bar.component.html',
-  styleUrl: './project-status-bar.component.css'
+  styleUrls: ['./project-status-bar.component.css']
 })
-export class ProjectStatusBarComponent {
+export class ProjectStatusBarComponent implements OnInit {
+  @Input() projectId!: number;
+  phases: any[] = [];
+  minDate!: Date;
+  maxDate!: Date;
 
+  constructor(private phaseService: PhaseService) { }
+
+  ngOnInit(): void {
+    if (!this.projectId) {
+      console.error('projectId não informado.');
+      return;
+    }
+
+    this.loadPhases();
+  }
+
+  loadPhases(): void {
+    this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
+      next: (phases) => {
+        this.phases = phases.map(p => ({
+          ...p,
+          estimatedStartDate: new Date(p.estimatedStartDate),
+          estimatedEndDate: new Date(p.estimatedEndDate)
+        }));
+      },
+      error: (err) => console.error('Erro ao carregar fases do projeto', err)
+    });
+  }
 }
