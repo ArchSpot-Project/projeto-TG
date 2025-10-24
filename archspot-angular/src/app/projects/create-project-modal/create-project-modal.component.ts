@@ -1,135 +1,158 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { UserResponse } from '../../core/services/search-user.service';
-import { ProjectService, CreateProjectRequest, ProjectResponse } from '../../core/services/project.service';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
-
-interface ProjectUser {
-  userId: number;
-  userName: string;
-  role: string;
-}
+import { ProjectService } from '../../core/services/project.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserResponse } from '../../core/services/search-user.service';
 
 @Component({
   selector: 'app-create-project-modal',
   templateUrl: './create-project-modal.component.html',
-  styleUrls: ['./create-project-modal.component.css']
+  styleUrls: ['./create-project-modal.component.scss']
 })
-export class CreateProjectModalComponent implements OnInit, OnChanges {
-  @Input() show = false;
-  @Input() currentUserId!: number;
-  @Input() currentUserName!: string;
+export class CreateProjectModalComponent implements OnInit {
+  @Input() show: boolean = false;
+  @Input() currentUserId?: number;
+  @Input() currentUserName?: string;
   @Output() close = new EventEmitter<void>();
   @Output() projectCreated = new EventEmitter<void>();
 
-  projectName = '';
-  projectDescription = '';
-  estimatedStartDate = '';
-  estimatedEndDate = '';
-  status = 'PLANNED';
+  roles: string[] = ['STAFF', 'CUSTOMER'];
+  projectName: string = '';
+  projectDescription: string = '';
+  estimatedStartDate: string = '';
+  estimatedEndDate: string = '';
 
-  users: ProjectUser[] = [];
-  showAddModal = false;
-  loading = false;
-  roles = ['ADMIN', 'STAFF', 'CUSTOMER'];
+  showAddModal: boolean = false;
+  users: { id: number; name: string; role: string }[] = [];
 
-  constructor(private projectService: ProjectService) { }
+  constructor(
+    private projectService: ProjectService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-  if (this.currentUserId != null && this.currentUserName != null) {
-    this.users = [{
-      userId: this.currentUserId,
-      userName: this.currentUserName,
-      role: 'ADMIN'
-    }];
-  } 
-}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.show && this.currentUserId && this.currentUserName) {
-      const exists = this.users.some(u => u.userId === this.currentUserId);
-      if (!exists) {
-        this.users = [{
-          userId: this.currentUserId,
-          userName: this.currentUserName,
-          role: 'ADMIN'
-        }, ...this.users]; 
+    if (!this.currentUserId || !this.currentUserName) {
+      const user = this.authService.getUser();
+      if (user) {
+        this.currentUserId = user.id;
+        this.currentUserName = user.name;
+      } else {
+        console.error('Usuário não autenticado');
+        alert('Erro: usuário não logado.');
       }
     }
   }
 
   cancel(): void {
-    this.show = false;
+    this.resetForm();
     this.close.emit();
   }
 
-  openAddUserModal(): void { this.showAddModal = true; }
-  cancelAdd(): void { this.showAddModal = false; }
+  openAddUserModal(): void {
+    this.showAddModal = true;
+  }
 
-  handleAddUser(event: { user: UserResponse; role: string }): void {
-    if (this.users.some(u => u.userId === event.user.id)) {
-      alert('Este usuário já foi adicionado.');
-      return;
-    }
-    this.users.push({ userId: event.user.id, userName: event.user.name, role: event.role });
+  cancelAdd(): void {
     this.showAddModal = false;
   }
 
-  removeUser(user: ProjectUser): void {
-    if (user.role === 'ADMIN' && user.userId === this.currentUserId) {
-      alert('O usuário administrador do projeto não pode ser removido.');
-      return;
+  //adicionar usuarios ao projeto - incluindo o usuário corrente
+  handleAddUser(data: { user: UserResponse; role: string }) {
+    const userObj = {
+      id: data.user.id,
+      name: data.user.name,
+      role: data.role
+    };
+
+    const exists = this.users.find(u => u.id === userObj.id);
+    if (!exists) {
+      this.users.push(userObj);
     }
-    this.users = this.users.filter(u => u.userId !== user.userId);
+  }
+
+  removeUser(userId: number): void {
+    this.users = this.users.filter(u => u.id !== userId);
   }
 
   createProject(): void {
-    if (!this.projectName || !this.estimatedStartDate || !this.estimatedEndDate) {
-      alert('Preencha todos os campos obrigatórios.');
+    if (!this.projectName.trim()) {
+      alert('O nome do projeto é obrigatório.');
+      return;
+    } else if (!this.estimatedStartDate) {
+      alert('A data de início é obrigatória.');
+      return;
+    } else if (!this.estimatedEndDate) {
+      alert('A data de término é obrigatória.');
       return;
     }
 
-    this.loading = true;
+    //validação de datas
+    if (this.estimatedStartDate && this.estimatedEndDate) {
+      const start = new Date(this.estimatedStartDate);
+      const end = new Date(this.estimatedEndDate);
+      if (start > end) {
+        alert('A data de início não pode ser maior que a data de término.');
+        return;
+      }
+    }
 
-    const payload: CreateProjectRequest = {
+    //dados do projeto a ser criado
+    const projectData = {
       name: this.projectName,
       description: this.projectDescription,
       estimatedStartDate: this.estimatedStartDate,
       estimatedEndDate: this.estimatedEndDate,
-      status: this.status
+      status: 'PLANNED'
     };
 
-    this.projectService.createProject(payload).subscribe({
-      next: (project: ProjectResponse) => {
-        const projectId = project.id;
+    //criando projeto
+    this.projectService.createProject(projectData).subscribe({
+      next: (project) => {
+        const assignments = [];
 
-        const allUsers = this.users.some(u => u.userId === this.currentUserId)
-          ? this.users
-          : [{ userId: this.currentUserId, userName: this.currentUserName, role: 'ADMIN' }, ...this.users];
+        // associa usuário logado como ADMIN
+        if (this.currentUserId) {
+          assignments.push(
+            this.projectService.assignUserToProject(project.id, this.currentUserId, 'ADMIN')
+          );
+        }
 
-        const requests = allUsers.map(u =>
-          this.projectService.assignUserToProject(projectId, u.userId, u.role)
-        );
+        // associa colaboradores adicionados
+        this.users.forEach(user => {
+          assignments.push(
+            this.projectService.assignUserToProject(project.id, user.id, user.role)
+          );
+        });
 
-        forkJoin(requests).subscribe({
+        forkJoin(assignments).subscribe({
           next: () => {
+            alert(`Projeto "${project.name}" criado com sucesso!`);
             this.projectCreated.emit();
-            this.loading = false;
+            this.resetForm();
+            this.users = [];
             this.cancel();
-            alert(`Projeto ${project.name} criado com sucesso`);
           },
-          error: err => {
-            console.error('Erro ao associar usuários', err);
+          error: (err) => {
+            console.error('Erro ao associar usuários:', err);
+            alert('Projeto criado, mas os usuários não foram associados.');
             this.projectCreated.emit();
-            this.loading = false;
+            this.resetForm();
+            this.users = [];
             this.cancel();
           }
         });
       },
-      error: err => {
-        console.error('Erro ao criar projeto', err);
+      error: (err) => {
+        console.error('Erro ao criar projeto:', err);
         alert('Erro ao criar projeto.');
-        this.loading = false;
       }
     });
+  }
+
+  private resetForm(): void {
+    this.projectName = '';
+    this.projectDescription = '';
+    this.estimatedStartDate = '';
+    this.estimatedEndDate = '';
   }
 }

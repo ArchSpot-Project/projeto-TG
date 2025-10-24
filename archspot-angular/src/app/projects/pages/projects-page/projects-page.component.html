@@ -33,8 +33,8 @@
           </p>
 
           <div class="border-top pt-2 mt-2 small">
-            <p class="mb-1"><strong>Início:</strong> {{ project.estimatedStartDate || '-' }}</p>
-            <p class="mb-1"><strong>Fim:</strong> {{ project.estimatedEndDate || '-' }}</p>
+            <p class="mb-1"><strong>Início:</strong> {{ project.estimatedStartDate | date:'dd-MM-yyyy'}}</p>
+            <p class="mb-1"><strong>Fim:</strong> {{ project.estimatedEndDate | date:'dd-MM-yyyy' }}</p>
           </div>
         </div>
       </div>
