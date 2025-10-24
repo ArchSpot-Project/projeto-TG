@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -14,9 +14,12 @@ export class ProjectsPageComponent implements OnInit {
   closedProjects: ProjectResponse[] = [];
   showModal = false;
 
+  currentUserId!: number;
+  currentUserName!: string;
+
   constructor(
     private projectService: ProjectService,
-    @Inject(AuthService) private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) { }
 
@@ -31,7 +34,9 @@ export class ProjectsPageComponent implements OnInit {
       return;
     }
 
-    this.projectService.getProjectsByUser(user.id).subscribe({
+    const userId = user.id;
+
+    this.projectService.getProjectsByUser(userId).subscribe({
       next: (userProjects) => {
         const projectRequests = userProjects.map(up =>
           this.projectService.getProjectById(up.projectId)
@@ -58,6 +63,13 @@ export class ProjectsPageComponent implements OnInit {
   }
 
   openModal(): void {
+    const user = this.authService.getUser();
+    if (!user || !user.id) {
+      alert('Usuário não logado');
+      return;
+    }
+    this.currentUserId = user.id;
+    this.currentUserName = user.name;
     this.showModal = true;
   }
 }

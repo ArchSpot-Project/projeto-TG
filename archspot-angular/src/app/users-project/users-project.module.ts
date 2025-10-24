@@ -5,13 +5,10 @@ import { UsersProjectPageComponent } from './pages/users-project-page/users-proj
 import { FormsModule } from '@angular/forms';
 import { LayoutModule } from '../layout/layout.module';
 import { SharedModule } from '../shared/shared.module';
-import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
-
 
 @NgModule({
   declarations: [
     UsersProjectPageComponent,
-    AddUserModalComponent
   ],
   imports: [
     CommonModule,

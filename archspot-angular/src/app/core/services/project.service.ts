@@ -22,12 +22,20 @@ export interface UserProjectResponse {
   role: string;
 }
 
+export interface CreateProjectRequest {
+  name: string;
+  estimatedStartDate: string;
+  estimatedEndDate: string;
+  description?: string;
+  status?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private apiUrl = 'http://localhost:8080/projects';
   private userApiUrl = 'http://localhost:8080/users';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<ProjectResponse[]> {
     return this.http.get<ProjectResponse[]>(this.apiUrl);
@@ -39,5 +47,16 @@ export class ProjectService {
 
   getProjectsByUser(userId: number): Observable<UserProjectResponse[]> {
     return this.http.get<UserProjectResponse[]>(`${this.userApiUrl}/${userId}/projects`);
+  }
+
+  createProject(payload: CreateProjectRequest): Observable<ProjectResponse> {
+    return this.http.post<ProjectResponse>(this.apiUrl, payload);
+  }
+
+  assignUserToProject(projectId: number, userId: number, role: string) {
+    return this.http.post(
+      `${this.apiUrl}/${projectId}/users/${userId}?role=${role}`,
+      {}
+    );
   }
 }

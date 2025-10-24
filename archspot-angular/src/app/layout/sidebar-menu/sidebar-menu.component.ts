@@ -22,7 +22,7 @@ export class SidebarMenuComponent implements OnInit {
     { id: 2, name: 'Projeto 2' },
   ];
   activeProject: Project | null = null;
-  isStaffInProject: boolean = false;
+  isAdmInProject: boolean = false;
 
   projectMenuItems = [
     { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos'},
@@ -69,30 +69,30 @@ export class SidebarMenuComponent implements OnInit {
       const projectId = parseInt(projectIdString, 10);
       this.activeProject = { id: projectId, name: `Projeto ${projectId}` };
       this.isProjectsMenuOpen = false;
-      this.checkIfUserIsStaff(projectId);
+      this.checkIfUserIsAdm(projectId);
     } else {
       this.activeProject = null;
       this.isProjectsMenuOpen = true;
-      this.isStaffInProject = false;
+      this.isAdmInProject = false;
     }
   }
 
-  /** checar se role é STAFF */
-  private checkIfUserIsStaff(projectId: number): void {
+  /** checar se role é ADMIN */
+  private checkIfUserIsAdm(projectId: number): void {
     const user = this.authService.getUser();
     if (!user?.id) {
-      this.isStaffInProject = false;
+      this.isAdmInProject = false;
       return;
     }
 
     this.userProjectService.getUsersByProject(projectId).subscribe({
       next: (users) => {
-        const match = users.find(u => u.userId === user.id && u.role === 'STAFF');
-        this.isStaffInProject = !!match;
+        const match = users.find(u => u.userId === user.id && u.role === 'ADMIN');
+        this.isAdmInProject = !!match;
       },
       error: (err) => {
         console.error('Erro ao verificar role do usuário no projeto:', err);
-        this.isStaffInProject = false;
+        this.isAdmInProject = false;
       }
     });
   }

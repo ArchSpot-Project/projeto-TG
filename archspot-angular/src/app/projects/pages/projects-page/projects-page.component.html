@@ -9,7 +9,10 @@
 
 <app-create-project-modal
   [show]="showModal"
-  (close)="showModal = false">
+  [currentUserId]="currentUserId"
+  [currentUserName]="currentUserName"
+  (close)="showModal = false"
+  (projectCreated)="loadUserProjects()">
 </app-create-project-modal>
 
   <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4 pb-4">

@@ -10,6 +10,7 @@ import { TableComponent } from './table/table.component';
 import { StatusTranslatePipe } from '../core/pipes/project-status.pipe';
 import { RoleTranslatePipe } from '../core/pipes/user-roles.pipes';
 import { CreateProjectModalComponent } from '../projects/create-project-modal/create-project-modal.component';
+import { AddUserModalComponent } from '../users-project/add-user-modal/add-user-modal.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { CreateProjectModalComponent } from '../projects/create-project-modal/cr
     TableComponent,
     StatusTranslatePipe,
     RoleTranslatePipe,
+    AddUserModalComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +36,8 @@ import { CreateProjectModalComponent } from '../projects/create-project-modal/cr
     CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
-    RoleTranslatePipe
+    RoleTranslatePipe,
+    AddUserModalComponent
   ],
   providers: [
     provideNgxMask()
