@@ -16,24 +16,20 @@ interface Project {
 })
 export class SidebarMenuComponent implements OnInit {
 
-  isProjectsMenuOpen: boolean = true;
-  projects: Project[] = [
-    { id: 1, name: 'Projeto 1' },
-    { id: 2, name: 'Projeto 2' },
-  ];
   activeProject: Project | null = null;
   isAdmInProject: boolean = false;
 
   projectMenuItems = [
-    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos'},
-    { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos'},
-    { key: 'financial', icon: 'assets/img/icons/13-financeiro.png', label: 'Financeiro'},
-    { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos'},
-    { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma'},
+    { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos' },
+    { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos' },
+    { key: 'payments', icon: 'assets/img/icons/13-financeiro.png', label: 'Pagamentos' },
+    { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
+    { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma' },
   ];
-  
+
   generalMenuItems = [
-    { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() }
+    { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() },
+    { icon: 'assets/img/icons/02-contact.png', label: 'Contatos', action: () => this.goToContacts() },
   ];
 
   profileMenuItems = [
@@ -68,11 +64,9 @@ export class SidebarMenuComponent implements OnInit {
     if (urlSegments[1] === 'projects' && projectIdString) {
       const projectId = parseInt(projectIdString, 10);
       this.activeProject = { id: projectId, name: `Projeto ${projectId}` };
-      this.isProjectsMenuOpen = false;
       this.checkIfUserIsAdm(projectId);
     } else {
       this.activeProject = null;
-      this.isProjectsMenuOpen = true;
       this.isAdmInProject = false;
     }
   }
@@ -100,13 +94,15 @@ export class SidebarMenuComponent implements OnInit {
   goToProjects(): void {
     this.router.navigate(['/projects']);
     this.activeProject = null;
-    this.isProjectsMenuOpen = true;
+  }
+
+  goToContacts(): void {
+    this.router.navigate(['/contacts']);
+    this.activeProject = null;
   }
 
   goToProjectDetails(projectId: number): void {
     this.router.navigate(['/projects', projectId]);
-    this.activeProject = this.projects.find(p => p.id === projectId) || null;
-    this.isProjectsMenuOpen = false;
   }
 
   goToProjectSubItem(subItem: string): void {

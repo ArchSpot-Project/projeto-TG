@@ -16,9 +16,10 @@ import { ReportsModule } from './reports/reports.module';
 import { ProfileModule } from './profile/profile.module';
 import { DrawingsModule } from './drawings/drawings.module';
 import { DocumentsModule } from './documents/documents.module';
-import { FinancialModule } from './financial/financial.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PhotosModule } from './photos/photos.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     NgbModule,
     DrawingsModule,
     DocumentsModule,
-    FinancialModule,
+    PaymentsModule,
     PhotosModule,
     ScheduleModule,
     AuthModule,
@@ -44,6 +45,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     LayoutModule,
     SharedModule,
     HttpClientModule,
+    ContactsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

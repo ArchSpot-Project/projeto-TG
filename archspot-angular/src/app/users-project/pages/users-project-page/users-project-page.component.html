@@ -1,53 +1,41 @@
-<app-page-layout [title]="'Cadastros'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
-  <div class="p-6 flex flex-col min-h-screen justify-center items-center">
+<app-page-layout [title]="'Equipe'" [showSidebar]="false" [showBackButton]="true" [fullWidth]="true">
+  <div class="p-6 flex flex-col min-h-screen items-center">
 
-    <!-- Cabeçalho -->
     <div class="mb-6">
-      <h3 class="fw-light text-gray-600">
-        {{ project?.name || 'Carregando projeto...' }}
-      </h3>
-      <hr class="my-2 w-48 mx-auto" />
-      <h3 class="font-semibold text-lg">Colaboradores do Projeto</h3>
+      <h3 class="fw-light text-gray-600">{{ project?.name || 'Carregando projeto...' }}</h3>
+      <hr class="my-3 w-48 mx-auto" />
+      <h3 class="font-semibold text-lg mb-4">Colaboradores do Projeto</h3>
     </div>
 
-    <!-- Conteúdo -->
     <div *ngIf="!loading" class="w-full max-w-5xl flex flex-col items-center">
 
-      <!-- Tabela -->
       <div class="w-full overflow-auto rounded-lg border border-gray-200 shadow-sm">
         <table class="table table-zebra w-full text-center">
           <thead class="bg-gray-100">
             <tr>
-              <th class="w-20 text-center">ID</th>
-              <th class="text-center">Nome</th>
-              <th class="text-center">Função</th>
-              <th class="text-center" *ngIf="isAdmInProject">Ações</th>
+              <th class="w-20">ID</th>
+              <th>Nome</th>
+              <th>Função</th>
+              <th *ngIf="isAdmInProject">Ações</th>
             </tr>
           </thead>
-
           <tbody>
             <tr *ngFor="let user of users" class="hover:bg-gray-50">
               <td>{{ user.userId }}</td>
               <td>{{ user.userName }}</td>
-
-              <!-- funções editaveis por combobox -->
               <td>
-                <ng-container *ngIf="isAdmInProject; else roleText">
-                  <!-- o gerente nao pode alterar sua propria função -->
-                  <ng-container *ngIf="user.userId !== authService.getUser()?.id; else selfRoleText">
-                    <select [(ngModel)]="user.role" (change)="changeUserRole(user, user.roleBeforeChange ?? user.role)"
-                      class="border border-gray-300 rounded-lg px-3 py-2 text-gray-700">
-                      <option *ngFor="let role of roles" [ngValue]="role">
-                        {{ role | roleTranslate }}
-                      </option>
-                    </select>
-                  </ng-container>
-                  <!-- mostrar apenas o texto da role do proprio gerente -->
-                  <ng-template #selfRoleText>{{ user.role | roleTranslate }}</ng-template>
+                <!-- caso o gerente esteja visualizando a pagina da equipe, ele pode mudar roles e remover participantes -->
+                <ng-container *ngIf="isAdmInProject && user.userId !== authService.getUser()?.id; else roleText">
+                  <select [disabled]="user.role === 'ADMIN'" [(ngModel)]="user.role"
+                    (change)="changeUserRole(user, user.roleBeforeChange ?? user.role)"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-gray-700">
+                    <option *ngFor="let role of roles" [ngValue]="role">
+                      {{ role | roleTranslate }}
+                    </option>
+                  </select>
                 </ng-container>
                 <ng-template #roleText>{{ user.role | roleTranslate }}</ng-template>
               </td>
-
               <td *ngIf="isAdmInProject">
                 <button class="btn btn-sm btn-error btn-outline" (click)="removeUser(user)" title="Remover usuário">
                   <img src="assets/img/icons/trash3.svg" alt="Remover" class="w-4 h-4" />
@@ -58,15 +46,13 @@
         </table>
       </div>
 
-      <div class="mt-4 flex justify-center" *ngIf="isAdmInProject">
-        <button class="btn btn-success" (click)="openAddUserModal()">
-          Adicionar colaborador
-        </button>
-      </div>
+      <button class="btn btn-success mt-4" *ngIf="isAdmInProject" (click)="openAddUserModal()">
+        Adicionar colaborador
+      </button>
     </div>
 
-    <!-- modal -->
-    <app-add-user-modal [roles]="roles" [show]="showAddModal" [existingUsers]="users" (close)="cancelAdd()"
+    <!-- modal adicionar usuario -->
+    <app-add-user-modal [roles]="modalRoles" [show]="showAddModal" [existingUsers]="users" (close)="cancelAdd()"
       (addUser)="handleAddUser($event)">
     </app-add-user-modal>
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { UserProjectService, UserProjectResponse } from '../../../core/services/user-project.service';
 import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
 import { UserResponse } from '../../../core/services/search-user.service';
@@ -17,13 +18,18 @@ export class UsersProjectPageComponent implements OnInit {
   loading = false;
 
   showAddModal = false;
-  roles = ['ADMIN', 'STAFF', 'CUSTOMER'];
+
+  // roles para mudar no combo box
+  roles = ['STAFF', 'CUSTOMER'];
+
+  // roles ao adicionar um usuario no projeto via modal
+  modalRoles = ['ADMIN', 'STAFF', 'CUSTOMER'];
 
   constructor(
     private route: ActivatedRoute,
     private userProjectService: UserProjectService,
     private projectService: ProjectService,
-    public authService: AuthService 
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +44,7 @@ export class UsersProjectPageComponent implements OnInit {
     }
   }
 
+  //verificar se o usuario é adm do projeto para exibição de controles
   private checkIfUserIsAdm(projectId: number): void {
     const user = this.authService.getUser();
     if (!user?.id) {
@@ -66,34 +73,35 @@ export class UsersProjectPageComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    this.userProjectService.getUsersByProject(this.projectId).subscribe({
+    this.userProjectService.getUsersByProject(this.projectId).pipe(
+      finalize(() => (this.loading = false))
+    ).subscribe({
       next: (res) => {
         this.users = res.map(u => ({ ...u, roleBeforeChange: u.role }));
-        this.loading = false;
       },
-      error: () => {
-        this.loading = false;
-        console.error('Erro ao carregar usuários');
-      }
+      error: () => console.error('Erro ao carregar usuários')
     });
   }
 
+  //remoção de usuários com regras de admin
   removeUser(user: UserProjectResponse): void {
     const currentUser = this.authService.getUser();
 
     if (user.role === 'ADMIN' && user.userId === currentUser?.id) {
       alert(
         'Um projeto não pode ficar sem um gerente. ' +
-        'Adicione outro colaborador como gerente antes de mudar sua função ou sair do projeto.'
+        'Adicione outro colaborador como gerente antes de sair do projeto.'
       );
-      window.location.href = window.location.href;
       return;
     }
 
     if (confirm(`Deseja desassociar ${user.userName} do projeto ${this.project?.name}?`)) {
-      this.userProjectService.removeUserFromProject(user.projectId, user.userId).subscribe({
+      this.loading = true;
+      this.userProjectService.removeUserFromProject(user.projectId, user.userId).pipe(
+        finalize(() => (this.loading = false))
+      ).subscribe({
         next: () => this.loadUsers(),
-        error: err => console.error('Erro ao remover usuário', err)
+        error: (err) => console.error('Erro ao remover usuário', err)
       });
     }
   }
@@ -113,92 +121,68 @@ export class UsersProjectPageComponent implements OnInit {
       role: event.role
     };
 
+    this.loading = true;
+
+    // caso queira adicionar um gerente para sair do projeto/assumir outra role
     if (event.reassignAdmin) {
+      // localizar o gerente atual
       const currentAdmin = this.users.find(u => u.role === 'ADMIN');
 
       if (currentAdmin) {
+        // atualizar o gerente atual para STAFF
         this.userProjectService.addUserToProject({
           userId: currentAdmin.userId,
           projectId: this.projectId,
           role: 'STAFF'
         }).subscribe({
           next: () => {
-            this.userProjectService.addUserToProject(payload).subscribe(() => {
-              this.loadUsers();
-              alert(`Novo gerente definido: ${event.user.name}. O antigo gerente foi rebaixado.`);
+            // adicionar o novo gerente
+            this.userProjectService.addUserToProject(payload).subscribe({
+              next: () => {
+                this.loading = false;
+                this.showAddModal = false;
+                alert(`Novo gerente definido: ${event.user.name}. O antigo gerente foi rebaixado.`);
+                location.reload(); // recarrega página para refletir mudanças
+              },
+              error: (err) => {
+                console.error('Erro ao adicionar novo gerente', err);
+                this.loading = false;
+              }
             });
           },
-          error: err => console.error('Erro ao rebaixar antigo gerente:', err)
+          error: (err) => {
+            console.error('Erro ao rebaixar gerente antigo', err);
+            this.loading = false;
+          }
         });
-        return;
       }
-    }
-
-    this.userProjectService.addUserToProject(payload).subscribe({
-      next: () => {
-        this.loadUsers();
-        this.showAddModal = false;
-      },
-      error: err => console.error('Erro ao adicionar usuário', err)
-    });
-  }
-
-  changeUserRole(user: UserProjectResponse, oldRole: string) {
-    const currentUser = this.authService.getUser();
-    const currentAdmin = this.users.find(u => u.role === 'ADMIN');
-
-    // se outro usuário for promovido a gerente
-    if (user.role === 'ADMIN' && currentAdmin && currentAdmin.userId !== user.userId) {
-      const confirmed = confirm(
-        `⚠️ ATENÇÃO: ${user.userName} será promovido(a) a gerente. ` +
-        `O atual gerente (${currentAdmin.userName}) será rebaixado(a) para colaborador. Deseja continuar?`
-      );
-
-      if (!confirmed) {
-        user.role = oldRole;
-        return;
-      }
-
-      // muda a role do gerente atual
-      this.userProjectService.addUserToProject({
-        userId: currentAdmin.userId,
-        projectId: this.projectId,
-        role: 'STAFF'
-      }).subscribe({
-        next: () => {
-          // promove novo gerente
-          this.userProjectService.addUserToProject({
-            userId: user.userId,
-            projectId: this.projectId,
-            role: 'ADMIN'
-          }).subscribe(() => {
-            // TODO: nao esta atualizando realmente - so depois do f5 - corrigir
-            this.loadUsers();
-            this.loadProject();
-          });
-        },
-        error: err => console.error('Erro ao rebaixar antigo gerente:', err)
-      });
-
       return;
     }
 
-    //atualização comum
+    // fluxo normal para adicionar usuario que não é gerente
+    this.userProjectService.addUserToProject(payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.showAddModal = false;
+        this.loadUsers();
+      },
+      error: (err) => {
+        console.error('Erro ao adicionar usuário', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  //atualizar/adicionar a role do usuario no backend
+  changeUserRole(user: UserProjectResponse, oldRole: string): void {
+    this.loading = true;
     this.userProjectService.addUserToProject({
       userId: user.userId,
       projectId: this.projectId,
       role: user.role
-    }).subscribe(() => {
-      this.loadUsers();
-      this.loadProject();
+    }).pipe(finalize(() => (this.loading = false))).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => console.error('Erro ao atualizar função do usuário:', err)
     });
-  }
-
-  getAvailableRolesForUser(user: UserProjectResponse): string[] {
-    const currentUser = this.authService.getUser();
-    if (user.userId === currentUser?.id) {
-      return [user.role];
-    }
-    return this.roles;
   }
 }
