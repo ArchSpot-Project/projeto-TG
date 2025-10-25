@@ -25,7 +25,8 @@
 
           <!-- condiciona exibição ou não do cronograma -->
           <ng-container *ngIf="showStatusBar && projectId">
-            <app-project-status-bar [projectId]="projectId"></app-project-status-bar>
+            <app-project-status-bar [projectId]="projectId" (statusBarClick)="goToSchedule()">
+            </app-project-status-bar>
           </ng-container>
 
           <!-- Condiciona o tamanho da coluna de conteúdo conforme exibe ou não -->

@@ -2,7 +2,7 @@
   <div class="fs-4 fw-medium mb-2">Cronograma</div>
   <hr>
 
-  <div class="timeline-container" *ngIf="phases.length > 0">
+  <div class="timeline-container" *ngIf="phases.length > 0" (click)="handleClick()" style="cursor:pointer;">
     <div class="timeline-line"></div>
 
     <div class="timeline-item" *ngFor="let phase of phases">
