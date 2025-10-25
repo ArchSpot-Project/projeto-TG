@@ -14,6 +14,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   project?: ProjectResponse;
   phases: any[] = [];
   gantt!: Gantt;
+  showCreateModal = false;
 
   @ViewChild('ganttContainer', { static: false }) ganttContainer!: ElementRef;
 
@@ -35,7 +36,17 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     if (this.phases.length > 0) this.renderGantt();
   }
 
-  //validação etapa predecessora
+  openCreatePhaseModal(): void {
+    this.showCreateModal = true;
+  }
+
+  //caso seja criada uma nova etapa, colca na lista e atualiza o Gantt
+  onPhaseCreated(newPhase: any) {
+    this.phases.push(newPhase);
+    this.updatePhaseStatus();
+    setTimeout(() => this.renderGantt(), 200);
+  }
+
   canStartPhase(index: number): boolean {
     const phase = this.phases[index];
 

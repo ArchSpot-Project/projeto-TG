@@ -50,14 +50,29 @@ public class PhaseService {
 
   // criar fase
   public PhaseDTO create(PhaseCreateDTO dto) {
-
     Project project = projectRepository.findById(dto.projectId())
         .orElseThrow(() -> new RuntimeException("Project not found"));
 
-    Phase previous = null;
-    if (dto.previousPhaseId() != null) {
-      previous = phaseRepository.findById(dto.previousPhaseId())
-          .orElseThrow(() -> new RuntimeException("Previous phase not found"));
+    // pega a última fase do projeto como predecessora automaticamente
+    Phase previous = phaseRepository.findFirstByProjectIdOrderByIdDesc(dto.projectId())
+        .orElse(null);
+
+    // validação: data de fim não pode ser menor que data de início - lança erro 400
+    if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
+      if (dto.estimatedEndDate().isBefore(dto.estimatedStartDate())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "A data estimada de fim não pode ser anterior à data estimada de início.");
+      }
+    }
+
+    // validação: data de inicio da nova fase deve ser maior que a da predecessora - lança erro 400
+    if (previous != null && previous.getEstimatedStartDate() != null && dto.estimatedStartDate() != null) {
+      if (!dto.estimatedStartDate().isAfter(previous.getEstimatedStartDate())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "A data estimada de início da nova etapa deve ser maior que a data estimada de início da etapa predecessora.");
+      }
     }
 
     Phase entity = new Phase();
@@ -67,7 +82,13 @@ public class PhaseService {
     entity.setEstimatedEndDate(dto.estimatedEndDate());
     entity.setRealStartDate(dto.realStartDate());
     entity.setRealEndDate(dto.realEndDate());
-    entity.setDuration(dto.duration());
+
+    // cálculo de duração da etapa
+    if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
+      entity.setDuration(
+          (int) java.time.temporal.ChronoUnit.DAYS.between(dto.estimatedStartDate(), dto.estimatedEndDate()));
+    }
+
     entity.setPreviousPhase(previous);
     entity.setProject(project);
     entity.setStatus(PhaseStatus.NOT_STARTED);

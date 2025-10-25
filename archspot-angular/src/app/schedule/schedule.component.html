@@ -58,13 +58,17 @@
       </ng-template>
 
       <div class="mt-3">
-        <a href="#"
-           class="link-dark link-opacity-50-hover link-underline-opacity-0 fs-6 d-inline-flex align-items-center"
-           data-bs-toggle="modal" data-bs-target="#modalNovaEtapa">
+        <a class="link-dark link-opacity-50-hover link-underline-opacity-0 fs-6 d-inline-flex align-items-center"
+          (click)="openCreatePhaseModal()">
           <img src="assets/img/icons/plus-circle.svg" class="me-2" alt="Adicionar" width="15" height="15">
           Adicionar nova etapa
         </a>
       </div>
+
+      <app-create-phase-modal [show]="showCreateModal" [projectId]="projectId"
+        [lastPhaseId]="phases.length ? phases[phases.length - 1].id : null" (close)="showCreateModal = false"
+        (phaseCreated)="onPhaseCreated($event)">
+      </app-create-phase-modal>
 
       <!-- Gantt Chart -->
       <div class="mt-5">
