@@ -10,7 +10,7 @@ import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
-
+import java.util.Map;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -78,6 +78,21 @@ public class ProjectService {
     project.cancelProject();
     return toResponseDTO(projectRepository.save(project));
   }
+
+  public ProjectResponseDTO updateTitleAndDescription(Long id, Map<String, String> updates) {
+    Project project = projectRepository.findById(id) 
+        .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+
+    if (updates.containsKey("name")) {
+        project.setName(updates.get("name"));
+    }
+    if (updates.containsKey("description")) {
+        project.setDescription(updates.get("description"));
+    }
+
+    projectRepository.save(project); 
+    return toResponseDTO(project);     
+}
 
   // mapeamento entidade -> DTO
   private ProjectResponseDTO toResponseDTO(Project project) {

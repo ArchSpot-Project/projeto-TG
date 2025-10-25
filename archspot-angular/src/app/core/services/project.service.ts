@@ -59,4 +59,24 @@ export class ProjectService {
       {}
     );
   }
+
+  updateProject(projectId: number, payload: { name: string; description?: string }): Observable<ProjectResponse> {
+    return this.http.put<ProjectResponse>(`${this.apiUrl}/${projectId}`, payload);
+  }
+
+  updateProjectTitleAndDescription(projectId: number, payload: { name: string; description?: string }) {
+    return this.http.patch<ProjectResponse>(`${this.apiUrl}/${projectId}`, payload);
+  }
+
+  finalizeProject(projectId: number) {
+    return this.http.post<ProjectResponse>(`${this.apiUrl}/${projectId}/finalize`, {});
+  }
+
+  cancelProject(projectId: number) {
+    return this.http.post<ProjectResponse>(`${this.apiUrl}/${projectId}/cancel`, {});
+  }
+
+  deleteProject(projectId: number) {
+    return this.http.delete(`${this.apiUrl}/${projectId}`);
+  }
 }
