@@ -108,7 +108,9 @@ public class ProjectService {
                 phase.getRealEndDate(),
                 phase.getDuration(),
                 phase.getPreviousPhase() != null ? phase.getPreviousPhase().getId() : null,
-                phase.getProject() != null ? phase.getProject().getId() : null))
+                phase.getProject() != null ? phase.getProject().getId() : null,
+                PhaseService.calculateStatus(phase).name() 
+            ))
             .toList()
         : List.of();
 

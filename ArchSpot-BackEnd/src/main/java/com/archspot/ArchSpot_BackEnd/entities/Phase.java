@@ -1,7 +1,9 @@
 package com.archspot.ArchSpot_BackEnd.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import com.archspot.ArchSpot_BackEnd.enums.PhaseStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -26,13 +28,14 @@ public class Phase {
   @NotNull(message = "Data estimada de início não pode ser nula")
   private LocalDate estimatedStartDate;
   private LocalDate estimatedEndDate;
-  private LocalDate realStartDate;
-  private LocalDate realEndDate;
+  private LocalDateTime realStartDate;
+  private LocalDateTime realEndDate;
 
   private Integer duration;
 
   // referência simples para predecessora (para teste inicial)
-  // TODO: futuramente, previousPhase poderá ser substituído ou complementado por PhaseDependency (classe de associção).
+  // TODO: futuramente, previousPhase poderá ser substituído ou complementado por
+  // PhaseDependency (classe de associção).
   @ManyToOne
   @JoinColumn(name = "previous_phase_id")
   @JsonIgnore
@@ -44,14 +47,19 @@ public class Phase {
   @JsonIgnore
   private Project project;
 
+  // status da etapa
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private PhaseStatus status = PhaseStatus.NOT_STARTED;
+
   // construtores
   public Phase() {
   }
 
-  public Phase(Long id, String name, String description, 
-                      LocalDate estimatedStartDate, LocalDate estimatedEndDate, 
-                      LocalDate realStartDate, LocalDate realEndDate,
-                      Integer duration, Phase previousPhase, Project project) {
+  public Phase(Long id, String name, String description,
+      LocalDate estimatedStartDate, LocalDate estimatedEndDate,
+      LocalDateTime realStartDate, LocalDateTime realEndDate,
+      int duration, Phase previousPhase, Project project) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -62,6 +70,7 @@ public class Phase {
     this.duration = duration;
     this.previousPhase = previousPhase;
     this.project = project;
+    this.status = PhaseStatus.NOT_STARTED;
   }
 
 }

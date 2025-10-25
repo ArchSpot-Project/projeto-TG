@@ -2,6 +2,7 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.enums.PhaseStatus;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
 
 @RestController
@@ -59,5 +61,23 @@ public class PhaseController {
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     service.delete(id);
     return ResponseEntity.noContent().build();
+  }
+
+  @PutMapping("/{id}/start")
+  public ResponseEntity<PhaseDTO> startPhase(@PathVariable Long id) {
+    return ResponseEntity.ok(service.startPhase(id));
+  }
+
+  @PutMapping("/{id}/finish")
+  public ResponseEntity<PhaseDTO> finishPhase(@PathVariable Long id) {
+    return ResponseEntity.ok(service.finishPhase(id));
+  }
+
+  @GetMapping("/phase-status")
+  public ResponseEntity<List<String>> getPhaseStatus() {
+    List<String> phaseStatus = Arrays.stream(PhaseStatus.values())
+        .map(Enum::name)
+        .toList();
+    return ResponseEntity.ok(phaseStatus);
   }
 }

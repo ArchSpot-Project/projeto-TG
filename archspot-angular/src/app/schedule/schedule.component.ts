@@ -21,43 +21,101 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private phaseService: PhaseService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
-    if (!this.projectId) {
-      console.error('ID do projeto não encontrado na URL.');
-      return;
-    }
+    if (!this.projectId) return console.error('ID do projeto não encontrado na URL.');
 
     this.loadProject();
     this.loadPhases();
   }
 
   ngAfterViewInit(): void {
-    // renderizar o gantt se as fases estiverem carregadas
-    if (this.phases.length > 0) {
-      this.renderGantt();
-    }
+    if (this.phases.length > 0) this.renderGantt();
+  }
+
+  //validação etapa predecessora
+  canStartPhase(index: number): boolean {
+    const phase = this.phases[index];
+
+    // se já foi iniciada ou finalizada, não pode iniciar
+    if (phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED') return false;
+
+    // se realStartDate já está preenchida, então a fase já está em andamento
+    if (phase.realStartDate) return false;
+
+    return true;
+  }
+
+  canFinishPhase(index: number): boolean {
+    const phase = this.phases[index];
+
+    // pode finalizar se estiver em andamento ou se realStartDate estiver preenchida
+    return phase.status === 'IN_PROGRESS' || (!!phase.realStartDate && phase.status !== 'COMPLETED');
+  }
+
+  startPhase(phase: any) {
+    this.phaseService.startPhase(phase.id).subscribe({
+      next: updated => {
+        phase.realStartDate = updated.realStartDate;
+        phase.status = 'IN_PROGRESS';
+        this.updatePhaseStatus();
+      },
+      error: err => {
+        // erro caso a etapa predecessora não esteja COMPLETED
+        alert(err.error?.message || 'Finalize a etapa anterior antes de iniciar esta fase.');
+        console.error(err);
+      }
+    });
+  }
+
+  finishPhase(phase: any) {
+    this.phaseService.finishPhase(phase.id).subscribe({
+      next: updated => {
+        // término real da etapa com data e hora atual
+        phase.realEndDate = updated.realEndDate;
+        phase.status = 'COMPLETED';
+        this.updatePhaseStatus();
+      },
+      error: err => console.error(err)
+    });
   }
 
   loadProject(): void {
     this.projectService.getProjectById(this.projectId).subscribe({
-      next: (project) => this.project = project,
-      error: (err) => console.error('Erro ao carregar projeto', err)
+      next: project => this.project = project,
+      error: err => console.error('Erro ao carregar projeto', err)
     });
   }
 
   loadPhases(): void {
     this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
-      next: (phases) => {
+      next: phases => {
         this.phases = phases;
+        this.updatePhaseStatus();
         setTimeout(() => this.renderGantt(), 200);
       },
-      error: (err) => console.error('Erro ao carregar fases do projeto', err)
+      error: err => console.error('Erro ao carregar fases', err)
     });
   }
 
+  updatePhaseStatus() {
+    const today = new Date();
+    this.phases.forEach(p => {
+      if (p.realEndDate) {
+        p.status = 'COMPLETED';
+      } else if (p.realStartDate) {
+        p.status = 'IN_PROGRESS';
+      } else if (new Date(p.estimatedEndDate) < today) {
+        p.status = 'OVERDUE';
+      } else {
+        p.status = 'NOT_STARTED';
+      }
+    });
+  }
+
+  //gantt
   renderGantt(): void {
     if (!this.ganttContainer) return;
 
