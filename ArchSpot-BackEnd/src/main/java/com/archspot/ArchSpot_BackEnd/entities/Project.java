@@ -29,7 +29,7 @@ public class Project {
     private LocalDate realStartDate;
     private LocalDate realEndDate;
 
-    private String Description;
+    private String description;
     private Status status;
 
     // valor total do projeto (será calculado a partir das parcelas)
@@ -44,8 +44,14 @@ public class Project {
     @JsonIgnore // evita loop no JSON; exposição via DTOs
     private List<UserProject> userProjects = new ArrayList<>();
 
+    // associação com parcelas
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Installment> installments = new ArrayList<>();
+
+    // associação com diretórios
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Directory> directories = new ArrayList<>();
 
     // Métodos de negócio
     public void finalizeProject() {

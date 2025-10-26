@@ -1,16 +1,18 @@
 package com.archspot.ArchSpot_BackEnd.entities;
 
+import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
 import jakarta.persistence.*;
-import lombok.Data;
-
+import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
-
 @Entity
-@Table(name = "tb_directories")
+@Table(name = "tb_directory")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Directory {
 
     @Id
@@ -19,7 +21,7 @@ public class Directory {
 
     private String name;
 
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate; // preenchido com LocalDateTime.now() no service
 
     @Enumerated(EnumType.STRING)
     private DirectoryType type; // DRAWINGS ou DOCUMENTS
@@ -28,6 +30,12 @@ public class Directory {
     @JoinColumn(name = "project_id")
     private Project project;
 
+    @Builder.Default
     @OneToMany(mappedBy = "directory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Document> documents;
+    private List<Document> documents = new ArrayList<>();
+
+    public void addDocument(Document document) {
+        documents.add(document);
+        document.setDirectory(this);
+    }
 }
