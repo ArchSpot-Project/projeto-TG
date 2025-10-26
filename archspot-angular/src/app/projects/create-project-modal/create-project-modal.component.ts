@@ -131,6 +131,7 @@ export class CreateProjectModalComponent implements OnInit {
             this.resetForm();
             this.users = [];
             this.cancel();
+            location.reload();
           },
           error: (err) => {
             console.error('Erro ao associar usuários:', err);

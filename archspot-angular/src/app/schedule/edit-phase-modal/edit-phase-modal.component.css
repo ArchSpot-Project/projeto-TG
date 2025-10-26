@@ -1,0 +1,70 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.modal-label,
+.modal-label2 {
+  text-align: left;
+}
+
+textarea{
+  resize: none;
+}
+
+.edit-phase-modal .modal-label,
+.edit-phase-modal .modal-label2 {
+  text-align: left;
+  display: block;
+}
+
+.modal-content.edit-phase-modal {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 1rem;
+  width: 700px;
+  max-width: 95vw;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-body label {
+  color: #555;
+}
+
+.modal-body input,
+.modal-body textarea {
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  transition: border-color 0.2s ease;
+}
+
+.modal-body input:focus,
+.modal-body textarea:focus {
+  border-color: #198754; 
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+}
+
+.modal-footer {
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

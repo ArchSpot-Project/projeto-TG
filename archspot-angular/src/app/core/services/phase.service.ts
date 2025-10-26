@@ -21,6 +21,14 @@ export class PhaseService {
     return this.http.post<any>(`${this.apiUrl}`, body);
   }
 
+  updatePhase(phaseId: number, phase: any) {
+    return this.http.put<any>(`${this.apiUrl}/${phaseId}`, phase);
+  }
+
+  deletePhase(phaseId: number) {
+    return this.http.delete(`${this.apiUrl}/${phaseId}`);
+  }
+
   startPhase(id: number) {
     return this.http.put<any>(`${this.apiUrl}/${id}/start`, {});
   }
