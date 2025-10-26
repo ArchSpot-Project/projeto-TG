@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -11,11 +11,8 @@ export class PageLayoutComponent {
   @Input() title: string = '';
   @Input() showSidebar: boolean = true; // padrão: mostrar sidebar
   @Input() showBackButton: boolean = false; // padrão: omitir icone voltar
-
   @Input() showStatusBar: boolean = false; // padrão: omitir cronograma
-
   @Input() fullWidth: boolean = false; // padrão: offset-1 col-10
-
   @Input() projectId?: number;
 
   constructor(private location: Location, private router: Router) { }
@@ -25,6 +22,12 @@ export class PageLayoutComponent {
       this.location.back(); // ...volta para a rota anterior
     } else {
       this.router.navigate(['/home']); // Senão fallback padrão
+    }
+  }
+
+  goToSchedule(): void {
+    if (this.projectId) {
+      this.router.navigate(['/projects', this.projectId, 'schedule']);
     }
   }
 }

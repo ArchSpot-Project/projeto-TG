@@ -8,9 +8,9 @@ export class RoleTranslatePipe implements PipeTransform {
     if (!value) return '—';
     switch (value.toUpperCase()) {
       case 'ADMIN':
-        return 'Administrador';
-      case 'STAFF':
         return 'Gerente';
+      case 'STAFF':
+        return 'Colaborador';
       case 'CUSTOMER':
         return 'Cliente';
       default:

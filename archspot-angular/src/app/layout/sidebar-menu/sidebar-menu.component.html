@@ -10,48 +10,31 @@
       </a>
     </li>
 
-    <!-- Quando há projeto ativo -->
-    <li *ngIf="activeProject" class="mb-3">
-      <div class="fw-semibold text-secondary mb-2">
-        {{ activeProject.name }}
-      </div>
+    <!-- menu do projeto -->
+    <ng-container *ngIf="activeProject">
+      <li class="fw-semibold text-secondary mb-2">{{ activeProject.name }}</li>
 
-      <ng-container *ngFor="let item of projectMenuItems">
-        <li class="mb-3">
-          <a (click)="goToProjectSubItem(item.key)" role="button"
-            class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-            <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
-            {{ item.label }}
-          </a>
-        </li>
-      </ng-container>
+      <li *ngFor="let item of projectMenuItems" class="mb-3">
+        <a (click)="goToProjectSubItem(item.key)" role="button"
+          class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+          <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+          {{ item.label }}
+        </a>
+      </li>
 
-      <li *ngIf="isStaffInProject" class="mb-3">
+      <li class="mb-3">
         <a (click)="goToUsersProject()" role="button"
           class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
           <img src="assets/img/icons/person-add.svg" alt="" class="me-2 mb-1" width="20" height="20">
-          Cadastros
+          Equipe
         </a>
       </li>
+    </ng-container>
 
     <!-- Itens gerais quando não há projeto ativo -->
     <ng-container *ngIf="!activeProject">
       <hr>
-      <ng-container *ngFor="let item of generalMenuItems">
-        <li class="mb-3">
-          <a (click)="item.action()" role="button"
-            class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-            <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
-            {{ item.label }}
-          </a>
-        </li>
-      </ng-container>
-    </ng-container>
-
-    <!-- Perfil -->
-    <hr>
-    <ng-container *ngFor="let item of profileMenuItems">
-      <li class="mb-3">
+      <li *ngFor="let item of generalMenuItems" class="mb-3">
         <a (click)="item.action()" role="button"
           class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
           <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
@@ -59,17 +42,25 @@
         </a>
       </li>
     </ng-container>
+
+    <!-- perfil -->
+    <hr>
+    <li *ngFor="let item of profileMenuItems" class="mb-3">
+      <a (click)="item.action()" role="button"
+        class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+        <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+        {{ item.label }}
+      </a>
+    </li>
 
     <!-- Ajuda e Sair -->
     <hr>
-    <ng-container *ngFor="let item of helpMenuItems">
-      <li class="mb-3">
-        <a (click)="item.action()" role="button"
-          class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
-          <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
-          {{ item.label }}
-        </a>
-      </li>
-    </ng-container>
+    <li *ngFor="let item of helpMenuItems" class="mb-3">
+      <a (click)="item.action()" role="button"
+        class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">
+        <img [src]="item.icon" alt="" class="me-2 mb-1" width="20" height="20">
+        {{ item.label }}
+      </a>
+    </li>
   </ul>
 </nav>

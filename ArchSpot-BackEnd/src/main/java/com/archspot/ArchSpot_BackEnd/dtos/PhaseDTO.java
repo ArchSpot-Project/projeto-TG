@@ -1,6 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.dtos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record PhaseDTO(
     Long id,
@@ -8,9 +9,10 @@ public record PhaseDTO(
     String description,
     LocalDate estimatedStartDate,
     LocalDate estimatedEndDate,
-    LocalDate realStartDate,
-    LocalDate realEndDate,
+    LocalDateTime realStartDate,
+    LocalDateTime realEndDate,
     Integer duration,
     Long previousPhaseId,
-    Long projectId
+    Long projectId,
+    String status
 ) {}

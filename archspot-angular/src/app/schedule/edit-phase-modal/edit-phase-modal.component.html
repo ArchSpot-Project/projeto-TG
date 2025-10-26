@@ -1,0 +1,59 @@
+<div class="modal-overlay" *ngIf="show" (click)="cancel()">
+  <div class="modal-content edit-phase-modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h4 class="modal-title">Editar Etapa #{{phaseIndex}} - {{phaseName}}</h4>
+    </div>
+
+    <hr />
+
+    <div class="modal-body">
+      <div class="mb-3">
+        <label class="fs-6 fw-semibold modal-label2">Nome</label>
+        <input type="text" class="form-control mt-1" [(ngModel)]="phaseName" placeholder="Nome da etapa" />
+      </div>
+
+      <div class="mb-4">
+        <label class="fs-6 fw-semibold modal-label">Descrição</label>
+        <textarea class="form-control mt-1" rows="3" [(ngModel)]="phaseDescription"
+          placeholder="Descrição da etapa"></textarea>
+      </div>
+
+      <!-- datas estimadas -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="fs-6 fw-semibold modal-label2">Previsão de início</label>
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseEstimatedStartDate"
+            [max]="phaseEstimatedEndDate || null" />
+        </div>
+        <div class="col-md-6">
+          <label class="fs-6 fw-semibold modal-label2">Previsão de término</label>
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseEstimatedEndDate"
+            [min]="phaseEstimatedStartDate || null" />
+        </div>
+      </div>
+
+      <!-- Datas reais - so podem ser alteradas se a etapa ja foi finalizada -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="fs-6 fw-semibold modal-label2">Início real</label>
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealStartDate" [disabled]="disableRealDates"
+            [max]="phaseRealEndDate || null" />
+        </div>
+        <div class="col-md-6">
+          <label class="fs-6 fw-semibold modal-label2">Término real</label>
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealEndDate" [disabled]="disableRealDates"
+            [min]="phaseRealStartDate || null" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ações -->
+    <div class="modal-footer d-flex justify-content-end gap-3 mt-4">
+      <button class="btn btn-outline-secondary px-4" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-danger px-4" (click)="deletePhase()">Excluir etapa</button>
+      <button class="btn btn-success px-4" (click)="updatePhase()">Confirmar</button>
+    </div>
+
+  </div>
+</div>

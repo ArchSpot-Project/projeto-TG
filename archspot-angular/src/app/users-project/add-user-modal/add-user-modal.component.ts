@@ -13,13 +13,12 @@ export class AddUserModalComponent {
   @Input() show = false;
 
   @Output() close = new EventEmitter<void>();
-  @Output() addUser = new EventEmitter<{ user: UserResponse; role: string }>();
+  @Output() addUser = new EventEmitter<{ user: UserResponse; role: string; reassignAdmin?: boolean }>();
 
   searchTerm = '';
   searchResults: UserResponse[] = [];
   selectedUser: UserResponse | null = null;
   selectedRole: string | null = null;
-  duplicateUserMessage: string | null = null;
 
   constructor(private searchUserService: SearchUserService) { }
 
@@ -33,7 +32,6 @@ export class AddUserModalComponent {
     this.selectedUser = user;
     this.searchTerm = user.name;
     this.searchResults = [];
-    this.duplicateUserMessage = null;
   }
 
   searchUsers(term: string): void {
@@ -43,6 +41,7 @@ export class AddUserModalComponent {
       return;
     }
 
+    //busca de usuários
     this.searchUserService.search(this.searchTerm).subscribe({
       next: (res: UserResponse[]) => {
         if (!res) {
@@ -50,25 +49,12 @@ export class AddUserModalComponent {
           return;
         }
 
-        const normalize = (str: string) => this.removerAcentos(str).toLowerCase();
+        const normalize = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
         const normalizedTerm = normalize(this.searchTerm);
 
-        const idMatches = res.filter(u =>
-          u.id.toString().startsWith(normalizedTerm)
-        );
-
-        const nameMatches = res.filter(
-          u =>
-            normalize(u.name).startsWith(normalizedTerm) &&
-            !idMatches.includes(u)
-        );
-
-        const containsMatches = res.filter(
-          u =>
-            !idMatches.includes(u) &&
-            !nameMatches.includes(u) &&
-            normalize(u.name).includes(normalizedTerm)
-        );
+        const idMatches = res.filter(u => u.id.toString().startsWith(normalizedTerm));
+        const nameMatches = res.filter(u => normalize(u.name).startsWith(normalizedTerm) && !idMatches.includes(u));
+        const containsMatches = res.filter(u => !idMatches.includes(u) && !nameMatches.includes(u) && normalize(u.name).includes(normalizedTerm));
 
         this.searchResults = [...idMatches, ...nameMatches, ...containsMatches];
       },
@@ -82,16 +68,32 @@ export class AddUserModalComponent {
   confirmAdd(): void {
     if (!this.selectedUser || !this.selectedRole) return;
 
-    const alreadyAdded = this.existingUsers.some(
-      u => Number(u.userId) === Number(this.selectedUser!.id)
-    );
-
+    const alreadyAdded = this.existingUsers.some(u => Number(u.userId) === Number(this.selectedUser!.id));
     if (alreadyAdded) {
       alert('Usuário já está associado ao projeto.');
       this.cancel();
       return;
     }
-    this.addUser.emit({ user: this.selectedUser, role: this.selectedRole });
+
+    // regra de único gerente para um projeto
+    if (this.selectedRole === 'ADMIN') {
+      const currentAdmin = this.existingUsers.find(u => u.role === 'ADMIN');
+      if (currentAdmin) {
+        const confirmed = confirm(
+          `⚠️ ATENÇÃO: você está adicionando o usuário ${this.selectedUser!.name} como GERENTE.\n` +
+          `Sua função será alterada para COLABORADOR.\n` +
+          `Deseja continuar?`
+        );
+        if (!confirmed) return;
+
+        this.addUser.emit({ user: this.selectedUser!, role: this.selectedRole!, reassignAdmin: true });
+        this.cancel();
+        return;
+      }
+    }
+
+    // fluxo normal
+    this.addUser.emit({ user: this.selectedUser!, role: this.selectedRole! });
     this.cancel();
   }
 
@@ -100,10 +102,5 @@ export class AddUserModalComponent {
     this.searchResults = [];
     this.selectedUser = null;
     this.selectedRole = null;
-    this.duplicateUserMessage = null;
-  }
-
-  private removerAcentos(str: string): string {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 }

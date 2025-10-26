@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PhaseService } from '../../../core/services/phase.service';
 
 @Component({
@@ -11,9 +11,14 @@ export class ProjectStatusBarComponent implements OnInit {
   phases: any[] = [];
   minDate!: Date;
   maxDate!: Date;
+  @Output() statusBarClick = new EventEmitter<void>();
 
   constructor(private phaseService: PhaseService) { }
 
+  handleClick() {
+    this.statusBarClick.emit();
+  }
+  
   ngOnInit(): void {
     if (!this.projectId) {
       console.error('projectId não informado.');

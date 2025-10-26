@@ -33,4 +33,8 @@ export class UserProjectService {
   removeUserFromProject(projectId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/users/${userId}`);
   }
+
+  updateUserRole(projectId: number, userId: number, role: string) {
+    return this.http.put(`${this.baseUrl}/${projectId}/users/${userId}/role`, { role });
+  }
 }

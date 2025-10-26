@@ -135,7 +135,7 @@ public class TestConfig implements CommandLineRunner {
                 phaseRepository.saveAll(Arrays.asList(phase1, phase2, phase3, phase4, phase5));
 
                 // ==== USER-PROJECT ASSOCIATIONS ====
-                UserProject up1 = new UserProject(user1, project1, UserRole.STAFF);
+                UserProject up1 = new UserProject(user1, project1, UserRole.ADMIN);
                 UserProject up2 = new UserProject(user2, project1, UserRole.STAFF);
                 UserProject up3 = new UserProject(user3, project1, UserRole.CUSTOMER);
                 UserProject up4 = new UserProject(user1, project2, UserRole.ADMIN);
@@ -146,7 +146,7 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up9 = new UserProject(user4, project4, UserRole.STAFF);
                 UserProject up10 = new UserProject(user1, project4, UserRole.ADMIN);
 
-                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5));
+                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7, up8, up9, up10));
 
                 // ==== INSTALLMENTS ====
                 Installment ins1 = new Installment();
