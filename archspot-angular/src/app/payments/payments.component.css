@@ -8,7 +8,6 @@
 .installment-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
 }
 
 .installment-card .card-title {
@@ -22,4 +21,26 @@
 
 .installment-card .btn:hover {
   transform: translateY(-1px);
+}
+
+#checkbox{
+  border: 1px solid;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.card-overdue {
+  background-color: #ffe5e5;
+}
+
+.card-paid {
+  background-color: #e6f4ea; 
+}
+
+.card-pending {
+  background-color: #ffffff; 
+}
+
+.card-canceled {
+  background-color: #f0f0f0;
 }
