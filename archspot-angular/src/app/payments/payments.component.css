@@ -1,9 +1,8 @@
 .installment-card {
-  background-color: #f7f7f7; /* Cinza claro */
+  background-color: #f7f7f7;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.08);
   transition: all 0.15s ease-in-out;
   border-radius: 1rem;
-  cursor: pointer;
 }
 
 .installment-card:hover {
@@ -12,7 +11,6 @@
   background-color: #fff;
 }
 
-/* Suaviza o título */
 .installment-card .card-title {
   font-weight: 600;
   color: #343a40;

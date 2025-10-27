@@ -8,7 +8,7 @@
         <button class="btn btn-outline-dark rounded-pill px-4 py-2" (click)="openCreateInstallmentModal()">
           + Nova parcela
         </button>
-        <button class="btn btn-outline-dark rounded-pill px-4 py-2" (click)="openCreateInstallmentModal()">
+        <button class="btn btn-outline-dark rounded-pill px-4 py-2" (click)="openCreateSequenceModal()">
           + Nova sequência de parcelas
         </button>
       </div>
@@ -52,13 +52,11 @@
                 Editar
               </button>
               <button *ngIf="inst.paymentStatus !== 'PAID' && inst.paymentStatus !== 'CANCELED'"
-                      class="btn btn-danger btn-sm"
-                      (click)="cancelInstallment(inst)">
+                class="btn btn-danger btn-sm" (click)="cancelInstallment(inst)">
                 Cancelar
               </button>
               <button *ngIf="inst.paymentStatus !== 'PAID' && inst.paymentStatus !== 'CANCELED'"
-                      class="btn btn-success btn-sm"
-                      (click)="payInstallment(inst)">
+                class="btn btn-success btn-sm" (click)="payInstallment(inst)">
                 Marcar como Paga
               </button>
             </div>
@@ -75,15 +73,17 @@
     </ng-template>
 
     <!-- Modais -->
-    <app-create-installment-modal [show]="showCreateModal" [projectId]="projectId"
-                                  (close)="showCreateModal = false"
-                                  (installmentCreated)="onInstallmentCreated($event)">
+    <app-create-installment-modal [show]="showCreateModal" [projectId]="projectId" (close)="showCreateModal = false"
+      (installmentCreated)="onInstallmentCreated($event)">
     </app-create-installment-modal>
 
-    <app-edit-installment-modal *ngIf="selectedInstallment" [show]="showEditModal"
-                                [installment]="selectedInstallment"
-                                (close)="closeEditModal()"
-                                (updated)="onInstallmentUpdated($event)">
+    <app-edit-installment-modal *ngIf="selectedInstallment" [show]="showEditModal" [installment]="selectedInstallment"
+      (close)="closeEditModal()" (updated)="onInstallmentUpdated($event)">
     </app-edit-installment-modal>
+
+    <app-create-sequence-installments-modal *ngIf="showCreateSequenceModal" [show]="showCreateSequenceModal"
+      [projectId]="projectId" (close)="showCreateSequenceModal = false"
+      (installmentsCreated)="handleInstallmentsCreated($event)">
+    </app-create-sequence-installments-modal>
   </div>
 </app-page-layout>

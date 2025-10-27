@@ -17,6 +17,7 @@ export class PaymentsComponent implements OnInit {
   paymentMethod: PaymentMethod | null = null;
   showCreateModal = false;
   showEditModal = false;
+  showCreateSequenceModal = false;
   selectedInstallment: InstallmentResponse | null = null;
   projectUsers: any[] = [];
   userId: number | null = null;
@@ -52,7 +53,7 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
-    //permissões de usuario (cliente nao pode criar/editar/excluir parcelas)
+  //permissões de usuario (cliente nao pode criar/editar/excluir parcelas)
   get isCustomerInProject(): boolean {
     if (!this.userId) return true;
     const user = this.projectUsers.find(u => u.userId === this.userId);
@@ -78,8 +79,17 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
+  handleInstallmentsCreated(newInstallments: InstallmentResponse[]) {
+    this.installments.push(...newInstallments);
+    this.installments.sort((a, b) => (a.estimatedPaymentDate > b.estimatedPaymentDate ? 1 : -1));
+  }
+
   openCreateInstallmentModal(): void {
     this.showCreateModal = true;
+  }
+
+  openCreateSequenceModal(): void {
+    this.showCreateSequenceModal = true;
   }
 
   onInstallmentCreated(newInstallment: InstallmentResponse): void {
