@@ -1,0 +1,27 @@
+.installment-card {
+  background-color: #f7f7f7; /* Cinza claro */
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease-in-out;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+.installment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+/* Suaviza o título */
+.installment-card .card-title {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.installment-card .btn {
+  transition: all 0.2s ease;
+}
+
+.installment-card .btn:hover {
+  transform: translateY(-1px);
+}

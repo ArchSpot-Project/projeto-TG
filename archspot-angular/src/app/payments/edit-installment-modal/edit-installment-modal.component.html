@@ -1,0 +1,43 @@
+<div class="modal-overlay" *ngIf="show" (click)="cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h4 class="modal-title">Editar Parcela</h4>
+    <hr />
+
+    <div class="mb-3">
+      <label class="form-label">Valor</label>
+      <input type="text" class="form-control" mask="separator.2" thousandSeparator="." decimalMarker=","
+        [ngModel]="cloned.amount | currency:'BRL':'symbol':'1.2-2'" (ngModelChange)="onAmountChange($event)" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" rows="2" [(ngModel)]="cloned.description"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Método de pagamento</label>
+      <select class="form-select" [(ngModel)]="cloned.paymentMethod">
+        <option [ngValue]="null" disabled>Selecione um método</option>
+        <option *ngFor="let method of paymentMethods" [ngValue]="method">
+          {{ method | paymentMethod }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Previsão de Pagamento</label>
+      <input type="date" class="form-control" [(ngModel)]="cloned.estimatedPaymentDate" />
+    </div>
+
+    <div class="mb-3" *ngIf="cloned.paymentStatus === 'PAID'">
+      <label class="form-label">Data do pagamento (real)</label>
+      <input type="date" class="form-control" [(ngModel)]="cloned.realPaymentDate" />
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary" (click)="cancel()">Fechar</button>
+      <button class="btn btn-danger" (click)="deleteInstallment()">Excluir Parcela</button>
+      <button class="btn btn-success" (click)="updateInstallment()">Salvar</button>
+    </div>
+  </div>
+</div>

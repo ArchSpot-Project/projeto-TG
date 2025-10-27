@@ -12,6 +12,8 @@ import { RoleTranslatePipe } from '../core/pipes/user-roles.pipes';
 import { CreateProjectModalComponent } from '../projects/create-project-modal/create-project-modal.component';
 import { AddUserModalComponent } from '../users-project/add-user-modal/add-user-modal.component';
 import { PhaseStatusPipe } from '../core/pipes/phase-status.pipe';
+import { PaymentMethodPipe } from '../core/pipes/payment-method.pipe';
+import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { PhaseStatusPipe } from '../core/pipes/phase-status.pipe';
     TableComponent,
     StatusTranslatePipe,
     RoleTranslatePipe,
+    PaymentMethodPipe,
+    PaymentStatusPipe,
     PhaseStatusPipe,
     AddUserModalComponent
   ],
@@ -38,6 +42,8 @@ import { PhaseStatusPipe } from '../core/pipes/phase-status.pipe';
     CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
+    PaymentMethodPipe,
+    PaymentStatusPipe,
     PhaseStatusPipe,
     RoleTranslatePipe,
     AddUserModalComponent
