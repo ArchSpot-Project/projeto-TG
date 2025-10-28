@@ -11,4 +11,5 @@ public class DirectoryCreateDTO {
   private String name;
   private DirectoryType type;
   private Long projectId;
+  private Long parentDirectoryId; // opcional, caso tenha diretório pai
 }

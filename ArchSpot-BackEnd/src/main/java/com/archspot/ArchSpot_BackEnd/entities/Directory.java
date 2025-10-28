@@ -30,6 +30,15 @@ public class Directory {
     @JoinColumn(name = "project_id")
     private Project project;
 
+    // Auto-relacionamento para subdiretórios
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Directory parentDirectory;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parentDirectory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Directory> subdirectories = new ArrayList<>();
+
     @Builder.Default
     @OneToMany(mappedBy = "directory", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents = new ArrayList<>();

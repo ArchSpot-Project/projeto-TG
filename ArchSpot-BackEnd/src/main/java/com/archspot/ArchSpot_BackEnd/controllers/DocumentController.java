@@ -3,12 +3,19 @@ package com.archspot.ArchSpot_BackEnd.controllers;
 import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.services.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -18,6 +25,10 @@ public class DocumentController {
 
   @Autowired
   private DocumentService documentService;
+
+  /*
+   * CRUD DE DOCUMENTO
+   */
 
   // Buscar todos os documentos
   @GetMapping
@@ -31,22 +42,8 @@ public class DocumentController {
     return ResponseEntity.ok(documentService.findById(id));
   }
 
-  // Buscar documentos por diretório
-  @GetMapping("/directory/{directoryId}")
-  public ResponseEntity<List<DocumentDTO>> getByDirectory(@PathVariable Long directoryId) {
-    return ResponseEntity.ok(documentService.findByDirectory(directoryId));
-  }
-
-  // Criar documento (upload de arquivo + metadados)
-  @PostMapping("/upload")
-  public ResponseEntity<DocumentDTO> uploadDocument(
-      @RequestParam("file") MultipartFile file,
-      @RequestParam("directoryId") Long directoryId,
-      @RequestParam("uploadedById") Long uploadedById,
-      @RequestParam(value = "description", required = false) String description) throws IOException {
-    DocumentDTO saved = documentService.uploadDocument(directoryId, uploadedById, file, description);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-  }
+  // Criar (upload) um documento e Buscar por diretório:
+  // aninhados em DirectoryController
 
   // Atualizar metadados (sem reenviar arquivo)
   @PutMapping("/{id}")
@@ -58,7 +55,7 @@ public class DocumentController {
   @PostMapping("/{id}/update")
   public ResponseEntity<DocumentDTO> uploadNewVersion(
       @PathVariable Long id,
-      @RequestParam("file") MultipartFile file) throws IOException {
+      @RequestParam MultipartFile file) throws IOException {
     DocumentDTO updated = documentService.updateDocumentVersion(id, file);
     return ResponseEntity.ok(updated);
   }
@@ -69,4 +66,27 @@ public class DocumentController {
     documentService.delete(id);
     return ResponseEntity.noContent().build();
   }
+
+  // Download de um arquivo
+  @GetMapping("/{id}/download")
+  public ResponseEntity<Resource> downloadFile(@PathVariable Long id) throws IOException {
+    Path filePath = documentService.getFilePath(id);
+
+    if (!Files.exists(filePath)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found on server");
+    }
+
+    Resource resource = new UrlResource(filePath.toUri());
+
+    String contentType = Files.probeContentType(filePath);
+    if (contentType == null) {
+      contentType = "application/octet-stream";
+    }
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName() + "\"")
+        .body(resource);
+  }
+
 }

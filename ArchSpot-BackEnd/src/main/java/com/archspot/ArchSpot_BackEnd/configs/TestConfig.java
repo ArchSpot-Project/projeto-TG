@@ -146,7 +146,7 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up9 = new UserProject(user4, project4, UserRole.STAFF);
                 UserProject up10 = new UserProject(user1, project4, UserRole.ADMIN);
 
-                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5));
+                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7, up8, up9, up10));
 
                 // ==== INSTALLMENTS ====
                 Installment ins1 = new Installment();

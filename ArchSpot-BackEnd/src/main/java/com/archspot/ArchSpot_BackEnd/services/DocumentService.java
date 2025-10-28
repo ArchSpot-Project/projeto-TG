@@ -43,6 +43,9 @@ public class DocumentService {
 
   // buscar documentos por diretório
   public List<DocumentDTO> findByDirectory(Long directoryId) {
+    directoryRepository.findById(directoryId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
+        
     return documentRepository.findByDirectoryId(directoryId).stream()
         .map(this::toDTO)
         .collect(Collectors.toList());
@@ -135,8 +138,16 @@ public class DocumentService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+    // garante que o diretório está vinculado a um projeto
+    if (directory.getProject() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Directory must be linked to a project");
+    }
+    Long projectId = directory.getProject().getId();
+
     // caminho local de armazenamento
-    Path uploadDir = Paths.get(UPLOAD_BASE_PATH, directory.getType().name().toLowerCase());
+    Path uploadDir = Paths.get(UPLOAD_BASE_PATH,
+        "project_" + projectId,
+        directory.getType().name().toLowerCase());
     Files.createDirectories(uploadDir);
 
     String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
