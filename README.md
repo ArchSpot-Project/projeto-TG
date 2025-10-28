@@ -6,10 +6,28 @@ Plataforma de Gerenciamento de Projetos Arquitetônicos
 > <br>A segunda versão para esse projeto pode ser encontrada no repositório [proj-engSoftware3](https://github.com/ArchSpot-Project/projeto-EngSoftware3)
 
 ## Membros do Projeto
-
- - [Eros Secundus Canto](https://github.com/erossecundus)
- - [Luciana Tiemi Shimoyama](https://github.com/lucitiemi)
- - [Clara Ricioni](https://github.com/clararicioni)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/clararicioni">
+        <img src="https://avatars.githubusercontent.com/u/99998256" width="100px;"/><br>
+          <b>Clara Bergamo</b><br>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/erossecundus">
+        <img src="https://avatars.githubusercontent.com/u/156208632" width="100px;"/><br>
+          <b>Eros Secundus</b><br>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/lucitiemi">
+        <img src="https://avatars.githubusercontent.com/u/156207790" width="100px;"/><br>
+          <b>Luciana Tiemi</b><br>
+      </a>
+    </td>
+  </tr>
+</table>
 
 
 ## Tema
