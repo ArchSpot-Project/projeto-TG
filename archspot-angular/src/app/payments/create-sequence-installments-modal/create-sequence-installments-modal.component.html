@@ -1,0 +1,44 @@
+<div class="modal-overlay" *ngIf="show" (click)="cancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h4 class="modal-title">Criar sequência de parcelas</h4>
+        
+        <hr>
+
+        <div class="mb-3">
+            <label class="form-label">Valor total</label>
+            <input type="text" class="form-control" mask="separator.2" placeholder="Valor cheio" thousandSeparator="."
+                decimalMarker="," [ngModel]="totalAmount | currency:'BRL':'symbol':'1.2-2'"
+                (ngModelChange)="onAmountChange($event)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Número de parcelas</label>
+            <input type="number" class="form-control" placeholder="Número de parcelas (mensal)"
+                [(ngModel)]="numberOfInstallments" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descrição das parcelas</label>
+            <input type="text" class="form-control" placeholder="Ex: Consultoria Mensal"
+                [(ngModel)]="sequenceDescription" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Data de início</label>
+            <input type="date" class="form-control" [(ngModel)]="startDate" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Método de pagamento</label>
+            <select class="form-control" [(ngModel)]="paymentMethod">
+                <option [ngValue]="null" disabled>Selecione um método</option>
+                <option *ngFor="let m of paymentMethods" [value]="m">{{ m | paymentMethod }}</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-secondary" (click)="cancel()">Fechar</button>
+            <button class="btn btn-success" (click)="createSequence()">Criar parcelas</button>
+        </div>
+    </div>
+</div>

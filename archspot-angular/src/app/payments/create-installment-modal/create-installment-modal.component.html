@@ -1,0 +1,38 @@
+<div class="modal-overlay" *ngIf="show" (click)="cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h4 class="modal-title">Criar nova parcela</h4>
+    <hr />
+
+    <!-- input com mascara de moeda BRL -->
+    <div class="mb-3">
+      <label class="form-label">Valor</label>
+      <input type="text" class="form-control" mask="separator.2" thousandSeparator="." decimalMarker=","
+        [ngModel]="amount | currency:'BRL':'symbol':'1.2-2'" (ngModelChange)="onAmountChange($event)" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" rows="2" [(ngModel)]="description" placeholder="Ex: Pagamento inicial"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Método de pagamento</label>
+      <select class="form-select" [(ngModel)]="paymentMethod">
+        <option [ngValue]="null" disabled>Selecione um método</option>
+        <option *ngFor="let method of paymentMethods" [ngValue]="method">
+          {{ method | paymentMethod }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Previsão de Pagamento</label>
+      <input type="date" class="form-control" [(ngModel)]="estimatedPaymentDate" />
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-success" (click)="createInstallment()">Criar Parcela</button>
+    </div>
+  </div>
+</div>

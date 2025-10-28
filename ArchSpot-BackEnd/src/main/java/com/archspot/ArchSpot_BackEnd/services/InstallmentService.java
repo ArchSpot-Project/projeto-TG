@@ -159,6 +159,18 @@ public class InstallmentService {
     return toDTO(installment);
   }
 
+  //cancelar parcela
+  @Transactional
+  public InstallmentResponseDTO cancelInstallment(Long id) {
+    Installment installment = installmentRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+
+    installment.setPaymentStatus(PaymentStatus.CANCELED);
+    installmentRepository.save(installment);
+
+    return toDTO(installment);
+  }
+
   /*
    * MÉTODOS AUXILIARES
    */

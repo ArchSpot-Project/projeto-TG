@@ -69,6 +69,13 @@ public class InstallmentController {
     return ResponseEntity.ok(installmentService.payInstallment(id, method));
   }
 
+  //cancelar uma parcela
+  @PatchMapping("/{id}/cancel")
+  public ResponseEntity<InstallmentResponseDTO> cancelInstallment(@PathVariable Long id) {
+    InstallmentResponseDTO canceled = installmentService.cancelInstallment(id);
+    return ResponseEntity.ok(canceled);
+  }
+
   // retorna lista de enums de status de pagamento
   @GetMapping("/payment-status")
   public ResponseEntity<List<String>> getPaymentStatuses() {
