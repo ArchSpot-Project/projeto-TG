@@ -20,14 +20,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.archspot.ArchSpot_BackEnd.dtos.DirectoryCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.DirectoryDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.services.DirectoryService;
 import com.archspot.ArchSpot_BackEnd.services.InstallmentService;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
 import com.archspot.ArchSpot_BackEnd.services.ProjectService;
@@ -42,7 +46,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProjectController {
 
-  private final ProjectService projectService;
+  @Autowired
+  private ProjectService projectService;
 
   @Autowired
   private PhaseService phaseService;
@@ -52,6 +57,9 @@ public class ProjectController {
 
   @Autowired
   private InstallmentService installmentService;
+
+  @Autowired
+  private DirectoryService directoryService;
 
   /*
    * CRUD BÁSICO DE PROJETO
@@ -186,5 +194,31 @@ public class ProjectController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status);
     }
   }
+
+  /*
+   * ENDPOINTS DE DIRETORIOS
+   */
+
+  // Buscar diretório por projeto (PARAM: ?type=DRAWINGS ou DOCUMENTS)
+  @GetMapping("/{projectId}/directories")
+  public ResponseEntity<List<DirectoryDTO>> getDirectoriesByProject(
+      @PathVariable Long projectId,
+      @RequestParam(required = false) DirectoryType type) {
+    List<DirectoryDTO> directories = directoryService.findByProjectAndType(projectId, type);
+    return ResponseEntity.ok(directories);
+  }
+
+  // Criar diretório de primeiro nível em um projeto
+  @PostMapping("/{projectId}/directories")
+  public ResponseEntity<DirectoryDTO> createDirectoryInProject(
+      @PathVariable Long projectId,
+      @RequestBody DirectoryCreateDTO dto) {
+    dto.setProjectId(projectId);
+    dto.setParentDirectoryId(null); // primeiro nível, sem diretório pai
+    DirectoryDTO created = directoryService.createDirectory(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+  }
+
+  // Deletar diretório e Update são atribuições do DirectoryController
 
 }
