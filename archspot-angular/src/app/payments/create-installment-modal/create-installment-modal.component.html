@@ -6,7 +6,7 @@
     <!-- input com mascara de moeda BRL -->
     <div class="mb-3">
       <label class="form-label">Valor</label>
-      <input type="text" class="form-control" mask="separator.2" thousandSeparator="." decimalMarker=","
+      <input type="text" placeholder="Valor da parcela" class="form-control" mask="separator.2" thousandSeparator="." decimalMarker=","
         [ngModel]="amount | currency:'BRL':'symbol':'1.2-2'" (ngModelChange)="onAmountChange($event)" />
     </div>
 

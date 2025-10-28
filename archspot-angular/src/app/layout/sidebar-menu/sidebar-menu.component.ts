@@ -38,7 +38,7 @@ export class SidebarMenuComponent implements OnInit {
   ];
 
   helpMenuItems = [
-    { icon: 'assets/img/icons/question-circle.svg', label: 'Ajuda', action: () => this.goToHelp() },
+    { icon: 'assets/img/icons/question-circle.svg', label: 'Sobre', action: () => this.goToAbout() },
     { icon: 'assets/img/icons/box-arrow-right.svg', label: 'Sair', action: () => this.logout() }
   ];
 
@@ -114,7 +114,7 @@ export class SidebarMenuComponent implements OnInit {
   goToReports() { this.router.navigate(['/reports']); }
   goToProfile() { this.router.navigate(['/profile']); }
   goToSettings() { this.router.navigate(['/settings']); }
-  goToHelp() { this.router.navigate(['/help']); }
+  goToAbout() { this.router.navigate(['/about']); }
 
   goToUsersProject() {
     if (this.activeProject) {

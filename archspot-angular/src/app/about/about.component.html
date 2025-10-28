@@ -1,0 +1,94 @@
+<app-page-layout [title]="'Sobre o ArchSpot'" [showSidebar]="true" [showBackButton]="true">
+    <ul ngbNav #nav="ngbNav" class="nav nav-tabs justify-content-center fs-5 mb-4">
+        <li [ngbNavItem]="'proposta'">
+            <a ngbNavLink>Proposta</a>
+            <ng-template ngbNavContent>
+                <section class="p-4 fs-5">
+                    <p>
+                        O <strong>ArchSpot</strong> é uma plataforma criada para integrar
+                        profissionais de Arquitetura e áreas correlatas com seus clientes,
+                        centralizando informações e otimizando a comunicação durante todas
+                        as etapas de um projeto.
+                    </p>
+
+                    <p class="mt-3">
+                        Uma das principais necessidades identificadas entre arquitetos,
+                        clientes e parceiros é a falta de um ambiente unificado para
+                        compartilhar cronogramas, atas de reunião, documentos e versões de
+                        projeto. O ArchSpot surge para atender exatamente essa demanda,
+                        oferecendo uma solução digital moderna e acessível diretamente pelo
+                        navegador.
+                    </p>
+
+                    <p class="mt-3">
+                        O sistema contempla serviços como
+                        <strong>upload de arquivos, gerenciamento de documentos, parcelas e consultas</strong>,
+                        com interfaces específicas para cada tipo de usuário. O foco
+                        principal são escritórios de arquitetura de pequeno e médio porte,
+                        que precisam de uma ferramenta completa e fácil de usar.
+                    </p>
+
+                    <h4 class="mt-5 fw-semibold">Serviços básicos</h4>
+                    <ul class="list-disc ms-4 mt-2">
+                        <li>
+                            Cronograma de desenvolvimento do projeto e da obra, com
+                            checkpoints e etapas personalizáveis;
+                        </li>
+                        <li>
+                            Área de documentação, incluindo:
+                            <ul class="list-circle ms-4 mt-2">
+                                <li>Proposta orçamentária e contrato;</li>
+                                <li>Última versão válida do projeto;</li>
+                                <li>Atas de reunião;</li>
+                                <li>Fotos do andamento da obra;</li>
+                                <li>Referências estéticas e funcionais;</li>
+                                <li>Orçamentos e contratos de fornecedores.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h4 class="mt-5 fw-semibold">Perfis de usuários e permissões</h4>
+                    <ul class="list-disc ms-4 mt-2">
+                        <li>
+                            <strong>Arquiteto Administrador (Gerente):</strong>
+                            <ul class="list-circle ms-4">
+                                <li>Permissões de administrador;</li>
+                                <li>Criação, edição e exclusão de parcelas;</li>
+                                <li>Criação, edição e exclusão de etapas no cronograma;</li>
+                                <li>Manutenção e controle de usuários;</li>
+                                <li>Acesso a todas as funcionalidades do sistema.</li>
+                            </ul>
+                        </li>
+                        <li class="mt-2">
+                            <strong>Equipe de Arquitetura (Colaboradores):</strong>
+                            <ul class="list-circle ms-4">
+                                <li>Upload de arquivos, referências e fotos;</li>
+                                <li>Criação, edição e exclusão de parcelas;</li>
+                                <li>Criação, edição e exclusão de etapas no cronograma;</li>
+                                <li>Visualização de colaboradores do projeto.</li>
+                            </ul>
+                        </li>
+                        <li class="mt-2">
+                            <strong>Cliente:</strong>
+                            <ul class="list-circle ms-4">
+                                <li>Visualização de arquivos;</li>
+                                <li>Visualização de etapas e parcelas;</li>
+                                <li>Visualização de colaboradores do projeto;</li>
+                                <li>Upload de referências e fotos.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <p class="mt-4">
+                        O ArchSpot busca simplificar a rotina dos profissionais e melhorar a
+                        experiência dos clientes, proporcionando uma gestão integrada,
+                        organizada e colaborativa de todos os aspectos de um projeto
+                        arquitetônico.
+                    </p>
+                </section>
+            </ng-template>
+        </li>
+    </ul>
+
+    <div [ngbNavOutlet]="nav" class="mt-3"></div>
+</app-page-layout>

@@ -20,6 +20,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { PhotosModule } from './photos/photos.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { AboutModule } from './about/about.module';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ContactsModule } from './contacts/contacts.module';
     PhotosModule,
     ScheduleModule,
     AuthModule,
+    AboutModule,
     CoreModule,
     HomeModule,
     ProjectsModule,
