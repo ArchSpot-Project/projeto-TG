@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 export interface ProjectResponse {
   id: number;
@@ -57,6 +57,22 @@ export class ProjectService {
     return this.http.post(
       `${this.apiUrl}/${projectId}/users/${userId}?role=${role}`,
       {}
+    );
+  }
+
+  userHasAccess(projectId: number, userId: number) {
+    if (!projectId || !userId) {
+      return of(false);
+    }
+
+    return this.getProjectsByUser(userId).pipe(
+      map(projects => {
+        return projects.some(p => Number(p.projectId) === Number(projectId));
+      }),
+      catchError(err => {
+        console.error('Erro ao verificar acesso ao projeto:', err);
+        return of(false);
+      })
     );
   }
 
