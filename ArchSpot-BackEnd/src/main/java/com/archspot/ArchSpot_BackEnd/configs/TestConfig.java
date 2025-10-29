@@ -3,6 +3,7 @@ package com.archspot.ArchSpot_BackEnd.configs;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +24,7 @@ import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserProjectRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.services.InstallmentService;
 
 @Configuration
 @Profile("test")
@@ -42,6 +44,9 @@ public class TestConfig implements CommandLineRunner {
 
         @Autowired
         private InstallmentRepository installmentRepository;
+
+        @Autowired
+        private InstallmentService installmentService;
 
         @Override
         public void run(String... args) throws Exception {
@@ -179,6 +184,12 @@ public class TestConfig implements CommandLineRunner {
                 project1.getInstallments().addAll(Arrays.asList(ins1, ins2));
                 project2.getInstallments().add(ins3);
                 projectRepository.saveAll(Arrays.asList(project1, project2));
+
+                // Aplica updateProjectTotal para atualizar o totalValue em Project (por conta dos valores instanciados no testConfig)
+                List<Project> allProjects = projectRepository.findAll();
+                for (Project project : allProjects) {
+                        installmentService.updateProjectTotal(project.getId());
+                }
         }
 
 }

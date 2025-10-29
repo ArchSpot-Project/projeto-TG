@@ -10,6 +10,7 @@ import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -81,6 +82,7 @@ public class InstallmentService {
     installment.setDescription(dto.description());
 
     installmentRepository.save(installment);
+    updateProjectTotal(installment.getProject().getId());
     return toDTO(installment);
   }
 
@@ -98,16 +100,18 @@ public class InstallmentService {
     installment.setDescription(dto.description());
 
     installmentRepository.save(installment);
+    updateProjectTotal(installment.getProject().getId());
     return toDTO(installment);
   }
 
   // deletar parcela
   @Transactional
   public void delete(Long id) {
-    if (!installmentRepository.existsById(id)) {
-      throw new ResponseStatusException(NOT_FOUND, "Installment not found");
-    }
-    installmentRepository.deleteById(id);
+    Installment installment = installmentRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Installment not found"));
+
+    installmentRepository.delete(installment);
+    updateProjectTotal(installment.getProject().getId());
   }
 
   /*
@@ -159,7 +163,7 @@ public class InstallmentService {
     return toDTO(installment);
   }
 
-  //cancelar parcela
+  // cancelar parcela
   @Transactional
   public InstallmentResponseDTO cancelInstallment(Long id) {
     Installment installment = installmentRepository.findById(id)
@@ -207,6 +211,21 @@ public class InstallmentService {
     if (dirty) {
       installmentRepository.saveAll(installments);
     }
+  }
+
+  // Atualiza valor total em um Projeto (poderia ser private -> está public para ser acessado em testConfig)
+  public void updateProjectTotal(Long projectId) {
+    BigDecimal total = installmentRepository
+        .findByProjectId(projectId)
+        .stream()
+        .map(Installment::getAmount)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    Project project = projectRepository.findById(projectId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+
+    project.setTotalValue(total);
+    projectRepository.save(project);
   }
 
   // mapeamente entidade para DTO
