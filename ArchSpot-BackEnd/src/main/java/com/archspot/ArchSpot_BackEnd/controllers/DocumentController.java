@@ -1,6 +1,9 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
+import com.archspot.ArchSpot_BackEnd.dtos.CommentCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.CommentDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.services.CommentService;
 import com.archspot.ArchSpot_BackEnd.services.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -25,6 +28,9 @@ public class DocumentController {
 
   @Autowired
   private DocumentService documentService;
+
+  @Autowired
+  private CommentService commentService;
 
   /*
    * CRUD DE DOCUMENTO
@@ -87,6 +93,26 @@ public class DocumentController {
         .contentType(MediaType.parseMediaType(contentType))
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName() + "\"")
         .body(resource);
+  }
+
+  /*
+   * ENDPOINT DE COMENTÁRIO EM DOCUMENTO
+   */
+
+  // Listar comentários de um documento
+  @GetMapping("/{documentId}/comments")
+  public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long documentId) {
+    List<CommentDTO> comments = commentService.getCommentsByDocument(documentId);
+    return ResponseEntity.ok(comments);
+  }
+
+  // Criar comentário em um documento
+  @PostMapping("/{documentId}/comments")
+  public ResponseEntity<CommentDTO> createComment(
+      @PathVariable Long documentId,
+      @RequestBody CommentCreateDTO dto) {
+    CommentDTO saved = commentService.createComment(documentId, dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 
 }

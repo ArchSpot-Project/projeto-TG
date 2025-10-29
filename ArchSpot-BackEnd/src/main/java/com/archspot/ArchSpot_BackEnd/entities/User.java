@@ -37,9 +37,10 @@ public class User {
     private String email;
 
     // private UserRole userRole; -> ficou como uma classe de associacao
-    /* avaliar no futuro se cabe um enum de acesso geral à plataforma
-        (p. ex.: standard, premium, corporate, admin do sistema, etc...)
-    */
+    /*
+     * avaliar no futuro se cabe um enum de acesso geral à plataforma
+     * (p. ex.: standard, premium, corporate, admin do sistema, etc...)
+     */
 
     @NotBlank(message = "Senha nao pode ser vazia")
     private String password;
@@ -49,12 +50,17 @@ public class User {
     @JsonIgnore // evita loop JSON; troque conforme sua estratégia de DTOs
     private List<UserProject> userProjects = new ArrayList<>();
 
+    // 🔹 Associação com Comment (sem cascade)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
+
     // construtores
     public User() {
     }
 
     public User(Long id, String cpf, String name, String phone, String address, String profession, String email,
-             String password) {
+            String password) {
         this.id = id;
         this.cpf = cpf;
         this.name = name;

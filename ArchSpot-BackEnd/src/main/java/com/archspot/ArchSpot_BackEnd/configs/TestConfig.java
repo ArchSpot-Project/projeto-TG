@@ -2,6 +2,7 @@ package com.archspot.ArchSpot_BackEnd.configs;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,14 +12,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.entities.Comment;
+import com.archspot.ArchSpot_BackEnd.entities.Directory;
+import com.archspot.ArchSpot_BackEnd.entities.Document;
 import com.archspot.ArchSpot_BackEnd.entities.Installment;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.entities.UserProject;
+import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentMethod;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.enums.Status;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.repositories.CommentRepository;
+import com.archspot.ArchSpot_BackEnd.repositories.DirectoryRepository;
+import com.archspot.ArchSpot_BackEnd.repositories.DocumentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
@@ -46,7 +54,13 @@ public class TestConfig implements CommandLineRunner {
         private InstallmentRepository installmentRepository;
 
         @Autowired
-        private InstallmentService installmentService;
+        private DirectoryRepository directoryRepository;
+
+        @Autowired
+        private DocumentRepository documentRepository;
+
+        @Autowired
+        private CommentRepository commentRepository;
 
         @Override
         public void run(String... args) throws Exception {
@@ -185,11 +199,68 @@ public class TestConfig implements CommandLineRunner {
                 project2.getInstallments().add(ins3);
                 projectRepository.saveAll(Arrays.asList(project1, project2));
 
-                // Aplica updateProjectTotal para atualizar o totalValue em Project (por conta dos valores instanciados no testConfig)
-                List<Project> allProjects = projectRepository.findAll();
-                for (Project project : allProjects) {
-                        installmentService.updateProjectTotal(project.getId());
-                }
+                // ==== DIRECTORIES ====
+
+                // Diretórios raiz por projeto
+                Directory dir1 = new Directory(null, "Arquitetura", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, null, null, null);
+                Directory dir2 = new Directory(null , "Complementares", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, null, null, null);
+                Directory dir3 = new Directory(null, "Contrato", LocalDateTime.now(), DirectoryType.DOCUMENTS, project1, null, null, null);
+
+                directoryRepository.saveAll(Arrays.asList(dir1, dir2, dir3));
+
+                // Subdiretórios
+                Directory subdir1 = new Directory(null, "Estudo Preliminar", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
+                Directory subdir2 = new Directory(null, "Executivo", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
+                Directory subdir3 = new Directory(null, "Engenharia", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir2, null, null);
+
+                directoryRepository.saveAll(Arrays.asList(subdir1, subdir2, subdir3));
+
+                // ==== DOCUMENTS ====
+                Document doc1 = Document.builder()
+                                .name("Planta Baixa")
+                                .description("Planta baixa do pavimento térreo")
+                                .directory(subdir1)
+                                .uploadedBy(user1)
+                                .uploadDate(LocalDateTime.now())
+                                .modificationDate(LocalDateTime.now())
+                                .size(1024L)
+                                .version(1)
+                                .fileUrl("/uploads/projeto_1/DRAWINGS/planta_baixa.pdf")
+                                .build();
+
+                Document doc2 = Document.builder()
+                                .name("Memorial Descritivo")
+                                .description("Documento com especificações do projeto")
+                                .directory(subdir2)
+                                .uploadedBy(user2)
+                                .uploadDate(LocalDateTime.now())
+                                .modificationDate(LocalDateTime.now())
+                                .size(2048L)
+                                .version(1)
+                                .fileUrl("/uploads/projeto_1/DOCUMENTS/memorial.pdf")
+                                .build();
+
+                Document doc3 = Document.builder()
+                                .name("Detalhamento Elétrico")
+                                .description("Desenho técnico com pontos e circuitos elétricos")
+                                .directory(subdir3)
+                                .uploadedBy(user1)
+                                .uploadDate(LocalDateTime.now())
+                                .modificationDate(LocalDateTime.now())
+                                .size(3072L)
+                                .version(1)
+                                .fileUrl("/uploads/projeto_1/DRAWINGS/EXECUTIVE/detalhamento_eletrico.pdf")
+                                .build();
+
+                documentRepository.saveAll(Arrays.asList(doc1, doc2, doc3));
+
+                // ==== COMMENTS ====
+                Comment c1 = new Comment(null, "Verificar medidas da área de serviço", LocalDateTime.now(), doc1,
+                                user2);
+                Comment c2 = new Comment(null, "Falta inserir legenda na prancha", LocalDateTime.now(), doc1, user3);
+                Comment c3 = new Comment(null, "Ajustar descrição de revestimentos", LocalDateTime.now(), doc2, user1);
+
+                commentRepository.saveAll(Arrays.asList(c1, c2, c3));
         }
 
 }
