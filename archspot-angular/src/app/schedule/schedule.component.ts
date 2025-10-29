@@ -15,7 +15,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   projectId!: number;
   project?: ProjectResponse;
   phases: any[] = [];
-  gantt!: Gantt;
+  gantt!: any;
   showCreateModal = false;
   showEditModal = false;
   selectedPhase: any = null;
