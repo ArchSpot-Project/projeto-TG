@@ -1,81 +1,82 @@
 <app-page-layout [title]="'Pagamentos'" [showSidebar]="false" [showBackButton]="true">
   <div class="p-4">
 
-    <!-- Cabeçalho com botões de criar e ações múltiplas -->
+    <!-- cabeçalho -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-light mb-0">{{ project?.name || 'Carregando projeto...' }} - Parcelas</h3>
-
-      <div class="d-flex align-items-center" style="gap: 6px;">
-        <!-- Botões de ação para múltiplas parcelas selecionadas -->
-        <button *ngIf="selectedInstallments.length > 0" class="btn btn-outline-light rounded-pill px-3 py-2"
-          (click)="cancelSelectedInstallments()">
-          <img src="assets/img/icons/cancel.svg" alt="Cancelar" width="20" height="20">
-        </button>
-        <button *ngIf="selectedInstallments.length > 0" class="btn btn-outline-light rounded-pill px-3 py-2"
-          (click)="deleteSelectedInstallments()">
-          <img src="assets/img/icons/trash3.svg" alt="Excluir" width="20" height="20">
-        </button>
-
-        <!-- Botões de criar -->
-        <button *ngIf="!isCustomerInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
-          (click)="openCreateInstallmentModal()">
-          + Nova parcela
-        </button>
-        <button *ngIf="!isCustomerInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
-          (click)="openCreateSequenceModal()">
-          + Nova sequência de parcelas
-        </button>
+      <div class="d-flex flex-column align-items-end">
+        <span class="fw-bold fs-5 mb-2">
+          Valor total do projeto: R$ {{ project?.totalValue | number:'1.2-2' }}
+        </span>
+        <div class="d-flex align-items-center" style="gap: 6px;">
+          <button *ngIf="selectedInstallments.length > 0" class="btn btn-outline-light rounded-pill px-3 py-2"
+            (click)="deleteSelectedInstallments()">
+            <img src="assets/img/icons/trash3.svg" alt="Excluir" width="20" height="20">
+          </button>
+          <button *ngIf="!isAssociateInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
+            (click)="openCreateInstallmentModal()">+ Nova parcela</button>
+          <button *ngIf="!isAssociateInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
+            (click)="openCreateSequenceModal()">+ Nova sequência de parcelas</button>
+        </div>
       </div>
     </div>
 
-    <!-- Cards das parcelas -->
-    <div *ngIf="installments.length > 0; else emptyState" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      <div class="col" *ngFor="let inst of installments; let i = index">
-        <div class="installment-card card h-100 border-0 rounded-4" [ngClass]="{
-       'card-overdue': inst.paymentStatus === 'OVERDUE',
-       'card-paid': inst.paymentStatus === 'PAID',
-       'card-pending': inst.paymentStatus === 'PENDING',
-       'card-canceled': inst.paymentStatus === 'CANCELED'
-     }">
-          <div class="card-body d-flex flex-column justify-content-between">
+    <!-- timeline -->
+    <div class="timeline-container">
+      <div *ngIf="installments.length > 0; else emptyState" class="timeline-left">
+        <div class="timeline-item" *ngFor="let inst of installments; let i = index" [ngClass]="{
+               'card-overdue': inst.paymentStatus === 'OVERDUE',
+               'card-paid': inst.paymentStatus === 'PAID',
+               'card-pending': inst.paymentStatus === 'PENDING',
+               'card-canceled': inst.paymentStatus === 'CANCELED'
+             }">
 
-            <!-- checkbox -->
-            <div *ngIf="!isCustomerInProject" class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="checkbox" [(ngModel)]="inst.selected"
-                (change)="toggleSelection(inst)">
-            </div>
+          <!-- ponto de status da parcela sobre a linha -->
+          <div class="timeline-dot">
+            <img *ngIf="inst.paymentStatus === 'PAID'" src="assets/img/icons/check-circle-fill.svg" alt="Pago">
+          </div>
 
-            <div>
-              <h5 class="card-title mb-1">
-                Parcela {{ i + 1 }} — <span class="fw-semibold">R$ {{ inst.amount | number:'1.2-2' }}</span>
-              </h5>
-              <p class="text-muted mb-3 fw-semibold fs-6">{{ inst.description || 'Sem descrição' }}</p>
+          <!-- card -->
+          <div class="installment-card card border-0 rounded-3 shadow-sm mb-3">
+            <div class="card-body p-3 d-flex flex-column justify-content-between">
 
-              <div class="small fs-6">
-                <p class="mb-1"><strong>Previsão:</strong> {{ inst.estimatedPaymentDate | date:'dd/MM/yyyy' }}</p>
-                <p class="mb-1" *ngIf="inst.realPaymentDate"><strong>Pago em:</strong> {{ inst.realPaymentDate |
-                  date:'dd/MM/yyyy' }}</p>
-                <p class="mb-1"><strong>Método:</strong> {{ inst.paymentMethod || 'Não informado' | paymentMethod }}</p>
-                <p class="mb-0"><strong>Status:</strong>
-                  <span [ngClass]="{
-            'text-success fw-bolder': inst.paymentStatus === 'PAID',
-            'text-danger fw-bold': inst.paymentStatus === 'OVERDUE',
-            'text-secondary fw-semibold': inst.paymentStatus === 'PENDING'
-          }">
-                    {{ inst.paymentStatus | paymentStatus }}
-                  </span>
-                </p>
+              <div *ngIf="!isAssociateInProject" class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="inst.selected"
+                  (change)="toggleSelection(inst)">
               </div>
-            </div>
 
-            <!-- Botões de ação individuais -->
-            <div *ngIf="!isCustomerInProject" class="mt-3 d-flex flex-wrap gap-2 justify-content-end">
-              <button class="btn btn-outline-secondary btn-sm"
-                (click)="openEditInstallmentModal(inst, i)">Editar</button>
-              <button *ngIf="inst.paymentStatus !== 'PAID' && inst.paymentStatus !== 'CANCELED'"
-                class="btn btn-danger btn-sm" (click)="cancelInstallment(inst)">Cancelar</button>
-              <button *ngIf="inst.paymentStatus !== 'PAID' && inst.paymentStatus !== 'CANCELED'"
-                class="btn btn-success btn-sm" (click)="payInstallment(inst)">Marcar como Paga</button>
+              <div>
+                <h6 class="card-title mb-1">
+                  Parcela {{ i + 1 }} — <span class="fw-semibold">R$ {{ inst.amount | number:'1.2-2' }}</span>
+                </h6>
+                <p class="text-muted mb-2 fw-semibold fs-7">{{ inst.description || 'Sem descrição' }}</p>
+
+                <div class="small fs-7">
+                  <p class="mb-1"><strong>Previsão:</strong> {{ inst.estimatedPaymentDate | date:'dd/MM/yyyy' }}</p>
+                  <p class="mb-1" *ngIf="inst.realPaymentDate"><strong>Pago em:</strong> {{ inst.realPaymentDate |
+                    date:'dd/MM/yyyy' }}</p>
+                  <p class="mb-1"><strong>Método:</strong> {{ inst.paymentMethod || 'Não informado' | paymentMethod }}
+                  </p>
+                  <p class="mb-0"><strong>Status:</strong>
+                    <span [ngClass]="{
+                        'text-success fw-bolder': inst.paymentStatus === 'PAID',
+                        'text-danger fw-bold': inst.paymentStatus === 'OVERDUE',
+                        'text-secondary fw-semibold': inst.paymentStatus === 'PENDING'
+                      }">
+                      {{ inst.paymentStatus | paymentStatus }}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div *ngIf="!isAssociateInProject" class="mt-2 d-flex flex-wrap gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm"
+                  (click)="openEditInstallmentModal(inst, i)">Editar</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteInstallment(inst.id)">Excluir</button>
+                <button *ngIf="inst.paymentStatus !== 'PAID' && inst.paymentStatus !== 'CANCELED'"
+                  class="btn btn-success btn-sm" (click)="payInstallment(inst)">Marcar como Paga</button>
+              </div>
+
             </div>
           </div>
         </div>

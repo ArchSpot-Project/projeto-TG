@@ -89,6 +89,7 @@ export class PaymentsComponent implements OnInit {
 
     alert('Parcelas excluídas com sucesso!');
     this.clearSelection();
+    location.reload();
   }
 
   clearSelection() {
@@ -103,10 +104,10 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
-  get isCustomerInProject(): boolean {
+  get isAssociateInProject(): boolean {
     if (!this.userId) return true;
     const user = this.projectUsers.find(u => u.userId === this.userId);
-    return user?.role === 'CUSTOMER';
+    return user?.role === 'CUSTOMER' || user?.role === 'EXTERNAL_COLLABORATOR';
   }
 
   loadProject(): void {
@@ -175,6 +176,7 @@ export class PaymentsComponent implements OnInit {
       next: () => {
         alert('Parcela excluída com sucesso!');
         this.installments = this.installments.filter(i => i.id !== id);
+        location.reload();
       },
       error: (err) => alert('Erro ao excluir parcela: ' + (err.error?.message || err.message))
     });
@@ -197,22 +199,6 @@ export class PaymentsComponent implements OnInit {
       error: err => {
         console.error('Erro ao pagar parcela', err);
         alert('Erro ao marcar parcela como paga.');
-      }
-    });
-  }
-
-  cancelInstallment(installment: SelectableInstallment): void {
-    if (!confirm('Deseja realmente cancelar esta parcela?')) return;
-
-    this.installmentService.cancelInstallment(installment.id).subscribe({
-      next: updated => {
-        const idx = this.installments.findIndex(i => i.id === updated.id);
-        if (idx >= 0) this.installments[idx] = { ...updated, selected: false };
-        alert('Parcela cancelada com sucesso!');
-      },
-      error: err => {
-        console.error('Erro ao cancelar parcela', err);
-        alert('Erro ao cancelar a parcela.');
       }
     });
   }

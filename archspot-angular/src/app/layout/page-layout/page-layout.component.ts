@@ -14,6 +14,8 @@ export class PageLayoutComponent {
   @Input() showStatusBar: boolean = false; // padrão: omitir cronograma
   @Input() fullWidth: boolean = false; // padrão: offset-1 col-10
   @Input() projectId?: number;
+  @Input() editing: boolean = false; // controla se o título vira input
+  @Output() titleChange = new EventEmitter<string>();
 
   constructor(private location: Location, private router: Router) { }
 

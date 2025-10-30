@@ -1,6 +1,5 @@
 <div class="container">
   <div class="row mt-2">
-    <!-- condicionada largura do conteudo -->
     <div [ngClass]="fullWidth ? 'col-12' : 'offset-1 col-10'">
 
       <!-- Cabeçalho de Título -->
@@ -9,33 +8,40 @@
           <a *ngIf="showBackButton" (click)="goBack()" class="btn p-1">
             <img src="/assets/img/icons/chevron-double-left.svg" alt="" width="30" height="30">
           </a>
-          {{ title }}
+
+          <!-- Título: input se editando, texto normal caso contrário -->
+          <ng-container *ngIf="editing; else showTitle">
+            <input type="text" [ngModel]="title" (ngModelChange)="titleChange.emit($event)"
+              class="page-title-input ms-2" />
+          </ng-container>
+
+          <ng-template #showTitle>
+            <span class="page-title-text ms-2">{{ title }}</span>
+          </ng-template>
         </h1>
         <hr>
       </div>
 
       <div class="row gx-3 mb-5">
-
-        <!-- condiciona exibição ou não do sidebar -->
+        <!-- Sidebar -->
         <div class="col-3" *ngIf="showSidebar;">
           <app-sidebar-menu></app-sidebar-menu>
         </div>
 
         <div [class.col-9]="showSidebar" [class.col]="!showSidebar">
 
-          <!-- condiciona exibição ou não do cronograma -->
+          <!-- Status bar -->
           <ng-container *ngIf="showStatusBar && projectId">
             <app-project-status-bar [projectId]="projectId" (statusBarClick)="goToSchedule()">
             </app-project-status-bar>
           </ng-container>
 
-          <!-- Condiciona o tamanho da coluna de conteúdo conforme exibe ou não -->
+          <!-- Conteúdo da página -->
           <div class="bg-white rounded-2 p-4">
             <ng-content></ng-content>
           </div>
         </div>
-
-
       </div>
     </div>
   </div>
+</div>

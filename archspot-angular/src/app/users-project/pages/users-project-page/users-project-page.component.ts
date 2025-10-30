@@ -20,10 +20,10 @@ export class UsersProjectPageComponent implements OnInit {
   showAddModal = false;
 
   // roles para mudar no combo box
-  roles = ['STAFF', 'CUSTOMER'];
+  roles = ['STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
 
   // roles ao adicionar um usuario no projeto via modal
-  modalRoles = ['ADMIN', 'STAFF', 'CUSTOMER'];
+  modalRoles = ['ADMIN', 'STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
 
   constructor(
     private route: ActivatedRoute,

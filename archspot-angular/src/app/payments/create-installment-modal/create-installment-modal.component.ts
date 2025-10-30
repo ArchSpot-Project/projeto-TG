@@ -57,6 +57,7 @@ export class CreateInstallmentModalComponent {
         alert('Parcela criada com sucesso!');
         this.installmentCreated.emit(created);
         this.cancel();
+        location.reload();
       },
       error: (err) => alert('Erro ao criar parcela: ' + (err.error?.message || err.message))
     });

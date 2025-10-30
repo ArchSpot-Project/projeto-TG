@@ -20,6 +20,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   showEditModal = false;
   selectedPhase: any = null;
   selectedPhaseIndex?: number;
+  ganttViewMode: 'Day' | 'Month' | 'Year' = 'Month';
 
   userRole: string | null = null;       // role global do usuário
   userId: number | null = null;         // id do usuário
@@ -33,7 +34,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     private phaseService: PhaseService,
     private authService: AuthService,
     private userProjectService: UserProjectService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -51,6 +52,13 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.phases.length > 0) this.renderGantt();
+  }
+
+  changeGanttView(view: 'Day' | 'Month' | 'Year') {
+    this.ganttViewMode = view;
+    if (this.gantt) {
+      this.gantt.change_view_mode(view);
+    }
   }
 
   /** Verifica se o usuário logado é CUSTOMER neste projeto */
@@ -119,6 +127,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
         phase.realStartDate = updated.realStartDate;
         phase.status = 'IN_PROGRESS';
         this.updatePhaseStatus();
+        this.updateProjectRealDates();
       },
       error: err => alert(err.error?.message || 'Finalize a etapa anterior antes de iniciar esta fase.')
     });
@@ -131,8 +140,42 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
         phase.realEndDate = updated.realEndDate;
         phase.status = 'COMPLETED';
         this.updatePhaseStatus();
+        this.updateProjectRealDates();
       },
       error: err => console.error(err)
+    });
+  }
+
+  updateProjectRealDates(): void {
+    this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
+      next: phases => {
+        const realStartDates = phases
+          .filter(p => p.realStartDate)
+          .map(p => new Date(p.realStartDate));
+
+        const realEndDates = phases
+          .filter(p => p.realEndDate)
+          .map(p => new Date(p.realEndDate));
+
+        const realStartDate = realStartDates.length
+          ? new Date(Math.min(...realStartDates.map(d => d.getTime())))
+          : null;
+
+        const realEndDate = realEndDates.length
+          ? new Date(Math.max(...realEndDates.map(d => d.getTime())))
+          : null;
+
+        if (realStartDate || realEndDate) {
+          this.projectService.updateProjectRealDates(this.projectId, realStartDate, realEndDate).subscribe({
+            next: proj => {
+              this.project = proj;
+              console.log('Projeto atualizado com datas reais:', proj);
+            },
+            error: err => console.error('Erro ao atualizar projeto com datas reais', err)
+          });
+        }
+      },
+      error: err => console.error('Erro ao buscar fases para atualizar projeto', err)
     });
   }
 
@@ -185,7 +228,7 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     }));
 
     this.gantt = new Gantt(this.ganttContainer.nativeElement, tasks, {
-      view_mode: 'Month',
+      view_mode: this.ganttViewMode,
       date_format: 'YYYY-MM-DD',
       custom_popup_html: (task: any) => `
         <div class="p-2">

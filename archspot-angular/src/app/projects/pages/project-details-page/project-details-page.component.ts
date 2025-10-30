@@ -49,6 +49,8 @@ export class ProjectDetailsPageComponent {
     this.projectService.getProjectById(id).subscribe({
       next: (project) => {
         this.project = project;
+        this.tempName = project.name;
+        this.tempDescription = project.description || '';
         this.loading = false;
       },
       error: (err) => {
