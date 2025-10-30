@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.archspot.ArchSpot_BackEnd.dtos.AlbumCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.AlbumDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.DirectoryCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.DirectoryDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
@@ -31,6 +33,7 @@ import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.services.AlbumService;
 import com.archspot.ArchSpot_BackEnd.services.DirectoryService;
 import com.archspot.ArchSpot_BackEnd.services.InstallmentService;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
@@ -60,6 +63,9 @@ public class ProjectController {
 
   @Autowired
   private DirectoryService directoryService;
+
+  @Autowired
+  private AlbumService albumService;
 
   /*
    * CRUD BÁSICO DE PROJETO
@@ -220,5 +226,27 @@ public class ProjectController {
   }
 
   // Deletar diretório e Update são atribuições do DirectoryController
+
+  /*
+   * ENDPOINTS DE ÁLBUNS
+   */
+
+  // listar por projeto
+  @GetMapping("/{projectId}/albums")
+  public ResponseEntity<List<AlbumDTO>> getAlbumsByProject(@PathVariable Long projectId) {
+    return ResponseEntity.ok(albumService.findByProject(projectId));
+  }
+
+  // criar álbum
+  @PostMapping("/{projectId}/albums")
+  public ResponseEntity<AlbumDTO> createAlbum(
+      @PathVariable Long projectId,
+      @RequestBody AlbumCreateDTO dto) {
+    dto.setProjectId(projectId);
+    AlbumDTO created = albumService.createAlbum(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+  }
+
+  // Deletar álbum e Update são atribuições do AlbumController
 
 }
