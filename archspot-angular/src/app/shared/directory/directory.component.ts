@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { DirectoryService, DirectoryDTO } from '../../core/services/directory.service';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { DirectoryDTO, DirectoryService } from '../../core/services/directory.service';
 import { DocumentDTO, DocumentService } from '../../core/services/document.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-directory',
@@ -9,52 +10,59 @@ import { DocumentDTO, DocumentService } from '../../core/services/document.servi
 })
 export class DirectoryComponent implements OnInit {
   @Input() directory!: DirectoryDTO;
-  subdirectories: DirectoryDTO[] = [];
+  @Output() directoryDeleted = new EventEmitter<number>();
+
   documents: DocumentDTO[] = [];
   expanded = false;
 
   constructor(
     private directoryService: DirectoryService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private authService: AuthService
   ) { }
 
-  ngOnInit(): void {
+  isCustomer(): boolean {
+    const user = this.authService.getUser();
+    return user?.userRole === 'CUSTOMER';
   }
+
+  ngOnInit(): void { }
 
   toggleExpand() {
     this.expanded = !this.expanded;
-
     if (this.expanded) {
-      this.loadSubdirectories();
       this.loadDocuments();
     }
   }
 
-  loadSubdirectories() {
-    this.directoryService.getSubdirectories(this.directory.id).subscribe({
-      next: (subdirs) => this.subdirectories = subdirs,
-      error: (err) => console.error('Erro ao carregar subdiretórios', err)
-    });
-  }
-
   loadDocuments() {
     this.documentService.getDocumentsByDirectory(this.directory.id).subscribe({
-      next: (docs) => this.documents = docs,
-      error: (err) => console.error('Erro ao carregar documentos', err)
+      next: (docs) => (this.documents = docs),
+      error: (err) => console.error('Erro ao carregar documentos', err),
     });
   }
 
-  criarSubdiretorio() {
-    const nome = prompt('Nome do novo subdiretório:');
-    if (!nome) return;
+  uploadFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (!file) return;
 
-    this.directoryService.createSubdirectory(this.directory.id, { name: nome }).subscribe({
-      next: (novo) => {
-        this.subdirectories.push(novo);
-        alert('Subdiretório criado!');
-      },
-      error: (err) => alert('Erro ao criar subdiretório')
-    });
+      const uploadedById = 1; // ID do usuário logado
+
+      this.documentService.uploadDocument(this.directory.id, file, uploadedById).subscribe({
+        next: () => {
+          alert('Documento enviado com sucesso!');
+          this.loadDocuments();
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Erro ao enviar documento.');
+        },
+      });
+    };
+    input.click();
   }
 
   renomearDiretorio() {
@@ -66,16 +74,22 @@ export class DirectoryComponent implements OnInit {
         this.directory.name = updated.name;
         alert('Diretório renomeado com sucesso!');
       },
-      error: () => alert('Erro ao renomear diretório.')
+      error: () => alert('Erro ao renomear diretório.'),
     });
   }
 
   deletarDiretorio() {
-    if (confirm(`Deseja deletar o diretório "${this.directory.name}" e todo o seu conteúdo?`)) {
-      this.directoryService.deleteDirectory(this.directory.id).subscribe({
-        next: () => alert('Diretório deletado!'),
-        error: () => alert('Erro ao deletar diretório.')
-      });
-    }
+    const confirmacao = confirm(
+      `Deseja realmente excluir o diretório "${this.directory.name}" e todo o seu conteúdo?`
+    );
+    if (!confirmacao) return;
+
+    this.directoryService.deleteDirectory(this.directory.id).subscribe({
+      next: () => {
+        alert('Diretório excluído com sucesso!');
+        this.directoryDeleted.emit(this.directory.id); // Notifica o pai
+      },
+      error: () => alert('Erro ao excluir diretório.'),
+    });
   }
 }

@@ -7,6 +7,7 @@ import { UserProjectService } from '../core/services/user-project.service';
 
 interface SelectableInstallment extends InstallmentResponse {
   selected?: boolean;
+  paymentStatus: PaymentStatus;
 }
 
 @Component({
@@ -58,40 +59,6 @@ export class PaymentsComponent implements OnInit {
     }
   }
 
-  cancelSelectedInstallments() {
-    if (!confirm('Deseja realmente cancelar as parcelas selecionadas?')) return;
-
-    this.selectedInstallments.forEach(inst => {
-      this.installmentService.cancelInstallment(inst.id).subscribe({
-        next: updated => {
-          const idx = this.installments.findIndex(i => i.id === updated.id);
-          if (idx >= 0) this.installments[idx] = updated;
-        },
-        error: err => console.error('Erro ao cancelar parcela', err)
-      });
-    });
-
-    alert('Parcelas canceladas com sucesso!');
-    this.clearSelection();
-  }
-
-  deleteSelectedInstallments() {
-    if (!confirm('Deseja realmente excluir as parcelas selecionadas?')) return;
-
-    this.selectedInstallments.forEach(inst => {
-      this.installmentService.deleteInstallment(inst.id).subscribe({
-        next: () => {
-          this.installments = this.installments.filter(i => i.id !== inst.id);
-        },
-        error: err => console.error('Erro ao excluir parcela', err)
-      });
-    });
-
-    alert('Parcelas excluídas com sucesso!');
-    this.clearSelection();
-    location.reload();
-  }
-
   clearSelection() {
     this.selectedInstallments.forEach(i => i.selected = false);
     this.selectedInstallments = [];
@@ -117,22 +84,41 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
+  private isOverdue(estimatedDate: string | Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const est = new Date(estimatedDate);
+    est.setHours(0, 0, 0, 0);
+    return est < today;
+  }
+
+  private recalculateProjectTotal(): void {
+    if (!this.project) return;
+    this.project.totalValue = this.installments
+      .reduce((sum, inst) => sum + inst.amount, 0);
+  }
+
   loadInstallments(): void {
     this.installmentService.findAll().subscribe({
       next: list => {
         this.installments = list
           .filter(i => i.projectId === this.projectId)
-          .map(i => ({ ...i, selected: false })) // adiciona selected
+          .map(i => {
+            let paymentStatus: PaymentStatus = 'PENDING';
+            if (i.realPaymentDate) paymentStatus = 'PAID';
+            else if (this.isOverdue(i.estimatedPaymentDate)) paymentStatus = 'OVERDUE';
+            return { ...i, selected: false, paymentStatus };
+          })
           .sort((a, b) => (a.estimatedPaymentDate > b.estimatedPaymentDate ? 1 : -1));
+
+        this.recalculateProjectTotal();
       },
       error: err => console.error('Erro ao carregar parcelas', err)
     });
   }
 
   handleInstallmentsCreated(newInstallments: InstallmentResponse[]) {
-    const selectable = newInstallments.map(i => ({ ...i, selected: false }));
-    this.installments.push(...selectable);
-    this.installments.sort((a, b) => (a.estimatedPaymentDate > b.estimatedPaymentDate ? 1 : -1));
+    this.loadInstallments();
   }
 
   openCreateInstallmentModal(): void {
@@ -144,11 +130,10 @@ export class PaymentsComponent implements OnInit {
   }
 
   onInstallmentCreated(newInstallment: InstallmentResponse): void {
-    this.installments.push({ ...newInstallment, selected: false });
-    this.installments.sort((a, b) => (a.estimatedPaymentDate > b.estimatedPaymentDate ? 1 : -1));
+    this.loadInstallments();
   }
 
-  openEditInstallmentModal(installment: SelectableInstallment, index: number): void {
+  openEditInstallmentModal(installment: SelectableInstallment): void {
     this.selectedInstallment = { ...installment };
     this.showEditModal = true;
   }
@@ -164,10 +149,27 @@ export class PaymentsComponent implements OnInit {
         this.installments = this.installments.filter(i => i.id !== this.selectedInstallment?.id);
       }
     } else {
+      const today = new Date();
+      let status: PaymentStatus = 'PENDING';
+      if (updated.realPaymentDate) status = 'PAID';
+      else if (new Date(updated.estimatedPaymentDate) < today) status = 'OVERDUE';
+
+      const installmentWithStatus: SelectableInstallment = { ...updated, selected: false, paymentStatus: status };
       const idx = this.installments.findIndex(i => i.id === updated.id);
-      if (idx >= 0) this.installments[idx] = { ...updated, selected: false };
+      if (idx >= 0) this.installments[idx] = installmentWithStatus;
     }
     this.closeEditModal();
+  }
+
+  deleteSelectedInstallments() {
+    if (!confirm('Deseja realmente excluir as parcelas selecionadas?'))
+      return; this.selectedInstallments.forEach(inst => {
+        this.installmentService.deleteInstallment(inst.id).subscribe({
+          next: () => { this.installments = this.installments.filter(i => i.id !== inst.id); },
+          error: err => console.error('Erro ao excluir parcela', err)
+        });
+      });
+    alert('Parcelas excluídas com sucesso!'); this.clearSelection(); location.reload();
   }
 
   deleteInstallment(id: number): void {
@@ -190,11 +192,10 @@ export class PaymentsComponent implements OnInit {
 
     this.installmentService.payInstallment(installment.id, installment.paymentMethod).subscribe({
       next: updated => {
+        const installmentWithStatus: SelectableInstallment = { ...updated, selected: false, paymentStatus: 'PAID' };
         const idx = this.installments.findIndex(i => i.id === updated.id);
-        if (idx >= 0) this.installments[idx] = { ...updated, selected: false };
-        else this.installments.push({ ...updated, selected: false });
-
-        alert('Parcela paga.');
+        if (idx >= 0) this.installments[idx] = installmentWithStatus;
+        else this.installments.push(installmentWithStatus);
       },
       error: err => {
         console.error('Erro ao pagar parcela', err);

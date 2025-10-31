@@ -1,50 +1,31 @@
 <div class="directory">
   <div class="directory-header" (click)="toggleExpand()">
-    <img
-      src="assets/img/icons/folder.svg"
-      width="20"
-      height="20"
-      class="me-2"
-      [class.open]="expanded"
-    />
-    <strong>{{ directory.name }}</strong>
+    <!-- Ícone da pasta -->
+    <img src="assets/img/icons/folder.svg" width="20" height="20" class="me-2 folder-icon" [class.open]="expanded" />
 
+    <strong class="flex-grow-1">{{ directory.name }}</strong>
+
+    <!-- Ações -->
     <div class="actions">
-      <img
-        src="assets/img/icons/plus.svg"
-        class="icon"
-        title="Novo subdiretório"
-        (click)="criarSubdiretorio(); $event.stopPropagation()"
-      />
-      <img
-        src="assets/img/icons/pencil.svg"
-        class="icon"
-        title="Renomear"
-        (click)="renomearDiretorio(); $event.stopPropagation()"
-      />
-      <img
-        src="assets/img/icons/trash3.svg"
-        class="icon"
-        title="Excluir"
-        (click)="deletarDiretorio(); $event.stopPropagation()"
-      />
+      <img src="assets/img/icons/pencil.svg" class="icon" title="Renomear diretório"
+        (click)="renomearDiretorio(); $event.stopPropagation()" />
+
+      <img src="assets/img/icons/trash3.svg" class="icon" title="Excluir diretório"
+        (click)="deletarDiretorio(); $event.stopPropagation()" />
+
+      <img *ngIf="directory.type === 'DOCUMENTS'" src="assets/img/icons/upload.svg" class="icon"
+        title="Enviar documento" (click)="uploadFile(); $event.stopPropagation()" />
     </div>
   </div>
 
-  <!-- diretorios -->
+  <!-- Conteúdo (tabela de documentos) -->
   <div class="directory-content" *ngIf="expanded">
-    <div class="subdirectories ms-4 mt-2">
-      <app-directory
-        *ngFor="let sub of subdirectories"
-        [directory]="sub"
-      ></app-directory>
-    </div>
+    <app-table *ngIf="documents.length > 0" [directoryId]="directory.id"
+      [title]="'Documentos em ' + directory.name"></app-table>
 
-    <!-- documentos -->
-    <app-table
-      *ngIf="documents.length > 0"
-      [directoryId]="directory.id"
-      [title]="'Documentos em ' + directory.name"
-    ></app-table>
+    <!-- Se não houver documentos -->
+    <div *ngIf="documents.length === 0" class="text-muted small ps-4 py-2">
+      Nenhum documento neste diretório.
+    </div>
   </div>
 </div>

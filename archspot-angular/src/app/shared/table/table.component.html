@@ -14,10 +14,15 @@
     <tbody>
         <tr *ngFor="let doc of documents; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ doc.name }}</td>
+            <td>
+                <span class="document-name" [title]="doc.description || 'Sem descrição'" (click)="abrirDoc(doc)">
+                    {{ getDisplayName(doc.name) }}
+                </span>
+            </td>
+
             <td>{{ getUploaderName(doc.uploadedById) }}</td>
             <td>{{ doc.modificationDate | date:'dd-MM-yyyy HH:mm' }}</td>
-            <td>{{ doc.size }} MB</td>
+            <td>{{ (doc.size / (1024*1024)) | number:'1.2-2' }} MB</td>
 
             <!-- dropdown editar arquivo -->
             <td>
@@ -39,19 +44,19 @@
                                 Baixar uma cópia
                             </a>
                         </li>
-                        <li>
+                        <li *ngIf="!isCustomerInProject">
                             <a class="dropdown-item" (click)="substituirDoc(doc)">
                                 <img src="assets/img/icons/upload.svg" width="15" height="15">
                                 Substituir nova versão
                             </a>
                         </li>
-                        <li>
+                        <li *ngIf="!isCustomerInProject">
                             <a class="dropdown-item" (click)="renomearDoc(doc)">
                                 <img src="assets/img/icons/pencil.svg" width="15" height="15">
                                 Renomear
                             </a>
                         </li>
-                        <li>
+                        <li *ngIf="!isCustomerInProject">
                             <a class="dropdown-item" (click)="deletarDoc(doc)">
                                 <img src="assets/img/icons/trash3.svg" width="15" height="15">
                                 Deletar

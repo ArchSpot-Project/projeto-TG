@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 export interface DocumentDTO {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   uploadedById: number;
   directoryId: number;
   uploadDate: string;
@@ -21,30 +21,33 @@ export interface DocumentDTO {
 export class DocumentService {
   private baseUrl = 'http://localhost:8080';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  /** Listar documentos de um diretório */
   getDocumentsByDirectory(directoryId: number): Observable<DocumentDTO[]> {
     return this.http.get<DocumentDTO[]>(`${this.baseUrl}/directories/${directoryId}/documents`);
   }
 
-  /** Fazer upload de um novo documento */
-  uploadDocument(directoryId: number, file: File, uploadedById: number, description?: string): Observable<DocumentDTO> {
+  uploadDocument(directoryId: number, file: File, uploadedById: number, description?: string) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('uploadedById', uploadedById.toString());
     if (description) formData.append('description', description);
 
-    return this.http.post<DocumentDTO>(`${this.baseUrl}/directories/${directoryId}/documents/upload`, formData);
+    return this.http.post<DocumentDTO>(
+      `http://localhost:8080/directories/${directoryId}/documents/upload`,
+      formData
+    );
   }
 
-  updateDocument(id: number, dto: DocumentDTO): Observable<DocumentDTO> {
+  updateDocument(id: number, dto: DocumentDTO): Observable<DocumentDTO> { //renomear
     return this.http.put<DocumentDTO>(`${this.baseUrl}/documents/${id}`, dto);
   }
 
-  uploadNewVersion(id: number, file: File): Observable<DocumentDTO> {
+  uploadNewVersion(id: number, file: File, description: string = ''): Observable<DocumentDTO> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('description', description);
+
     return this.http.post<DocumentDTO>(`${this.baseUrl}/documents/${id}/update`, formData);
   }
 

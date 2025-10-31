@@ -23,16 +23,12 @@ export class DirectoryService {
     return this.http.get<DirectoryDTO[]>(`http://localhost:8080/projects/${projectId}/directories?type=${type}`);
   }
 
+  createDirectoryInProject(projectId: number, dto: { name: string }) {
+    return this.http.post<DirectoryDTO>(`http://localhost:8080/projects/${projectId}/directories`, dto);
+  }
+
   getDocumentsByDirectory(directoryId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${directoryId}/documents`);
-  }
-
-  getSubdirectories(directoryId: number): Observable<DirectoryDTO[]> {
-    return this.http.get<DirectoryDTO[]>(`${this.apiUrl}/${directoryId}/subdirectories`);
-  }
-
-  createSubdirectory(parentId: number, dto: { name: string }): Observable<DirectoryDTO> {
-    return this.http.post<DirectoryDTO>(`${this.apiUrl}/${parentId}/subdirectories`, dto);
   }
 
   renameDirectory(id: number, newName: string): Observable<DirectoryDTO> {
@@ -41,5 +37,13 @@ export class DirectoryService {
 
   deleteDirectory(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getSubdirectories(directoryId: number): Observable<DirectoryDTO[]> {
+    return this.http.get<DirectoryDTO[]>(`${this.apiUrl}/${directoryId}/subdirectories`);
+  }
+
+  createSubdirectory(parentId: number, dto: { name: string }): Observable<DirectoryDTO> {
+    return this.http.post<DirectoryDTO>(`${this.apiUrl}/${parentId}/subdirectories`, dto);
   }
 }
