@@ -31,8 +31,8 @@
     </div>
   </div>
 
+  <!-- diretorios -->
   <div class="directory-content" *ngIf="expanded">
-    <!-- Subdiretórios -->
     <div class="subdirectories ms-4 mt-2">
       <app-directory
         *ngFor="let sub of subdirectories"
@@ -40,7 +40,7 @@
       ></app-directory>
     </div>
 
-    <!-- Documentos -->
+    <!-- documentos -->
     <app-table
       *ngIf="documents.length > 0"
       [directoryId]="directory.id"

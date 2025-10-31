@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DirectoryDTO, DirectoryService } from '../core/services/directory.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-documents',
@@ -14,12 +15,18 @@ export class DocumentsComponent implements OnInit {
   activeTabId: number | null = null;
   activeSubTabId: number | null = null;
 
-  projectId = 1; // TODO: pegar dinamicamente conforme o projeto atual
+  projectId!: number;
 
-  constructor(private directoryService: DirectoryService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private directoryService: DirectoryService
+  ) { }
 
   ngOnInit(): void {
-    this.loadDirectories();
+    this.route.params.subscribe(params => {
+      this.projectId = +params['id'];
+      this.loadDirectories();
+    });
   }
 
   loadDirectories() {

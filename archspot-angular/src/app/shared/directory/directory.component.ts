@@ -16,10 +16,9 @@ export class DirectoryComponent implements OnInit {
   constructor(
     private directoryService: DirectoryService,
     private documentService: DocumentService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    // Carrega subdiretórios e documentos somente se for expandido
   }
 
   toggleExpand() {
@@ -58,7 +57,6 @@ export class DirectoryComponent implements OnInit {
     });
   }
 
-  /** Renomear diretório */
   renomearDiretorio() {
     const novoNome = prompt('Novo nome do diretório:', this.directory.name);
     if (!novoNome || novoNome === this.directory.name) return;
@@ -72,7 +70,6 @@ export class DirectoryComponent implements OnInit {
     });
   }
 
-  /** Deletar diretório */
   deletarDiretorio() {
     if (confirm(`Deseja deletar o diretório "${this.directory.name}" e todo o seu conteúdo?`)) {
       this.directoryService.deleteDirectory(this.directory.id).subscribe({

@@ -1,6 +1,6 @@
 <app-page-layout [title]="'Documentos'" [showSidebar]="false" [showBackButton]="true">
 
-  <!-- NAV PRINCIPAL (Diretórios raiz) -->
+  <!-- diretórios raiz -->
   <nav *ngIf="directories.length > 0">
     <div class="nav nav-tabs fs-5" role="tablist">
 
@@ -12,14 +12,12 @@
         {{ dir.name }}
       </button>
 
-      <!-- botão adicionar diretório -->
       <a class="btn align-middle ms-2">
         <img src="/assets/img/icons/plus-circle.svg" alt="" width="20" height="20">
       </a>
     </div>
   </nav>
 
-  <!-- SUBDIRETÓRIOS (só aparece quando o diretório ativo tem filhos) -->
   <nav *ngIf="subdirectories.length > 0" class="mt-2">
     <div class="nav nav-tabs fs-6">
       <button *ngFor="let sub of subdirectories"
@@ -30,7 +28,6 @@
         {{ sub.name }}
       </button>
 
-      <!-- botão adicionar subdiretório -->
       <a class="btn align-middle ms-2">
         <img src="/assets/img/icons/plus-circle.svg" alt="" width="20" height="20">
       </a>
@@ -44,7 +41,7 @@
       <app-table [directoryId]="activeSubTabId"></app-table>
     </div>
 
-    <!-- Se o diretório não tem subdiretórios -->
+    <!-- se o diretório não tem subdiretórios -->
     <ng-template #parentDocs>
       <app-table *ngIf="activeTabId" [directoryId]="activeTabId"></app-table>
     </ng-template>
