@@ -209,7 +209,7 @@ public class TestConfig implements CommandLineRunner {
                 // Subdiretórios
                 Directory subdir1 = new Directory(null, "Estudo Preliminar", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
                 Directory subdir2 = new Directory(null, "Executivo", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
-                Directory subdir3 = new Directory(null, "Engenharia", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir2, null, null);
+                Directory subdir3 = new Directory(null, "Engenharia", LocalDateTime.now(), DirectoryType.DOCUMENTS, project1, dir3, null, null);
 
                 directoryRepository.saveAll(Arrays.asList(subdir1, subdir2, subdir3));
 
@@ -217,7 +217,7 @@ public class TestConfig implements CommandLineRunner {
                 Document doc1 = Document.builder()
                                 .name("Planta Baixa")
                                 .description("Planta baixa do pavimento térreo")
-                                .directory(subdir1)
+                                .directory(subdir3)
                                 .uploadedBy(user1)
                                 .uploadDate(LocalDateTime.now())
                                 .modificationDate(LocalDateTime.now())
@@ -229,7 +229,7 @@ public class TestConfig implements CommandLineRunner {
                 Document doc2 = Document.builder()
                                 .name("Memorial Descritivo")
                                 .description("Documento com especificações do projeto")
-                                .directory(subdir2)
+                                .directory(subdir3)
                                 .uploadedBy(user2)
                                 .uploadDate(LocalDateTime.now())
                                 .modificationDate(LocalDateTime.now())

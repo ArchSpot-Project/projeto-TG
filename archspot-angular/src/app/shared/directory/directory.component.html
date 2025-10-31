@@ -1,0 +1,50 @@
+<div class="directory">
+  <div class="directory-header" (click)="toggleExpand()">
+    <img
+      src="assets/img/icons/folder.svg"
+      width="20"
+      height="20"
+      class="me-2"
+      [class.open]="expanded"
+    />
+    <strong>{{ directory.name }}</strong>
+
+    <div class="actions">
+      <img
+        src="assets/img/icons/plus.svg"
+        class="icon"
+        title="Novo subdiretório"
+        (click)="criarSubdiretorio(); $event.stopPropagation()"
+      />
+      <img
+        src="assets/img/icons/pencil.svg"
+        class="icon"
+        title="Renomear"
+        (click)="renomearDiretorio(); $event.stopPropagation()"
+      />
+      <img
+        src="assets/img/icons/trash3.svg"
+        class="icon"
+        title="Excluir"
+        (click)="deletarDiretorio(); $event.stopPropagation()"
+      />
+    </div>
+  </div>
+
+  <div class="directory-content" *ngIf="expanded">
+    <!-- Subdiretórios -->
+    <div class="subdirectories ms-4 mt-2">
+      <app-directory
+        *ngFor="let sub of subdirectories"
+        [directory]="sub"
+      ></app-directory>
+    </div>
+
+    <!-- Documentos -->
+    <app-table
+      *ngIf="documents.length > 0"
+      [directoryId]="directory.id"
+      [title]="'Documentos em ' + directory.name"
+    ></app-table>
+  </div>
+</div>

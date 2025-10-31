@@ -1,0 +1,42 @@
+.directory {
+  border-left: 2px solid #ccc;
+  margin-left: 10px;
+  padding-left: 10px;
+}
+
+.directory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.directory-header:hover {
+  background: #e9ecef;
+}
+
+.directory-header img.open {
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.icon:hover {
+  opacity: 1;
+}

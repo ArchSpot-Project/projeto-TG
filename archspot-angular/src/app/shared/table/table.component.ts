@@ -1,4 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { DocumentDTO, DocumentService } from '../../core/services/document.service';
+import { UserService } from '../../core/services/user.service';
+import { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-table',
@@ -7,59 +10,116 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class TableComponent implements OnInit {
   @Input() title = '';
+  @Input() directoryId!: number;
 
-  documents: any[] = [];
+  documents: DocumentDTO[] = [];
+  userCache: { [id: number]: string } = {};
+
+  constructor(
+    private documentService: DocumentService,
+    private userService: UserService
+  ) { }
 
   ngOnInit(): void {
-    // documents de exemplo - serão dados do back ou API do google drive
-    this.documents = [
-      {
-        name: `${this.title} Documento 1`,
-        owner: 'Ana',
-        modifiedTime: new Date('2025-09-10T10:30:00'),
-        size: 2.4
+    this.loadDocuments();
+  }
+
+  loadDocuments() {
+    if (!this.directoryId) return;
+
+    this.documentService.getDocumentsByDirectory(this.directoryId).subscribe({
+      next: (docs) => {
+        this.documents = docs;
+        this.loadUserNames();
       },
-      {
-        name: `${this.title} Documento 2`,
-        owner: 'Fernando',
-        modifiedTime: new Date('2025-12-10T14:30:00'),
-        size: 1.8
-      },
-      {
-        name: `${this.title} Documento 3`,
-        owner: 'Helio',
-        modifiedTime: new Date('2025-11-10T16:30:00'),
-        size: 2.1
+      error: (err) => console.error('Erro ao carregar documentos', err)
+    });
+  }
+
+  loadUserNames() {
+    const uniqueUserIds = Array.from(new Set(this.documents.map(d => d.uploadedById)));
+
+    uniqueUserIds.forEach(id => {
+      if (!this.userCache[id]) {
+        this.userService.getUserById(id).subscribe({
+          next: (user: User) => this.userCache[id] = user.name,
+          error: () => this.userCache[id] = `Usuário ${id}`
+        });
       }
-    ];
+    });
   }
 
-  //ações do dropdown
-  abrirDoc(doc: any) {
-    console.log('Abrir:', doc.name);
-    alert(`Abrindo: ${doc.name}`);
+  getUploaderName(id: number): string {
+    return this.userCache[id] || `Carregando...`;
   }
 
-  downloadDoc(doc: any) {
-    console.log('Baixar:', doc.name);
-    alert(`Baixando: ${doc.name}`);
+  abrirDoc(doc: DocumentDTO) {
+    window.open(doc.fileUrl, '_blank');
   }
 
-  substituirDoc(doc: any) {
-    console.log('Substituir:', doc.name);
-    alert(`Substituindo: ${doc.name}`);
+  downloadDoc(doc: DocumentDTO) {
+    this.documentService.downloadDocument(doc.id).subscribe({
+      next: (blob) => {
+        const a = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = doc.name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => alert('Erro ao baixar o documento.')
+    });
   }
 
-  renomearDoc(doc: any) {
-    console.log('Renomear:', doc.name);
+  substituirDoc(doc: DocumentDTO) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '*/*';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      this.documentService.uploadNewVersion(doc.id, file).subscribe({
+        next: (updatedDoc) => {
+          alert(`Nova versão enviada com sucesso!`);
+          this.loadDocuments();
+          location.reload();
+        },
+        error: () => alert('Erro ao enviar nova versão.')
+      });
+    };
+    input.click();
+  }
+
+  renomearDoc(doc: DocumentDTO) {
     const newName = prompt('Digite o novo nome', doc.name);
-    if (newName) doc.name = newName;
+    if (!newName || newName === doc.name) return;
+
+    const updatedDoc = { ...doc, name: newName };
+
+    this.documentService.updateDocument(doc.id, updatedDoc).subscribe({
+      next: (response) => {
+        doc.name = response.name;
+        alert('Documento renomeado com sucesso!');
+        this.loadDocuments();
+      },
+      error: (err) => {
+        console.error('Erro ao renomear:', err);
+        alert('Erro ao renomear documento.');
+      }
+    });
   }
 
-  deletarDoc(doc: any) {
-    console.log('Deletar:', doc.name);
-    if (confirm(`Deseja realmente deletar ${doc.name}?`)) {
-      this.documents = this.documents.filter(d => d !== doc);
-    }
+  deletarDoc(doc: DocumentDTO) {
+    if (!confirm(`Deseja realmente deletar ${doc.name}?`)) return;
+
+    this.documentService.deleteDocument(doc.id).subscribe({
+      next: () => {
+        this.documents = this.documents.filter(d => d.id !== doc.id);
+        alert('Documento deletado com sucesso!');
+        location.reload();
+      },
+      error: () => alert('Erro ao deletar documento.')
+    });
   }
 }

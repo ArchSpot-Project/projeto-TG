@@ -4,6 +4,7 @@ import { LayoutModule } from '../layout/layout.module';
 import { DocumentsRoutingModule } from './documents-routing.module';
 import { DocumentsComponent } from './documents.component';
 import { SharedModule } from '../shared/shared.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [DocumentsComponent],
@@ -11,7 +12,8 @@ import { SharedModule } from '../shared/shared.module';
     CommonModule,
     DocumentsRoutingModule,
     LayoutModule,
-    SharedModule  
+    SharedModule,
+    FormsModule
   ]
 })
 export class DocumentsModule {}
