@@ -19,48 +19,19 @@
   </div>
 </div>
 
+<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <div class="row d-flex justify-content-between align-items-end">
-    <div class="col-auto pe-0">
-      <button class="btn p-1" (click)="voltarEdicao()">
-        <img src="/assets/img/icons/chevron-left.svg" alt="" width="20" height="20">
-      </button>
-    </div>
-    <div class="col fs-5 fw-medium">Pagamentos do Projeto: {{ projetoSelecionado.projectName }}</div>
-    <div class="col-auto">
-      <button class="btn p-1" (click)="baixarPDF()">
-        <img src="/assets/img/icons/download.svg" alt="Baixar" width="20" height="20">
-      </button>
-    </div>
-    <hr class="mt-1">
-  </div>
-
-  <table class="table mt-4 align-middle" id="relatorioTabela" *ngIf="parcelas.length > 0">
-    <thead class="table-light">
-      <tr>
-        <th>Projeto</th>
-        <th>Parcela</th>
-        <th>Descrição</th>
-        <th>Status</th>
-        <th>Valor</th>
-        <th>Previsão Pgto</th>
-        <th>Data Pgto</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of parcelas">
-        <td>{{ projetoSelecionado.projectName }}</td>
-        <td>{{ p.name }}</td>
-        <td>{{ p.description }}</td>
-        <td>{{ p.status }}</td>
-        <td>{{ p.amount | currency:'BRL' }}</td>
-        <td>{{ p.estimatedPaymentDate | date:'dd/MM/yyyy' }}</td>
-        <td>{{ p.realPaymentDate ? (p.realPaymentDate | date:'dd/MM/yyyy') : '-' }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div *ngIf="parcelas.length === 0">
-    <h5 class="fw-semibold mt-3">Nenhuma parcela encontrada.</h5>
-  </div>
+  <app-reports-table [titulo]="'Pagamentos do Projeto - ' + projetoSelecionado.projectName" 
+  [pdfNomeArquivo]="'relatorio_pagamentos_projeto.pdf'"
+  [colunas]="[
+  { campo: 'projeto', label: 'Projeto' },
+  { campo: 'name', label: 'Parcela' },
+  { campo: 'description', label: 'Descrição' },
+  { campo: 'status', label: 'Status', pipe: 'statusTranslate' },
+  { campo: 'amount', label: 'Valor', pipe: 'currency' },
+  { campo: 'paymentMethod', label: 'Método de Pagamento', pipe: 'paymentMethod' },
+  { campo: 'estimatedPaymentDate', label: 'Previsão Pgto', pipe: 'date' },
+  { campo: 'realPaymentDate', label: 'Data Pgto', pipe: 'date' }
+]" [registros]="parcelas" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
+  </app-reports-table>
 </ng-template>

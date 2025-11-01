@@ -19,53 +19,23 @@
   </div>
 </div>
 
+<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <div class="row d-flex justify-content-between align-items-end">
-    <div class="col-auto pe-0">
-      <button class="btn p-1" (click)="voltarEdicao()">
-        <img src="/assets/img/icons/chevron-left.svg" alt="" width="20" height="20">
-      </button>
-    </div>
-    <div class="col fs-5 fw-medium">Cronograma do Projeto: {{ projetoSelecionado.projectName }}</div>
-    <div class="col-auto pe-0">
-      <button class="btn p-1" (click)="baixarPDF()">
-        <img src="/assets/img/icons/download.svg" alt="Baixar" width="20" height="20">
-      </button>
-    </div>
-    <hr class="mt-1">
-  </div>
-
-  <div *ngIf="loading">Gerando relatório...</div>
-  <div *ngIf="error" class="text-danger">{{ error }}</div>
-
-  <div *ngIf="phases.length > 0 && !loading">
-    <table class="table mt-4 align-middle" id="relatorioTabela">
-      <thead class="table-light">
-        <tr>
-          <th>Projeto</th>
-          <th>Etapa</th>
-          <th>Status</th>
-          <th>Previsão Início</th>
-          <th>Previsão Término</th>
-          <th>Data Real de Início</th>
-          <th>Data Real de Término</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let phase of phases">
-          <td>{{ projetoSelecionado.projectName }}</td>
-          <td>{{ phase.name }}</td>
-          <td>{{ mapStatus(phase.status) | phaseStatus }}</td>
-          <td>{{ phase.estimatedStartDate | date:'dd/MM/yyyy' }}</td>
-          <td>{{ phase.estimatedEndDate | date:'dd/MM/yyyy' }}</td>
-          <td>{{ phase.realStartDate ? (phase.realStartDate | date:'dd/MM/yyyy') : '-' }}</td>
-          <td>{{ phase.realEndDate ? (phase.realEndDate | date:'dd/MM/yyyy') : '-' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="phases.length === 0 && !loading">
-    <h5 class="fw-semibold mt-3">Nenhuma etapa encontrada.</h5>
-  </div>
+  <app-reports-table
+    [titulo]="'Cronograma Por Projeto'"
+    [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
+    [colunas]="[
+      { campo: 'projectName', label: 'Projeto' },
+      { campo: 'name', label: 'Etapa' },
+      { campo: 'status', label: 'Status' },
+      { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
+      { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
+      { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
+      { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
+    ]"
+    [registros]="phases"
+    [loading]="loading"
+    [error]="error"
+    (voltar)="voltarEdicao()">
+  </app-reports-table>
 </ng-template>

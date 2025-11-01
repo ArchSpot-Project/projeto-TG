@@ -11,6 +11,7 @@ import { ReportFinanceiroProjetoComponent } from './components/report-financeiro
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../shared/shared.module';
+import { ReportsTableComponent } from './reports-table/reports-table.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { SharedModule } from '../shared/shared.module';
     ReportCronogramaGeralComponent,
     ReportCronogramaProjetoComponent,
     ReportFinanceiroGeralComponent,
-    ReportFinanceiroProjetoComponent
+    ReportFinanceiroProjetoComponent,
+    ReportsTableComponent
   ],
   imports: [
     CommonModule,

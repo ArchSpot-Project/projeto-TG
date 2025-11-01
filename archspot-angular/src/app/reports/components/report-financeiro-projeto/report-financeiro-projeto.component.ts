@@ -37,7 +37,7 @@ export class ReportFinanceiroProjetoComponent implements OnInit {
     private projectService: ProjectService,
     private installmentService: InstallmentService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const currentUser = this.authService.getUser();
@@ -69,6 +69,7 @@ export class ReportFinanceiroProjetoComponent implements OnInit {
     this.installmentService.getInstallmentsByProject(projetoId).subscribe({
       next: (parcelas) => {
         this.parcelas = parcelas.map(p => ({
+          projeto: this.projetoSelecionado.projectName,
           name: `Parcela ${p.id}`,
           description: p.description ?? '-',
           amount: p.amount,
@@ -95,7 +96,7 @@ export class ReportFinanceiroProjetoComponent implements OnInit {
   }
 
   mapStatus(status?: string): string {
-    switch(status) {
+    switch (status) {
       case 'PENDING': return 'Pendente';
       case 'PAID': return 'Pago';
       case 'OVERDUE': return 'Em atraso';

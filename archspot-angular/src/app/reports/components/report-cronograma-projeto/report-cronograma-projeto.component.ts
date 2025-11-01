@@ -3,8 +3,6 @@ import { ProjectService } from '../../../core/services/project.service';
 import { PhaseService } from '../../../core/services/phase.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PhaseWithProject } from '../../../core/models/phase.model';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-report-cronograma-projeto',
@@ -27,13 +25,12 @@ export class ReportCronogramaProjetoComponent implements OnInit {
     private projectService: ProjectService,
     private phaseService: PhaseService,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const currentUser = this.authService.getUser();
     if (!currentUser) return;
 
-    // pega todos os projetos do usuário
     this.projectService.getProjectsByUser(currentUser.id).subscribe(projects => {
       this.projetos = projects;
     });
@@ -60,7 +57,11 @@ export class ReportCronogramaProjetoComponent implements OnInit {
 
     this.phaseService.getPhasesByProjectId(this.projetoSelecionado.projectId).subscribe({
       next: (phases) => {
-        this.phases = phases.map(p => ({ ...p }));
+        this.phases = phases.map(p => ({
+          ...p,
+          projectName: this.projetoSelecionado.projectName,
+          status: this.mapStatus(p.status)
+        }));
         this.loading = false;
       },
       error: (err) => {
@@ -86,38 +87,5 @@ export class ReportCronogramaProjetoComponent implements OnInit {
       case 'CANCELLED': return 'Cancelado';
       default: return status ?? '-';
     }
-  }
-
-  baixarPDF(): void {
-    const tabela = document.getElementById('relatorioTabela');
-    if (!tabela) return;
-
-    const container = document.createElement('div');
-    container.style.padding = '15px';
-    container.style.backgroundColor = 'white';
-    container.style.display = 'inline-block';
-    container.style.position = 'absolute';
-    container.style.top = '-9999px';
-    container.appendChild(tabela.cloneNode(true));
-
-    document.body.appendChild(container);
-
-    html2canvas(container, { scale: 2 }).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('ArchSpot - Relatório de Cronograma por Projeto', pdf.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
-
-      pdf.addImage(imgData, 'PNG', 10, 25, pdfWidth, pdfHeight);
-      pdf.save('relatorio_cronograma_projeto.pdf');
-
-      document.body.removeChild(container);
-    });
   }
 }
