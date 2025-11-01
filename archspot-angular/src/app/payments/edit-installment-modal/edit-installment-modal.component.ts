@@ -55,6 +55,7 @@ export class EditInstallmentModalComponent implements OnChanges {
       next: (res) => {
         alert('Parcela atualizada com sucesso!');
         this.updated.emit(res);
+        location.reload();
       },
       error: (err) => alert('Erro ao atualizar parcela: ' + (err.error?.message || err.message))
     });

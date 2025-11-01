@@ -20,7 +20,7 @@ export class CreateSequenceInstallmentsModalComponent {
   paymentMethod: PaymentMethod | null = null;
   sequenceDescription: string | null = null;
 
-  paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO'];
+  paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'CHECK', 'CASH'];
 
   constructor(private installmentService: InstallmentService) { }
 

@@ -33,7 +33,9 @@ export class SidebarMenuComponent implements OnInit {
   ];
 
   profileMenuItems = [
-    { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() }
+    { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() },
+    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToProfile() },
+    { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() },
   ];
 
   helpMenuItems = [
