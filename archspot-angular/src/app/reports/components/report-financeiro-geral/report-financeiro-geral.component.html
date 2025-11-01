@@ -4,18 +4,22 @@
 </div>
 
 <div *ngIf="!isGenerated">
-  <form class="row">
-    <div class="col mb-3">
+  <!-- Linha 1: Datas -->
+  <div class="row mb-3">
+    <div class="col-md-6">
       <label class="form-label">De:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
     </div>
 
-    <div class="col mb-3">
+    <div class="col-md-6">
       <label class="form-label">Até:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
     </div>
+  </div>
 
-    <div class="col mb-3">
+  <!-- Linha 2: Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-6">
       <label class="form-label">Status da parcela:</label>
       <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
         <option value="todos" selected>Todos</option>
@@ -25,7 +29,7 @@
       </select>
     </div>
 
-    <div class="col mb-3">
+    <div class="col-md-6">
       <label class="form-label">Método de pagamento:</label>
       <select class="form-select shadow-sm" [(ngModel)]="formData.metodoPagamento" name="metodo">
         <option value="todos" selected>Todos</option>
@@ -38,12 +42,15 @@
         <option value="dinheiro">Dinheiro em espécie</option>
       </select>
     </div>
+  </div>
 
-    <div class="col-12 text-end mt-3">
+  <!-- Botões -->
+  <div class="row">
+    <div class="col-12 text-end">
       <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
       <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
     </div>
-  </form>
+  </div>
 </div>
 
 <!-- após gerar relatório -->

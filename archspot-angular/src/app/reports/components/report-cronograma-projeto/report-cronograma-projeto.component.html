@@ -26,7 +26,7 @@
         <img src="/assets/img/icons/chevron-left.svg" alt="" width="20" height="20">
       </button>
     </div>
-    <div class="col fs-5 fw-medium">Cronograma do Projeto</div>
+    <div class="col fs-5 fw-medium">Cronograma do Projeto: {{ projetoSelecionado.projectName }}</div>
     <div class="col-auto pe-0">
       <button class="btn p-1" (click)="baixarPDF()">
         <img src="/assets/img/icons/download.svg" alt="Baixar" width="20" height="20">
@@ -42,6 +42,7 @@
     <table class="table mt-4 align-middle" id="relatorioTabela">
       <thead class="table-light">
         <tr>
+          <th>Projeto</th>
           <th>Etapa</th>
           <th>Status</th>
           <th>Previsão Início</th>
@@ -52,8 +53,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let phase of phases">
+          <td>{{ projetoSelecionado.projectName }}</td>
           <td>{{ phase.name }}</td>
-          <td>{{ mapStatus(phase.status) }}</td>
+          <td>{{ mapStatus(phase.status) | phaseStatus }}</td>
           <td>{{ phase.estimatedStartDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ phase.estimatedEndDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ phase.realStartDate ? (phase.realStartDate | date:'dd/MM/yyyy') : '-' }}</td>
