@@ -10,6 +10,7 @@ import { ReportFinanceiroGeralComponent } from './components/report-financeiro-g
 import { ReportFinanceiroProjetoComponent } from './components/report-financeiro-projeto/report-financeiro-projeto.component';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { FormsModule } from '@angular/forms';
     ReportsRoutingModule,
     LayoutModule,
     NgbNavModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ]
 })
 export class ReportsModule { }
