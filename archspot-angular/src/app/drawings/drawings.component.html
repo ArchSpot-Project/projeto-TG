@@ -1,1 +1,8 @@
-<app-page-layout [title]="'Desenhos'" [showSidebar]="false" [showBackButton]="true">
+<app-page-layout [title]="'Desenhos - ' + projectName" [showSidebar]="false" [showBackButton]="true">
+
+  <!-- Novo componente que encapsula toda a lógica de diretórios -->
+  <app-directory [projectId]="projectId" [userId]="userId" [isCustomerInProject]="isCustomerInProject"
+    directoryType="DRAWINGS" (directoryChanged)="onDirectoryChange($event)">
+  </app-directory>
+
+</app-page-layout>

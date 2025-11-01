@@ -4,5 +4,7 @@ export interface DirectoryDTO {
   creationDate: string;
   type: string;
   projectId: number;
-  parentDirectoryId?: number;
+  parentDirectoryId?: number | null;
+  subdirectories?: DirectoryDTO[];
+  documents?: any[];
 }

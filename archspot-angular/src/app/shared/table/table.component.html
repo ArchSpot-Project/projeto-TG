@@ -15,7 +15,8 @@
         <tr *ngFor="let doc of documents; let i = index">
             <td>{{ i + 1 }}</td>
             <td>
-                <span class="document-name" [title]="doc.description || 'Sem descrição'" (click)="abrirDoc(doc)">
+                <span class="document-name" [attr.data-title]="doc.description || 'Sem descrição'"
+                    (click)="abrirDoc(doc)">
                     {{ getDisplayName(doc.name) }}
                 </span>
             </td>

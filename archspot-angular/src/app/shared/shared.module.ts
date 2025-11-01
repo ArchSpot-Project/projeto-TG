@@ -16,6 +16,7 @@ import { PaymentMethodPipe } from '../core/pipes/payment-method.pipe';
 import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
 import { DirectoryComponent } from './directory/directory.component';
 import { DateDashPipe } from '../core/pipes/date.pipe';
+import { DirectoryNodeComponent } from './directory/directory-node/directory-node.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { DateDashPipe } from '../core/pipes/date.pipe';
     PhaseStatusPipe,
     DateDashPipe,
     AddUserModalComponent,
-    DirectoryComponent
+    DirectoryComponent,
+    DirectoryNodeComponent
   ],
   imports: [
     CommonModule,

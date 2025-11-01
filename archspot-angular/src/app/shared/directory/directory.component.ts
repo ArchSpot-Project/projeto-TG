@@ -25,7 +25,8 @@ export class DirectoryComponent implements OnInit {
     visible: false,
     x: 0,
     y: 0,
-    dir: null as DirectoryDTO | null
+    dir: null as DirectoryDTO | null,
+    isRoot: false
   };
 
   @ViewChild(TableComponent) tableComponent!: TableComponent;
@@ -39,12 +40,11 @@ export class DirectoryComponent implements OnInit {
     this.loadDirectories();
   }
 
-  // ---- Diretórios ----
   loadDirectories() {
     this.directoryService.getDirectoriesByProjectAndType(this.projectId, this.directoryType)
       .subscribe({
         next: (dirs) => {
-          this.directories = dirs.filter(d => d.type === 'DOCUMENTS');
+          this.directories = dirs;
           if (this.directories.length > 0) {
             this.setActiveTab(this.directories[0]);
           }
@@ -53,26 +53,53 @@ export class DirectoryComponent implements OnInit {
       });
   }
 
+  createSubdirectory(parentDir: DirectoryDTO) {
+    const name = prompt(`Nome do novo subdiretório dentro de "${parentDir.name}":`);
+    if (!name) return;
+
+    const dto = { name, projectId: this.projectId, type: 'DRAWINGS' };
+    this.directoryService.createSubdirectory(parentDir.id, dto).subscribe({
+      next: (dir) => {
+        parentDir.subdirectories = parentDir.subdirectories || [];
+        parentDir.subdirectories.push(dir);
+        alert('Subdiretório criado com sucesso!');
+        location.reload();
+      },
+      error: err => { console.error(err); alert('Erro ao criar subdiretório.'); }
+    });
+  }
+
+  activeRoot: DirectoryDTO | null = null;
+
   setActiveTab(dir: DirectoryDTO) {
     this.activeTabId = dir.id;
     this.directoryChanged.emit(dir.id);
+
+    // define o diretório raiz ativo (para exibir subdiretórios)
+    const root = this.directories.find(d =>
+      d.id === dir.id || d.subdirectories?.some(sub => sub.id === dir.id)
+    );
+    this.activeRoot = root || null;
+
     this.closeContextMenu();
   }
 
   createDirectory() {
-    const name = prompt('Digite o nome do novo diretório:');
+    const name = prompt('Digite o nome do novo diretório raiz:');
     if (!name) return;
 
-    const dto = { name, projectId: this.projectId, type: 'DOCUMENTS' };
+    const dto = { name, projectId: this.projectId, type: this.directoryType };
     this.directoryService.createDirectoryInProject(this.projectId, dto).subscribe({
       next: (dir) => {
         this.directories.push(dir);
         this.setActiveTab(dir);
         alert('Diretório criado com sucesso!');
+        location.reload();
       },
       error: err => { console.error(err); alert('Erro ao criar diretório.'); }
     });
   }
+
 
   editDirectoryName(dir: DirectoryDTO, event: MouseEvent) {
     event.stopPropagation();
@@ -80,7 +107,7 @@ export class DirectoryComponent implements OnInit {
     if (!newName || newName === dir.name) return;
 
     this.directoryService.renameDirectory(dir.id, newName).subscribe({
-      next: (updated) => { dir.name = updated.name; alert('Nome atualizado com sucesso!'); },
+      next: (updated) => { dir.name = updated.name; alert('Nome atualizado com sucesso!'); location.reload(); },
       error: err => { console.error(err); alert('Erro ao renomear diretório.'); }
     });
   }
@@ -94,6 +121,7 @@ export class DirectoryComponent implements OnInit {
         alert('Diretório excluído!');
         this.directories = this.directories.filter(d => d.id !== dir.id);
         if (this.directories.length) this.setActiveTab(this.directories[0]);
+        location.reload();
       },
       error: () => alert('Erro ao excluir diretório.')
     });
@@ -121,13 +149,13 @@ export class DirectoryComponent implements OnInit {
     input.click();
   }
 
-  // ---- Context Menu ----
-  openContextMenu(event: MouseEvent, dir: DirectoryDTO) {
+  openContextMenu(event: MouseEvent, dir: DirectoryDTO, isRoot: boolean) {
     event.preventDefault();
     this.contextMenu.visible = true;
     this.contextMenu.x = event.clientX;
     this.contextMenu.y = event.clientY;
     this.contextMenu.dir = dir;
+    this.contextMenu.isRoot = isRoot;
   }
 
   closeContextMenu() {
