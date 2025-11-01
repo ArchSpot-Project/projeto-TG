@@ -72,7 +72,7 @@
           <td>{{ phase.projectName }}</td>
           <td>{{ phase.projectStatus | statusTranslate }}</td>
           <td>{{ phase.name }}</td>
-          <td>{{ phase.status }}</td>
+          <td>{{ phase.status ?? '-' | phaseStatus }}</td>
           <td>{{ phase.estimatedStartDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ phase.estimatedEndDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ phase.realStartDate ? (phase.realStartDate | date:'dd/MM/yyyy') : '-' }}</td>

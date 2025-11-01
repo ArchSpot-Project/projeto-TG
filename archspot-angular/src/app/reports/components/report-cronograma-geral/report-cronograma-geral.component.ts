@@ -22,7 +22,7 @@ export class ReportCronogramaGeralComponent {
   formData = {
     periodoInicio: '',
     periodoFim: '',
-    status: '',
+    status: 'todos',
   };
 
   constructor(
