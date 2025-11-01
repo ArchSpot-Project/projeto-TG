@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { DirectoryDTO, DirectoryService } from '../../core/services/directory.service';
-import { DocumentDTO, DocumentService } from '../../core/services/document.service';
-import { AuthService } from '../../core/services/auth.service';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DirectoryService } from '../../core/services/directory.service';
+import { DocumentService } from '../../core/services/document.service';
+import { TableComponent } from '../../shared/table/table.component';
+import { DirectoryDTO } from '../../core/models/directory.model';
 
 @Component({
   selector: 'app-directory',
@@ -9,87 +10,133 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrls: ['./directory.component.css']
 })
 export class DirectoryComponent implements OnInit {
-  @Input() directory!: DirectoryDTO;
-  @Output() directoryDeleted = new EventEmitter<number>();
 
-  documents: DocumentDTO[] = [];
-  expanded = false;
+  @Input() projectId!: number;
+  @Input() userId!: number | null;
+  @Input() isCustomerInProject: boolean = false;
+  @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' | string = 'DOCUMENTS';
+
+  @Output() directoryChanged = new EventEmitter<number>(); // emite o id do diretório ativo
+
+  directories: DirectoryDTO[] = [];
+  activeTabId: number | null = null;
+
+  contextMenu = {
+    visible: false,
+    x: 0,
+    y: 0,
+    dir: null as DirectoryDTO | null
+  };
+
+  @ViewChild(TableComponent) tableComponent!: TableComponent;
 
   constructor(
     private directoryService: DirectoryService,
-    private documentService: DocumentService,
-    private authService: AuthService
+    private documentService: DocumentService
   ) { }
 
-  isCustomer(): boolean {
-    const user = this.authService.getUser();
-    return user?.userRole === 'CUSTOMER';
+  ngOnInit(): void {
+    this.loadDirectories();
   }
 
-  ngOnInit(): void { }
-
-  toggleExpand() {
-    this.expanded = !this.expanded;
-    if (this.expanded) {
-      this.loadDocuments();
-    }
+  // ---- Diretórios ----
+  loadDirectories() {
+    this.directoryService.getDirectoriesByProjectAndType(this.projectId, this.directoryType)
+      .subscribe({
+        next: (dirs) => {
+          this.directories = dirs.filter(d => d.type === 'DOCUMENTS');
+          if (this.directories.length > 0) {
+            this.setActiveTab(this.directories[0]);
+          }
+        },
+        error: err => console.error('Erro ao carregar diretórios', err)
+      });
   }
 
-  loadDocuments() {
-    this.documentService.getDocumentsByDirectory(this.directory.id).subscribe({
-      next: (docs) => (this.documents = docs),
-      error: (err) => console.error('Erro ao carregar documentos', err),
+  setActiveTab(dir: DirectoryDTO) {
+    this.activeTabId = dir.id;
+    this.directoryChanged.emit(dir.id);
+    this.closeContextMenu();
+  }
+
+  createDirectory() {
+    const name = prompt('Digite o nome do novo diretório:');
+    if (!name) return;
+
+    const dto = { name, projectId: this.projectId, type: 'DOCUMENTS' };
+    this.directoryService.createDirectoryInProject(this.projectId, dto).subscribe({
+      next: (dir) => {
+        this.directories.push(dir);
+        this.setActiveTab(dir);
+        alert('Diretório criado com sucesso!');
+      },
+      error: err => { console.error(err); alert('Erro ao criar diretório.'); }
     });
   }
 
+  editDirectoryName(dir: DirectoryDTO, event: MouseEvent) {
+    event.stopPropagation();
+    const newName = prompt('Renomear diretório:', dir.name);
+    if (!newName || newName === dir.name) return;
+
+    this.directoryService.renameDirectory(dir.id, newName).subscribe({
+      next: (updated) => { dir.name = updated.name; alert('Nome atualizado com sucesso!'); },
+      error: err => { console.error(err); alert('Erro ao renomear diretório.'); }
+    });
+  }
+
+  deleteDirectory(dir: DirectoryDTO) {
+    this.closeContextMenu();
+    if (!confirm(`Deseja excluir o diretório "${dir.name}"?`)) return;
+
+    this.directoryService.deleteDirectory(dir.id).subscribe({
+      next: () => {
+        alert('Diretório excluído!');
+        this.directories = this.directories.filter(d => d.id !== dir.id);
+        if (this.directories.length) this.setActiveTab(this.directories[0]);
+      },
+      error: () => alert('Erro ao excluir diretório.')
+    });
+  }
+
+  // ---- Upload ----
   uploadFile() {
+    if (!this.activeTabId) return;
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = (event: any) => {
       const file = event.target.files[0];
       if (!file) return;
 
-      const uploadedById = 1; // ID do usuário logado
-
-      this.documentService.uploadDocument(this.directory.id, file, uploadedById).subscribe({
-        next: () => {
-          alert('Documento enviado com sucesso!');
-          this.loadDocuments();
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Erro ao enviar documento.');
-        },
-      });
+      const description = prompt('Digite uma descrição para o documento:') || '';
+      this.documentService.uploadDocument(this.activeTabId!, file, this.userId!, description)
+        .subscribe({
+          next: () => {
+            alert(`Documento "${file.name}" enviado com sucesso!`);
+            this.tableComponent.loadDocuments();
+          },
+          error: err => { console.error(err); alert('Erro ao enviar documento.'); }
+        });
     };
     input.click();
   }
 
-  renomearDiretorio() {
-    const novoNome = prompt('Novo nome do diretório:', this.directory.name);
-    if (!novoNome || novoNome === this.directory.name) return;
-
-    this.directoryService.renameDirectory(this.directory.id, novoNome).subscribe({
-      next: (updated) => {
-        this.directory.name = updated.name;
-        alert('Diretório renomeado com sucesso!');
-      },
-      error: () => alert('Erro ao renomear diretório.'),
-    });
+  // ---- Context Menu ----
+  openContextMenu(event: MouseEvent, dir: DirectoryDTO) {
+    event.preventDefault();
+    this.contextMenu.visible = true;
+    this.contextMenu.x = event.clientX;
+    this.contextMenu.y = event.clientY;
+    this.contextMenu.dir = dir;
   }
 
-  deletarDiretorio() {
-    const confirmacao = confirm(
-      `Deseja realmente excluir o diretório "${this.directory.name}" e todo o seu conteúdo?`
-    );
-    if (!confirmacao) return;
+  closeContextMenu() {
+    this.contextMenu.visible = false;
+    this.contextMenu.dir = null;
+  }
 
-    this.directoryService.deleteDirectory(this.directory.id).subscribe({
-      next: () => {
-        alert('Diretório excluído com sucesso!');
-        this.directoryDeleted.emit(this.directory.id); // Notifica o pai
-      },
-      error: () => alert('Erro ao excluir diretório.'),
-    });
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeContextMenu();
   }
 }

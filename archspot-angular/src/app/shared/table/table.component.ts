@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DocumentDTO, DocumentService } from '../../core/services/document.service';
+import { DocumentService } from '../../core/services/document.service';
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserProjectService } from '../../core/services/user-project.service';
+import { DocumentDTO } from '../../core/models/document.model';
 
 @Component({
   selector: 'app-table',

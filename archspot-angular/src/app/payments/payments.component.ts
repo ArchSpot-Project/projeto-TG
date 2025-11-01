@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { InstallmentService, InstallmentResponse, PaymentMethod, PaymentStatus } from '../core/services/installment.service';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectService, ProjectResponse } from '../core/services/project.service';
 import { AuthService } from '../core/services/auth.service';
 import { UserProjectService } from '../core/services/user-project.service';
+import { InstallmentResponse, PaymentMethod, PaymentStatus } from '../core/models/payment.model';
+import { ProjectResponse } from '../core/models/project.model';
+import { InstallmentService } from '../core/services/installment.service';
+import { ProjectService } from '../core/services/project.service';
 
 interface SelectableInstallment extends InstallmentResponse {
   selected?: boolean;

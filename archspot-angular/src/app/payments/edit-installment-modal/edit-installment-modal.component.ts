@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { InstallmentService, InstallmentResponse, InstallmentRequest, PaymentMethod } from '../../core/services/installment.service';
+import { InstallmentService } from '../../core/services/installment.service';
+import { InstallmentRequest, InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
 
 @Component({
   selector: 'app-edit-installment-modal',

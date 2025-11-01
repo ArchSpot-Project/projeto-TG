@@ -1,36 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
-
-export interface ProjectResponse {
-  id: number;
-  name: string;
-  estimatedStartDate?: Date;
-  estimatedEndDate?: Date;
-  realStartDate?: Date;
-  realEndDate?: Date;
-  description?: string;
-  totalValue?: number;
-  status?: string;
-  phases?: any[];
-}
-
-export interface UserProjectResponse {
-  id: number;
-  userId: number;
-  userName: string;
-  projectId: number;
-  projectName: string;
-  role: string;
-}
-
-export interface CreateProjectRequest {
-  name: string;
-  estimatedStartDate: string;
-  estimatedEndDate: string;
-  description?: string;
-  status?: string;
-}
+import { CreateProjectRequest, ProjectResponse } from '../models/project.model';
+import { UserProjectResponse } from '../models/user-project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -87,7 +59,7 @@ export class ProjectService {
       realStartDate,
       realEndDate
     });
-  } 
+  }
 
   updateProjectTitleAndDescription(projectId: number, payload: { name: string; description?: string }) {
     return this.http.patch<ProjectResponse>(`${this.apiUrl}/${projectId}`, payload);

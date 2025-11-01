@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { UserProjectService, UserProjectResponse } from '../../../core/services/user-project.service';
-import { ProjectService, ProjectResponse } from '../../../core/services/project.service';
 import { UserResponse } from '../../../core/services/search-user.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserProjectResponse } from '../../../core/models/user-project.model';
+import { ProjectResponse } from '../../../core/models/project.model';
+import { UserProjectService } from '../../../core/services/user-project.service';
+import { ProjectService } from '../../../core/services/project.service';
 
 @Component({
   selector: 'app-users-project-page',

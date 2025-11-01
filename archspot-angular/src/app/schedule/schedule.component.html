@@ -38,7 +38,7 @@
                   </app-edit-phase-modal>
                 </td>
                 <th scope="row">{{ i + 1 }}</th>
-                <td>{{ phase.name }}</td>
+                <td [title]="phase.description">{{ phase.name }}</td>
                 <td>{{ phase.duration }} dias</td>
                 <td>{{ phase.estimatedStartDate | date:'dd/MM/yyyy' }}</td>
                 <td>{{ phase.estimatedEndDate | date:'dd/MM/yyyy' }}</td>

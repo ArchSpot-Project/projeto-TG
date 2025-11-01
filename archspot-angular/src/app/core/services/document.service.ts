@@ -1,19 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-export interface DocumentDTO {
-  id: number;
-  name: string;
-  description?: string;
-  uploadedById: number;
-  directoryId: number;
-  uploadDate: string;
-  modificationDate: string;
-  size: number;
-  version: number;
-  fileUrl: string;
-}
+import { DocumentDTO } from '../models/document.model';
 
 @Injectable({
   providedIn: 'root'

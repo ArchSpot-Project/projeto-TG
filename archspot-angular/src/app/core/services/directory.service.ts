@@ -1,15 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface DirectoryDTO {
-  id: number;
-  name: string;
-  creationDate: string;
-  type: string;
-  projectId: number;
-  parentDirectoryId?: number;
-}
+import { DirectoryDTO } from '../models/directory.model';
 
 @Injectable({
   providedIn: 'root'

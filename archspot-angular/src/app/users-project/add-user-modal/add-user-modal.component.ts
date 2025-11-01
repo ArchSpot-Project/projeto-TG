@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SearchUserService, UserResponse } from '../../core/services/search-user.service';
-import { UserProjectResponse } from '../../core/services/project.service';
+import { UserProjectResponse } from '../../core/models/project.model';
 
 @Component({
   selector: 'app-add-user-modal',

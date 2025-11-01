@@ -1,10 +1,11 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectResponse, ProjectService } from '../core/services/project.service';
+import { ProjectService } from '../core/services/project.service';
 import { PhaseService } from '../core/services/phase.service';
 import { AuthService } from '../core/services/auth.service';
 import { UserProjectService } from '../core/services/user-project.service';
 import Gantt from 'frappe-gantt';
+import { ProjectResponse } from '../core/models/project.model';
 
 @Component({
   selector: 'app-schedule',
