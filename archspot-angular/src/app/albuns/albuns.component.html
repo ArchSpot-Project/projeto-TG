@@ -1,0 +1,92 @@
+<app-page-layout [title]="projectName +' - Álbuns de Fotos'" [showSidebar]="false" [showBackButton]="true">
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>Álbuns</h3>
+      <button class="btn btn-outline-success btn-sm p-2" data-bs-toggle="modal" data-bs-target="#modalCriarAlbum">
+        + Novo Álbum
+      </button>
+    </div>
+
+    <!-- botoes editar e deletar album -->
+    <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
+      <div class="col" *ngFor="let album of albums">
+        <div class="card h-100 bg-transparent rounded-3" (click)="openAlbum(album.id)">
+          <div class="card-actions">
+            <button title="Editar álbum" (click)="editAlbum(album); $event.stopPropagation()">
+              <img src="assets/img/icons/pencil.svg" width="18" height="18" alt="Editar">
+            </button>
+            <button title="Excluir álbum" (click)="deleteAlbum(album); $event.stopPropagation()">
+              <img src="assets/img/icons/trash3.svg" width="18" height="18" alt="Excluir">
+            </button>
+          </div>
+
+          <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ album.name }}" />
+          <div class="card-body">
+            <h5 class="card-title">{{ album.name }}</h5>
+            <p class="card-text text-truncate">{{ album.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal criar album -->
+  <div class="modal fade" id="modalCriarAlbum" tabindex="-1" aria-labelledby="modalCriarAlbumLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="createAlbum()">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalCriarAlbumLabel">Novo Álbum</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="albumName" class="form-label">Nome do Álbum</label>
+              <input type="text" class="form-control" id="albumName" [(ngModel)]="newAlbum.name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="albumDescription" class="form-label">Descrição</label>
+              <textarea class="form-control" id="albumDescription" [(ngModel)]="newAlbum.description"
+                name="description"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success">Criar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal editar album -->
+  <div class="modal fade" id="modalEditarAlbum" tabindex="-1" aria-labelledby="modalEditarAlbumLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="updateAlbum()">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEditarAlbumLabel">Editar Álbum</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="editAlbumName" class="form-label">Nome do Álbum</label>
+              <input type="text" class="form-control" id="editAlbumName" [(ngModel)]="selectedAlbum.name" name="name"
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="editAlbumDescription" class="form-label">Descrição</label>
+              <textarea class="form-control" id="editAlbumDescription" [(ngModel)]="selectedAlbum.description"
+                name="description"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</app-page-layout>
