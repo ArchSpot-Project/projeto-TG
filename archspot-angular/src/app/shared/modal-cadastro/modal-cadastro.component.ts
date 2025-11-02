@@ -12,13 +12,13 @@ import { AuthService } from '../../core/services/auth.service';
 })
 
 export class ModalCadastroComponent implements OnInit {
-  
+
   constructor(
     public activeModal: NgbActiveModal,
     private userService: UserService,
     private authService: AuthService
   ) { }
-  
+
   @Input() isEditMode: boolean = false;
   @Input() userData: Partial<UserDTO> = {};
 
@@ -66,7 +66,7 @@ export class ModalCadastroComponent implements OnInit {
   onSubmit(form: NgForm) {
     this.passwordsDoNotMatch = this.password !== this.confirmPassword;
     if (form.invalid || this.passwordsDoNotMatch) {
-      console.log('Formulário inválido.');
+      alert('Formulário inválido.');
       return;
     }
 
@@ -90,7 +90,12 @@ export class ModalCadastroComponent implements OnInit {
           location.reload();
         },
         error: (err) => {
-          alert('Erro ao atualizar perfil.');
+          const errMsg = err?.error?.message || err?.message || '';
+          if (errMsg.toLowerCase().includes('cpf')) {
+            alert('CPF inválido!');
+          } else {
+            alert('Erro ao atualizar perfil.');
+          }
           console.error(err);
         }
       });
@@ -101,7 +106,12 @@ export class ModalCadastroComponent implements OnInit {
           this.activeModal.close();
         },
         error: (err) => {
-          alert('Erro ao cadastrar usuário.');
+          const errMsg = err?.error?.message || err?.message || '';
+          if (errMsg.toLowerCase().includes('cpf')) {
+            alert('CPF inválido!');
+          } else {
+            alert('Erro ao cadastrar usuário.');
+          }
           console.error(err);
         }
       });
