@@ -5,11 +5,10 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.archspot.ArchSpot_BackEnd.dtos.LoginRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.UserDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.exceptions.DatabaseException;
@@ -24,6 +23,9 @@ public class UserService {
 	@Autowired
 	private UserRepository repository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	// Para consultar todos os usuarios
 	public List<User> findAll() {
 		return repository.findAll();
@@ -37,15 +39,15 @@ public class UserService {
 
 	// Para criar novo usuario
 	public User create(UserCreateDTO dto) {
-		User obj = new User();
-		obj.setCpf(dto.cpf());
-		obj.setName(dto.name());
-		obj.setPhone(dto.phone());
-		obj.setAddress(dto.address());
-		obj.setProfession(dto.profession());
-		obj.setEmail(dto.email());
-		obj.setPassword(dto.password());
-		return repository.save(obj);
+		User user = new User();
+		user.setCpf(dto.cpf());
+		user.setName(dto.name());
+		user.setPhone(dto.phone());
+		user.setAddress(dto.address());
+		user.setProfession(dto.profession());
+		user.setEmail(dto.email());
+		user.setPassword(passwordEncoder.encode(dto.password())); // criptografa aqui
+		return repository.save(user);
 	}
 
 	// Para deletar usuario
@@ -79,16 +81,4 @@ public class UserService {
 		}
 
 	}
-
-	/*
-	 * Autentica o usuário pelas credenciais.
-	 * 
-	 * @return Optional.empty() se inválido, ou UserDTO se válido.
-	 */
-	public Optional<UserDTO> authenticate(LoginRequestDTO creds) {
-		return repository
-				.findByEmailAndPassword(creds.email(), creds.password())
-				.map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail()));
-	}
-
 }
