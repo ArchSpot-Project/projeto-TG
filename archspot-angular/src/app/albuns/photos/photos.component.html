@@ -1,16 +1,28 @@
-<app-page-layout [title]="projectName +' - Álbuns de Fotos'" [showSidebar]="false" [showBackButton]="true">
+<app-page-layout [title]="projectName + ' - Álbuns de Fotos'" [showSidebar]="false" [showBackButton]="true">
   <div class="container">
-    <div class="row mt-3 mb-4 align-items-center">
+
+    <div class="row mt-4 mb-4 align-items-center justify-content-between">
+
       <div class="col">
-        <h2 class="fw-light">Álbum: {{albumName}}</h2>
+        <h2 class="fw-light mb-0">Álbum: {{ albumName }}</h2>
       </div>
-      <div class="col-auto">
-        <button class="btn btn-outline-success btn-sm p-2">
+
+      <!-- ações -->
+      <div class="col-auto d-flex align-items-center gap-2">
+        <button class="btn btn-outline-light btn-sm" title="Download .ZIP" (click)="downloadAlbum()" style="color:#000;">
+          <img src="assets/img/icons/download.svg" alt="Download">
+          Baixar .ZIP
+        </button>
+
+        <button class="btn btn-success btn-sm" (click)="triggerFileInput()">
           + Adicionar foto
         </button>
+
+        <input type="file" #fileInput style="display:none" (change)="handleFileUpload($event)" multiple>
       </div>
     </div>
 
+    <!-- loading -->
     <div *ngIf="loading" class="text-center py-5">
       <div class="spinner-border text-success"></div>
     </div>
@@ -19,11 +31,37 @@
       Album vazio.
     </div>
 
-    <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4">
-      <div class="col" *ngFor="let photo of photos">
-        <div class="card border-0 shadow-sm">
-          <img [src]="photo.fileUrl" class="card-img-top rounded-2" alt="{{ photo.name }}">
+    <!-- grid das fotos -->
+    <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-4">
+      <div class="col position-relative" *ngFor="let photo of photos">
+        <div class="card h-100 bg-transparent rounded-3 photo-card" (click)="openModal(photo)">
+
+          <!-- ações do card -->
+          <div class="card-actions">
+            <button title="Editar" (click)="editPhotoName(photo); $event.stopPropagation()">
+              <img src="assets/img/icons/pencil.svg" alt="Editar">
+            </button>
+            <button title="Excluir" (click)="deletePhoto(photo); $event.stopPropagation()">
+              <img src="assets/img/icons/trash3.svg" alt="Excluir">
+            </button>
+          </div>
+
+          <img [src]="photo.fileUrl" [alt]="photo.name">
+
+          <!-- informações da foto -->
+          <div class="photo-tooltip">
+            <strong>{{ photo.name }}</strong><br>
+            {{ (photo.size ? (photo.size / 1024 / 1024) : 0) | number:'1.2-2' }} MB
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- modal para exibir a foto inteira -->
+    <div class="photo-modal" *ngIf="selectedPhoto" (click)="closeModal()">
+      <div class="photo-modal-content" (click)="$event.stopPropagation()">
+        <button class="photo-modal-close" (click)="closeModal()">&times;</button>
+        <img [src]="selectedPhoto.fileUrl" [alt]="selectedPhoto.name">
       </div>
     </div>
   </div>
