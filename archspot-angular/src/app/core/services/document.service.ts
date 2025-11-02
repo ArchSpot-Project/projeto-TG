@@ -11,6 +11,10 @@ export class DocumentService {
 
   constructor(private http: HttpClient) { }
 
+  getDocumentById(id: number): Observable<DocumentDTO> {
+    return this.http.get<DocumentDTO>(`${this.baseUrl}/documents/${id}`);
+  }
+
   getDocumentsByDirectory(directoryId: number): Observable<DocumentDTO[]> {
     return this.http.get<DocumentDTO[]>(`${this.baseUrl}/directories/${directoryId}/documents`);
   }

@@ -5,9 +5,10 @@ import { DocumentsRoutingModule } from './documents-routing.module';
 import { DocumentsComponent } from './documents.component';
 import { SharedModule } from '../shared/shared.module';
 import { FormsModule } from '@angular/forms';
+import { DocumentViewComponent } from './document-view/document-view.component';
 
 @NgModule({
-  declarations: [DocumentsComponent],
+  declarations: [DocumentsComponent, DocumentViewComponent],
   imports: [
     CommonModule,
     DocumentsRoutingModule,

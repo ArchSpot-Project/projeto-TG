@@ -5,6 +5,7 @@ import { User } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserProjectService } from '../../core/services/user-project.service';
 import { DocumentDTO } from '../../core/models/document.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table',
@@ -26,7 +27,8 @@ export class TableComponent implements OnChanges {
     private documentService: DocumentService,
     private userProjectService: UserProjectService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -62,9 +64,12 @@ export class TableComponent implements OnChanges {
     return name.replace(/\.[^/.]+$/, '');
   }
 
-  abrirDoc(doc: DocumentDTO) { //em implementação
-    const url = `http://localhost:8080/documents/${doc.id}/view`;
-    window.open(url, '_blank');
+  abrirDoc(doc: DocumentDTO) {
+    this.router.navigate([`/projects/${this.projectId}/documents/${doc.id}/view`]);
+  }
+
+  abrirDrawing(drawing: DocumentDTO) {
+    this.router.navigate([`/projects/${this.projectId}/drawings/${drawing.id}/view`]);
   }
 
   loadDocuments() {
