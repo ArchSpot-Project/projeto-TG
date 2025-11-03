@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,6 +12,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "tb_user")
@@ -43,16 +46,30 @@ public class User {
      */
 
     @NotBlank(message = "Senha nao pode ser vazia")
+    @ToString.Exclude
     private String password;
+
+    // Método para encriptar a senha automaticamente de toda instância que for persistida ou atualziada
+    @PrePersist
+    @PreUpdate
+    private void encryptPassword() {
+        if (this.password != null && !this.password.startsWith("$2a")) { // evita rehash se já estiver encriptada
+            this.password = new BCryptPasswordEncoder().encode(this.password);
+        }
+    }
 
     // associacão com projeto
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // evita loop JSON; troque conforme sua estratégia de DTOs
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<UserProject> userProjects = new ArrayList<>();
 
     // 🔹 Associação com Comment (sem cascade)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     // construtores

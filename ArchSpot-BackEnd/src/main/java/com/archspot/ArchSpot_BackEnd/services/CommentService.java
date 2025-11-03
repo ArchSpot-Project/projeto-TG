@@ -9,6 +9,8 @@ import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.repositories.CommentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.DocumentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,22 +61,21 @@ public class CommentService {
 
   // Deletar comentário (apenas dono ou admin do projeto)
   @Transactional
-  public void deleteComment(Long commentId, Long userId) {
+  public void deleteComment(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
 
-    userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    // Usuário autenticado (vem do token)
+    User currentUser = SecurityUtils.getCurrentUser();
 
+    // Resgata o projeto associado (comentário > documento > diretório > projeto)
     Project project = comment.getDocument().getDirectory().getProject();
 
     // Verifica se o usuário é dono do comentário
-    boolean isOwner = comment.getUser().getId().equals(userId);
+    boolean isOwner = comment.getUser().getId().equals(currentUser.getId());
 
     // Verifica se o usuário é ADMIN no projeto
-    boolean isProjectAdmin = project.getUserProjects().stream()
-        .anyMatch(up -> up.getUser().getId().equals(userId)
-            && up.getRole().name().equalsIgnoreCase("ADMIN"));
+    boolean isProjectAdmin = ProjectPermissionUtils.isAdmin(project, currentUser);
 
     if (!isOwner && !isProjectAdmin) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not allowed to delete this comment");
