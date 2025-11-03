@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlbumService } from '../core/services/album.service';
 import { Album } from '../core/models/album.model';
 import { ProjectService } from '../core/services/project.service';
+import { AuthService } from '../core/services/auth.service';
+import { UserProjectService } from '../core/services/user-project.service';
 
 @Component({
   selector: 'app-album',
@@ -14,6 +16,9 @@ export class AlbunsComponent implements OnInit {
   projectId!: number;
   projectName = '';
   selectedAlbum: Partial<Album> = {};
+  userRole: string | null = null;
+  userId: number | null = null;
+  projectUsers: any[] = [];
 
   newAlbum: Partial<Album> = {
     name: '',
@@ -21,6 +26,8 @@ export class AlbunsComponent implements OnInit {
   };
 
   constructor(
+    private authService: AuthService,
+    private userProjectService: UserProjectService,
     private albumService: AlbumService,
     private projectService: ProjectService,
     private route: ActivatedRoute,
@@ -28,7 +35,13 @@ export class AlbunsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const currentUser = this.authService.getUser();
+    this.userId = currentUser?.id || null;
+    this.userRole = currentUser?.userRole || null;
+
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.loadProjectUsers();
     this.loadAlbums();
     this.loadProjectName();
   }
@@ -45,6 +58,19 @@ export class AlbunsComponent implements OnInit {
       next: proj => this.projectName = proj.name,
       error: err => console.error('Erro ao carregar projeto', err)
     });
+  }
+
+  loadProjectUsers(): void {
+    this.userProjectService.getUsersByProject(this.projectId).subscribe({
+      next: users => this.projectUsers = users,
+      error: err => console.error('Erro ao carregar usuários do projeto', err)
+    });
+  }
+
+  get isCustomerInProject(): boolean {
+    if (!this.userId) return false;
+    const user = this.projectUsers.find(u => u.userId === this.userId);
+    return user?.role === 'CUSTOMER';
   }
 
   openAlbum(albumId: number) {
@@ -65,6 +91,12 @@ export class AlbunsComponent implements OnInit {
       },
       error: (err) => console.error('Erro ao criar álbum', err)
     });
+  }
+
+  canEditOrDeleteAlbum(): boolean {
+    if (!this.userId || !this.projectUsers) return false;
+    const currentUser = this.projectUsers.find(u => u.userId === this.userId);
+    return currentUser?.role?.toUpperCase() === 'ADMIN';
   }
 
   editAlbum(album: Album) {

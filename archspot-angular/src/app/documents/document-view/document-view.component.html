@@ -1,13 +1,5 @@
+<app-page-layout [title]="documentName + ' - Visualização'" [showSidebar]="false" [showBackButton]="true">
 <div class="container mt-4">
-
-  <div class="d-flex align-items-center mb-3">
-    <a routerLink="/documents" class="btn me-2">
-      <img src="/assets/img/icons/chevron-double-left.svg" width="30" height="30">
-    </a>
-    <h1 class="fs-2" *ngIf="document">{{ document.name }}</h1>
-  </div>
-  <hr>
-
 
   <!-- Preview de documento -->
 
@@ -50,3 +42,4 @@
     </div>
   </div>
 </div>
+</app-page-layout>

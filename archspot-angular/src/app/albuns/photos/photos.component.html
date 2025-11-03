@@ -9,7 +9,8 @@
 
       <!-- ações -->
       <div class="col-auto d-flex align-items-center gap-2">
-        <button class="btn btn-outline-light btn-sm" title="Download .ZIP" (click)="downloadAlbum()" style="color:#000;">
+        <button class="btn btn-outline-light btn-sm" title="Download .ZIP" (click)="downloadAlbum()"
+          style="color:#000;">
           <img src="assets/img/icons/download.svg" alt="Download">
           Baixar .ZIP
         </button>
@@ -38,10 +39,11 @@
 
           <!-- ações do card -->
           <div class="card-actions">
-            <button title="Editar" (click)="editPhotoName(photo); $event.stopPropagation()">
+            <button *ngIf="!isCustomerInProject" title="Editar"
+              (click)="editPhotoName(photo); $event.stopPropagation()">
               <img src="assets/img/icons/pencil.svg" alt="Editar">
             </button>
-            <button title="Excluir" (click)="deletePhoto(photo); $event.stopPropagation()">
+            <button *ngIf="!isCustomerInProject" title="Excluir" (click)="deletePhoto(photo); $event.stopPropagation()">
               <img src="assets/img/icons/trash3.svg" alt="Excluir">
             </button>
           </div>
@@ -51,7 +53,8 @@
           <!-- informações da foto -->
           <div class="photo-tooltip">
             <strong>{{ photo.name }}</strong><br>
-            {{ (photo.size ? (photo.size / 1024 / 1024) : 0) | number:'1.2-2' }} MB
+            {{ (photo.size ? (photo.size / 1024 / 1024) : 0) | number:'1.2-2' }} MB<br>
+            <strong>Enviado por:</strong> {{ getUploaderName(photo) }}
           </div>
         </div>
       </div>

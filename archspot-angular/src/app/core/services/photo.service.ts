@@ -14,11 +14,11 @@ export class PhotoService {
     return this.http.get<Photo[]>(`${this.baseUrl}/albums/${albumId}/photos`);
   }
 
-  uploadPhoto(albumId: number, file: File, optionalName?: string): Observable<Photo> {
+  uploadPhoto(albumId: number, file: File, uploadedById: number, optionalName?: string): Observable<Photo> {
     const formData = new FormData();
     formData.append('file', file);
     if (optionalName) formData.append('optionalName', optionalName);
-    formData.append('uploadedById', '1');
+    formData.append('uploadedById', uploadedById.toString());
 
     return this.http.post<Photo>(`${this.baseUrl}/albums/${albumId}/photos`, formData);
   }
