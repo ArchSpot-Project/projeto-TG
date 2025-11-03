@@ -14,10 +14,11 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { DrawingsComponent } from './drawings/drawings.component';
 import { UsersProjectPageComponent } from './users-project/pages/users-project-page/users-project-page.component';
 import { PaymentsComponent } from './payments/payments.component';
-import { PhotosComponent } from './photos/photos.component';
 import { DocumentsComponent } from './documents/documents.component';
 import { LandingPageComponent } from './public/pages/landing-page/landing-page.component';
 import { DocumentViewComponent } from './documents/document-view/document-view.component';
+import { AlbunsComponent } from './albuns/albuns.component';
+import { PhotosComponent } from './albuns/photos/photos.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -36,14 +37,13 @@ const routes: Routes = [
   { path: 'projects/:id/schedule', component: ScheduleComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/payments', component: PaymentsComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/users-project', component: UsersProjectPageComponent, canActivate: [authGuard, projectAccessGuard] },
-  { path: 'projects/:id/photos', component: PhotosComponent, canActivate: [authGuard, projectAccessGuard] },
+  { path: 'projects/:id/albuns', component: AlbunsComponent, canActivate: [authGuard, projectAccessGuard] },
+  { path: 'projects/:id/albuns/:albumId', component: PhotosComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/documents', component: DocumentsComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/documents/:documentId/view', component: DocumentViewComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/drawings', component: DrawingsComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/drawings/:drawingId/view', component: DocumentViewComponent, canActivate: [authGuard, projectAccessGuard] },
 
-  // rota curinga
-  { path: '**', redirectTo: 'home' }
 ];
 
 @NgModule({

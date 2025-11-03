@@ -23,7 +23,7 @@ export class SidebarMenuComponent implements OnInit {
     { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos' },
     { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos' },
     { key: 'payments', icon: 'assets/img/icons/13-financeiro.png', label: 'Pagamentos' },
-    { key: 'photos', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
+    { key: 'albuns', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
     { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma' },
   ];
 

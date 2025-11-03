@@ -17,10 +17,10 @@ import { ProfileModule } from './profile/profile.module';
 import { DrawingsModule } from './drawings/drawings.module';
 import { DocumentsModule } from './documents/documents.module';
 import { PaymentsModule } from './payments/payments.module';
-import { PhotosModule } from './photos/photos.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { AboutModule } from './about/about.module';
+import { AlbunsModule } from './albuns/albuns.module';
 
 @NgModule({
   declarations: [
@@ -33,10 +33,10 @@ import { AboutModule } from './about/about.module';
     DrawingsModule,
     DocumentsModule,
     PaymentsModule,
-    PhotosModule,
     ScheduleModule,
     AuthModule,
     AboutModule,
+    AlbunsModule,
     CoreModule,
     HomeModule,
     ProjectsModule,

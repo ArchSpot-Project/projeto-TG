@@ -7,6 +7,7 @@ import { UserService } from '../../core/services/user.service';
 import { UserProjectService } from '../../core/services/user-project.service';
 import { DocumentDTO } from '../../core/models/document.model';
 import { CommentDTO } from '../../core/models/comment.model';
+import { DocumentService } from '../../core/services/document.service';
 
 @Component({
   selector: 'app-document-view',
@@ -20,6 +21,7 @@ export class DocumentViewComponent implements OnInit {
   item!: DocumentDTO;
   itemBlobUrl!: SafeResourceUrl;
   fileType!: string;
+  documentName = '';
 
   itemType: 'document' | 'drawing' = 'document';
 
@@ -32,6 +34,7 @@ export class DocumentViewComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private commentService: CommentService,
+    private documentService: DocumentService,
     private authService: AuthService,
     private userService: UserService,
     private userProjectService: UserProjectService
@@ -44,8 +47,6 @@ export class DocumentViewComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.projectId = +params['id'];
       this.itemId = +params['documentId'] || +params['drawingId'];
-
-      // detecta se a URL é /drawings/ ou /documents/
       this.itemType = this.route.snapshot.routeConfig?.path?.includes('drawings') ? 'drawing' : 'document';
 
       if (isNaN(this.projectId) || isNaN(this.itemId)) {
@@ -54,10 +55,20 @@ export class DocumentViewComponent implements OnInit {
       }
 
       this.loadUserRole();
-      // this.loadItem();
+      this.loadItem();
       this.loadComments();
     });
   }
+
+  loadItem(): void {
+  this.documentService.getDocumentById(this.itemId).subscribe({
+    next: (data) => {
+      this.item = data;
+      this.documentName = data.name;
+    },
+    error: err => console.error('Erro ao carregar documento', err)
+  });
+}
 
   get document() {
     return this.item;
