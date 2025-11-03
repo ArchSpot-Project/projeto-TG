@@ -27,64 +27,41 @@
                         principal são escritórios de arquitetura de pequeno e médio porte,
                         que precisam de uma ferramenta completa e fácil de usar.
                     </p>
+                </section>
+            </ng-template>
+        </li>
 
-                    <h4 class="mt-5 fw-semibold">Serviços básicos</h4>
-                    <ul class="list-disc ms-4 mt-2">
-                        <li>
-                            Cronograma de desenvolvimento do projeto e da obra, com
-                            checkpoints e etapas personalizáveis;
-                        </li>
-                        <li>
-                            Área de documentação, incluindo:
-                            <ul class="list-circle ms-4 mt-2">
-                                <li>Proposta orçamentária e contrato;</li>
-                                <li>Última versão válida do projeto;</li>
-                                <li>Atas de reunião;</li>
-                                <li>Fotos do andamento da obra;</li>
-                                <li>Referências estéticas e funcionais;</li>
-                                <li>Orçamentos e contratos de fornecedores.</li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <h4 class="mt-5 fw-semibold">Perfis de usuários e permissões</h4>
-                    <ul class="list-disc ms-4 mt-2">
-                        <li>
-                            <strong>Arquiteto Administrador (Gerente):</strong>
-                            <ul class="list-circle ms-4">
-                                <li>Permissões de administrador;</li>
-                                <li>Criação, edição e exclusão de parcelas;</li>
-                                <li>Criação, edição e exclusão de etapas no cronograma;</li>
-                                <li>Manutenção e controle de usuários;</li>
-                                <li>Acesso a todas as funcionalidades do sistema.</li>
-                            </ul>
-                        </li>
-                        <li class="mt-2">
-                            <strong>Equipe de Arquitetura (Colaboradores):</strong>
-                            <ul class="list-circle ms-4">
-                                <li>Upload de arquivos, referências e fotos;</li>
-                                <li>Criação, edição e exclusão de parcelas;</li>
-                                <li>Criação, edição e exclusão de etapas no cronograma;</li>
-                                <li>Visualização de colaboradores do projeto.</li>
-                            </ul>
-                        </li>
-                        <li class="mt-2">
-                            <strong>Cliente:</strong>
-                            <ul class="list-circle ms-4">
-                                <li>Visualização de arquivos;</li>
-                                <li>Visualização de etapas e parcelas;</li>
-                                <li>Visualização de colaboradores do projeto;</li>
-                                <li>Upload de referências e fotos.</li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <p class="mt-4">
-                        O ArchSpot busca simplificar a rotina dos profissionais e melhorar a
-                        experiência dos clientes, proporcionando uma gestão integrada,
-                        organizada e colaborativa de todos os aspectos de um projeto
-                        arquitetônico.
-                    </p>
+        <li [ngbNavItem]="'integrantes'">
+            <a ngbNavLink>Integrantes</a>
+            <ng-template ngbNavContent>
+                <section class="p-4 fs-5 text-center">
+                    <h3 class="mb-4">Integrantes</h3>
+                    <div class="d-flex justify-content-center flex-wrap gap-4">
+                        <a href="https://github.com/clararicioni" target="_blank" class="text-decoration-none text-dark integrante-card">
+                            <div class="card p-3 shadow-sm" style="width: 150px;">
+                                <img src="https://avatars.githubusercontent.com/u/99998256" class="card-img-top mb-2" alt="Clara Bergamo">
+                                <div class="card-body p-0">
+                                    <b>Clara Bergamo</b>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://github.com/erossecundus" target="_blank" class="text-decoration-none text-dark integrante-card">
+                            <div class="card p-3 shadow-sm" style="width: 150px;">
+                                <img src="https://avatars.githubusercontent.com/u/156208632" class="card-img-top mb-2" alt="Eros Secundus">
+                                <div class="card-body p-0">
+                                    <b>Eros Secundus</b>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://github.com/lucitiemi" target="_blank" class="text-decoration-none text-dark integrante-card">
+                            <div class="card p-3 shadow-sm" style="width: 150px;">
+                                <img src="https://avatars.githubusercontent.com/u/156207790" class="card-img-top mb-2" alt="Luciana Tiemi">
+                                <div class="card-body p-0">
+                                    <b>Luciana Tiemi</b>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </section>
             </ng-template>
         </li>

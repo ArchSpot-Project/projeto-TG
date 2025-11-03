@@ -15,6 +15,7 @@ import { PhaseStatusPipe } from '../core/pipes/phase-status.pipe';
 import { PaymentMethodPipe } from '../core/pipes/payment-method.pipe';
 import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
 import { DirectoryComponent } from './directory/directory.component';
+import { DateDashPipe } from '../core/pipes/date.pipe';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { DirectoryComponent } from './directory/directory.component';
     PaymentMethodPipe,
     PaymentStatusPipe,
     PhaseStatusPipe,
+    DateDashPipe,
     AddUserModalComponent,
     DirectoryComponent
   ],
@@ -49,6 +51,7 @@ import { DirectoryComponent } from './directory/directory.component';
     ProjectStatusBarComponent,
     PaymentStatusPipe,
     PhaseStatusPipe,
+    DateDashPipe,
     RoleTranslatePipe,
     DirectoryComponent,
     AddUserModalComponent

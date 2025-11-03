@@ -30,6 +30,10 @@ export class InstallmentService {
     return this.http.get<InstallmentResponse[]>(this.apiUrl);
   }
 
+  getInstallmentsByProject(projectId: number): Observable<InstallmentResponse[]> {
+    return this.http.get<InstallmentResponse[]>(`http://localhost:8080/projects/${projectId}/installments`);
+  }
+
   payInstallment(id: number, method: PaymentMethod): Observable<InstallmentResponse> {
     const params = new HttpParams().set('method', method);
     return this.http.patch<InstallmentResponse>(`${this.apiUrl}/${id}/pay`, null, { params });
