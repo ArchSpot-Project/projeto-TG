@@ -4,7 +4,7 @@
 }
 
 .document-name:hover::after {
-  content: attr(title);
+  content: attr(data-title);
   position: absolute;
   bottom: 100%;
   left: 0;
@@ -17,4 +17,13 @@
   width: max-content;
   max-width: 250px;
   margin-bottom: 4px; 
+}
+
+/* desativa o tooltip do navegador */
+.document-name[title]:hover::before {
+  content: attr(title);
+  pointer-events: none;
+}
+.document-name[title]:hover {
+  pointer-events: none;
 }

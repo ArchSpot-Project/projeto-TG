@@ -41,7 +41,7 @@
     [colunas]="[
       { campo: 'projectName', label: 'Projeto' },
       { campo: 'name', label: 'Etapa' },
-      { campo: 'status', label: 'Status' },
+      { campo: 'status', label: 'Status', pipe:'phaseStatus' },
       { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
       { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
       { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },

@@ -17,6 +17,7 @@ import { PaymentsComponent } from './payments/payments.component';
 import { PhotosComponent } from './photos/photos.component';
 import { DocumentsComponent } from './documents/documents.component';
 import { LandingPageComponent } from './public/pages/landing-page/landing-page.component';
+import { DocumentViewComponent } from './documents/document-view/document-view.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -37,7 +38,9 @@ const routes: Routes = [
   { path: 'projects/:id/users-project', component: UsersProjectPageComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/photos', component: PhotosComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/documents', component: DocumentsComponent, canActivate: [authGuard, projectAccessGuard] },
+  { path: 'projects/:id/documents/:documentId/view', component: DocumentViewComponent, canActivate: [authGuard, projectAccessGuard] },
   { path: 'projects/:id/drawings', component: DrawingsComponent, canActivate: [authGuard, projectAccessGuard] },
+  { path: 'projects/:id/drawings/:drawingId/view', component: DocumentViewComponent, canActivate: [authGuard, projectAccessGuard] },
 
   // rota curinga
   { path: '**', redirectTo: 'home' }
@@ -47,4 +50,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

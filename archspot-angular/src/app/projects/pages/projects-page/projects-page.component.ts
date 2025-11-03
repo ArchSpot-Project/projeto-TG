@@ -14,7 +14,8 @@ export class ProjectsPageComponent implements OnInit {
   openProjects: ProjectResponse[] = [];
   closedProjects: ProjectResponse[] = [];
   showModal = false;
-
+  loading = true;
+  errorMessage = '';
   currentUserId!: number;
   currentUserName!: string;
 
@@ -31,14 +32,23 @@ export class ProjectsPageComponent implements OnInit {
   loadUserProjects(): void {
     const user = this.authService.getUser();
     if (!user || !user.id) {
-      console.error('Usuário não logado');
+      this.errorMessage = 'Usuário não logado.';
+      this.loading = false;
       return;
     }
 
-    const userId = user.id;
+    this.currentUserId = user.id;
+    this.currentUserName = user.name;
+    this.loading = true;
 
-    this.projectService.getProjectsByUser(userId).subscribe({
+    this.projectService.getProjectsByUser(user.id).subscribe({
       next: (userProjects) => {
+        if (!userProjects || userProjects.length === 0) {
+          this.errorMessage = 'Nenhum projeto encontrado para o usuário.';
+          this.loading = false;
+          return;
+        }
+
         const projectRequests = userProjects.map(up =>
           this.projectService.getProjectById(up.projectId)
         );
@@ -51,11 +61,20 @@ export class ProjectsPageComponent implements OnInit {
             this.closedProjects = projects.filter(
               p => p.status === 'COMPLETED' || p.status === 'CANCELLED'
             );
+            this.loading = false;
           },
-          error: err => console.error('Erro ao carregar detalhes dos projetos', err)
+          error: (err) => {
+            console.error(err);
+            this.errorMessage = 'Erro ao carregar detalhes dos projetos.';
+            this.loading = false;
+          }
         });
       },
-      error: err => console.error('Erro ao carregar projetos do usuário', err)
+      error: (err) => {
+        console.error(err);
+        this.errorMessage = 'Erro ao carregar projetos do usuário.';
+        this.loading = false;
+      }
     });
   }
 
@@ -64,13 +83,6 @@ export class ProjectsPageComponent implements OnInit {
   }
 
   openModal(): void {
-    const user = this.authService.getUser();
-    if (!user || !user.id) {
-      alert('Usuário não logado');
-      return;
-    }
-    this.currentUserId = user.id;
-    this.currentUserName = user.name;
     this.showModal = true;
   }
 }

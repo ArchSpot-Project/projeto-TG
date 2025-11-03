@@ -1,66 +1,39 @@
-.directory {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  overflow: hidden;
+.nav-tabs {
+  border-bottom: 1px solid #dee2e6;
 }
 
-.directory-header {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-  user-select: none;
+.nav-tabs .nav-link {
+  color: #495057;
+  border: 1px solid transparent;
+  border-top-left-radius: .375rem;
+  border-top-right-radius: .375rem;
+  padding: .5rem 1rem;
+  margin-right: 2px;
   transition: background-color 0.2s ease;
 }
 
-.directory-header:hover {
+.nav-tabs .nav-link:hover {
   background-color: #f8f9fa;
 }
 
-.folder-icon {
-  transition: transform 0.2s ease;
-}
-
-.folder-icon.open {
-  transform: rotate(20deg);
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-}
-
-.icon {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.2s ease, transform 0.1s ease;
-}
-
-.icon:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.directory-content {
-  border-top: 1px solid #eee;
-  background: #fafafa;
-  padding: 8px 12px;
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  background-color: #fff;
+  border-color: #dee2e6 #dee2e6 #fff;
 }
 
 .context-menu {
   position: fixed;
   z-index: 1000;
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
+
 .context-menu li {
-  padding: 4px 8px;
+  padding: 6px 10px;
   cursor: pointer;
 }
+
 .context-menu li:hover {
   background-color: #f0f0f0;
 }
-

@@ -21,21 +21,15 @@
 
 <!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <app-reports-table
-    [titulo]="'Cronograma Por Projeto'"
-    [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
+  <app-reports-table [titulo]="'Cronograma Por Projeto'" [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
     [colunas]="[
       { campo: 'projectName', label: 'Projeto' },
       { campo: 'name', label: 'Etapa' },
-      { campo: 'status', label: 'Status' },
+      { campo: 'status', label: 'Status', pipe:'phaseStatus' },
       { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
       { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
       { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
       { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
-    ]"
-    [registros]="phases"
-    [loading]="loading"
-    [error]="error"
-    (voltar)="voltarEdicao()">
+    ]" [registros]="phases" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>

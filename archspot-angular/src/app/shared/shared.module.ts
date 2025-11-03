@@ -16,6 +16,8 @@ import { PaymentMethodPipe } from '../core/pipes/payment-method.pipe';
 import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
 import { DirectoryComponent } from './directory/directory.component';
 import { DateDashPipe } from '../core/pipes/date.pipe';
+import { DirectoryNodeComponent } from './directory/directory-node/directory-node.component';
+import { SafeUrlPipe } from '../core/pipes/safe-url.pipe';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { DateDashPipe } from '../core/pipes/date.pipe';
     CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
+    SafeUrlPipe,
     ProjectStatusBarComponent,
     RoleTranslatePipe,
     PaymentMethodPipe,
@@ -33,7 +36,8 @@ import { DateDashPipe } from '../core/pipes/date.pipe';
     PhaseStatusPipe,
     DateDashPipe,
     AddUserModalComponent,
-    DirectoryComponent
+    DirectoryComponent,
+    DirectoryNodeComponent
   ],
   imports: [
     CommonModule,
@@ -47,6 +51,7 @@ import { DateDashPipe } from '../core/pipes/date.pipe';
     CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
+    SafeUrlPipe,
     PaymentMethodPipe,
     ProjectStatusBarComponent,
     PaymentStatusPipe,

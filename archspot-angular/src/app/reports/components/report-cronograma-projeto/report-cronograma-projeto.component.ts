@@ -84,7 +84,7 @@ export class ReportCronogramaProjetoComponent implements OnInit {
       case 'OVERDUE': return 'Atrasado';
       case 'IN_PROGRESS': return 'Em andamento';
       case 'COMPLETED': return 'Concluído';
-      case 'CANCELLED': return 'Cancelado';
+      case 'NOT_STARTED': return 'Não iniciada';
       default: return status ?? '-';
     }
   }

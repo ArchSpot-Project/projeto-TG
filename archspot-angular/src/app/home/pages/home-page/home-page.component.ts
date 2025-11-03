@@ -14,10 +14,12 @@ export class HomePageComponent implements OnInit {
   openProjects: ProjectResponse[] = [];
   closedProjects: ProjectResponse[] = [];
   showModal = false;
+  loading = true;
+  errorMessage = '';
 
   constructor(
     private projectService: ProjectService,
-    @Inject(AuthService) private authService: AuthService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -28,12 +30,21 @@ export class HomePageComponent implements OnInit {
   loadUserProjects(): void {
     const user = this.authService.getUser();
     if (!user || !user.id) {
-      console.error('Usuário não logado');
+      this.errorMessage = 'Usuário não logado.';
+      this.loading = false;
       return;
     }
 
+    this.loading = true;
+
     this.projectService.getProjectsByUser(user.id).subscribe({
       next: (userProjects) => {
+        if (!userProjects || userProjects.length === 0) {
+          this.errorMessage = 'Nenhum projeto encontrado para o usuário.';
+          this.loading = false;
+          return;
+        }
+
         const projectRequests = userProjects.map(up =>
           this.projectService.getProjectById(up.projectId)
         );
@@ -46,11 +57,20 @@ export class HomePageComponent implements OnInit {
             this.closedProjects = projects.filter(
               p => p.status === 'COMPLETED' || p.status === 'CANCELLED'
             );
+            this.loading = false;
           },
-          error: err => console.error('Erro ao carregar detalhes dos projetos', err)
+          error: (err) => {
+            console.error(err);
+            this.errorMessage = 'Erro ao carregar detalhes dos projetos.';
+            this.loading = false;
+          }
         });
       },
-      error: err => console.error('Erro ao carregar projetos do usuário', err)
+      error: (err) => {
+        console.error(err);
+        this.errorMessage = 'Erro ao carregar projetos do usuário.';
+        this.loading = false;
+      }
     });
   }
 
