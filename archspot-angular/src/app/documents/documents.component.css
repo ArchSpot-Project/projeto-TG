@@ -1,0 +1,11 @@
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+}
+.context-menu li {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.context-menu li:hover {
+  background-color: #f0f0f0;
+}

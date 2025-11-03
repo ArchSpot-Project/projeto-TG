@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { InstallmentService, InstallmentResponse, InstallmentRequest, PaymentMethod } from '../../core/services/installment.service';
+import { InstallmentService } from '../../core/services/installment.service';
+import { InstallmentRequest, InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
 
 @Component({
   selector: 'app-edit-installment-modal',
@@ -58,21 +59,4 @@ export class EditInstallmentModalComponent implements OnChanges {
       error: (err) => alert('Erro ao atualizar parcela: ' + (err.error?.message || err.message))
     });
   }
-
-  deleteInstallment(): void {
-    if (!confirm('Deseja realmente excluir esta parcela?')) return;
-
-    this.installmentService.deleteInstallment(this.cloned.id).subscribe({
-      next: () => {
-        alert('Parcela excluída com sucesso!');
-        this.updated.emit(null);
-        this.cancel(); 
-      },
-      error: (err) => {
-        console.error('Erro ao excluir parcela', err);
-        alert('Erro ao excluir a parcela.');
-      }
-    });
-  }
-
 }

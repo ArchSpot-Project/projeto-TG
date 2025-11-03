@@ -16,7 +16,7 @@ export class CreateProjectModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() projectCreated = new EventEmitter<void>();
 
-  roles: string[] = ['STAFF', 'CUSTOMER'];
+  roles: string[] = ['STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
   projectName: string = '';
   projectDescription: string = '';
   estimatedStartDate: string = '';

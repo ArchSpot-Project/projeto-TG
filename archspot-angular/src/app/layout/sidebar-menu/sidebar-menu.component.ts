@@ -33,8 +33,7 @@ export class SidebarMenuComponent implements OnInit {
   ];
 
   profileMenuItems = [
-    { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() },
-    { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToSettings() }
+    { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() }
   ];
 
   helpMenuItems = [
@@ -113,7 +112,6 @@ export class SidebarMenuComponent implements OnInit {
 
   goToReports() { this.router.navigate(['/reports']); }
   goToProfile() { this.router.navigate(['/profile']); }
-  goToSettings() { this.router.navigate(['/settings']); }
   goToAbout() { this.router.navigate(['/about']); }
 
   goToUsersProject() {

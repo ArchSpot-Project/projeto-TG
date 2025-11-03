@@ -1,0 +1,19 @@
+.page-title-input,
+.page-title-text {
+  font-size: 3rem;
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.page-title-input {
+  width: 100%;
+}
+
+.page-title-input:focus {
+  outline: none;
+  box-shadow: none;
+}

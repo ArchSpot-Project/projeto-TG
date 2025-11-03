@@ -24,36 +24,32 @@
               <tr *ngFor="let phase of phases; let i = index">
                 <td>
                   <button *ngIf="!isCustomerInProject" class="btn btn-transparent p-1"
-                          (click)="openEditPhaseModal(phase, i)">
+                    (click)="openEditPhaseModal(phase, i)">
                     <img src="assets/img/icons/pencil-square.svg" alt="Editar" width="15" height="15">
                   </button>
 
-                  <app-edit-phase-modal *ngIf="selectedPhase" [show]="showEditModal"
-                                        [phaseId]="selectedPhase.id"
-                                        [phaseIndex]="selectedPhaseIndex"
-                                        [phaseName]="selectedPhase.name"
-                                        [phaseDescription]="selectedPhase.description"
-                                        [phaseEstimatedStartDate]="selectedPhase.estimatedStartDate"
-                                        [phaseEstimatedEndDate]="selectedPhase.estimatedEndDate"
-                                        [phaseRealStartDate]="selectedPhase.realStartDate"
-                                        [phaseRealEndDate]="selectedPhase.realEndDate"
-                                        [phaseStatus]="selectedPhase.status"
-                                        (close)="closeEditModal()">
+                  <app-edit-phase-modal *ngIf="selectedPhase" [show]="showEditModal" [phaseId]="selectedPhase.id"
+                    [phaseIndex]="selectedPhaseIndex" [phaseName]="selectedPhase.name"
+                    [phaseDescription]="selectedPhase.description"
+                    [phaseEstimatedStartDate]="selectedPhase.estimatedStartDate"
+                    [phaseEstimatedEndDate]="selectedPhase.estimatedEndDate"
+                    [phaseRealStartDate]="selectedPhase.realStartDate" [phaseRealEndDate]="selectedPhase.realEndDate"
+                    [phaseStatus]="selectedPhase.status" (close)="closeEditModal()">
                   </app-edit-phase-modal>
                 </td>
                 <th scope="row">{{ i + 1 }}</th>
-                <td>{{ phase.name }}</td>
+                <td [title]="phase.description">{{ phase.name }}</td>
                 <td>{{ phase.duration }} dias</td>
                 <td>{{ phase.estimatedStartDate | date:'dd/MM/yyyy' }}</td>
                 <td>{{ phase.estimatedEndDate | date:'dd/MM/yyyy' }}</td>
-                <td>{{ phase.realStartDate ? (phase.realStartDate | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
-                <td>{{ phase.realEndDate ? (phase.realEndDate | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                <td>{{ phase.realStartDate ? (phase.realStartDate | date:'dd/MM/yyyy') : '-' }}</td>
+                <td>{{ phase.realEndDate ? (phase.realEndDate | date:'dd/MM/yyyy') : '-' }}</td>
                 <td>{{ phase.status | phaseStatus }}</td>
                 <td>
                   <button *ngIf="canStartPhase(i)" class="btn btn-sm btn-primary"
-                          (click)="startPhase(phase)">Iniciar</button>
+                    (click)="startPhase(phase)">Iniciar</button>
                   <button *ngIf="canFinishPhase(i)" class="btn btn-sm btn-success"
-                          (click)="finishPhase(phase)">Finalizar</button>
+                    (click)="finishPhase(phase)">Finalizar</button>
                   <span *ngIf="!canStartPhase(i) && !canFinishPhase(i)">-</span>
                 </td>
               </tr>
@@ -70,21 +66,29 @@
 
       <div class="mt-3" *ngIf="!isCustomerInProject">
         <a class="link-dark link-opacity-50-hover link-underline-opacity-0 fs-6 d-inline-flex align-items-center"
-           (click)="openCreatePhaseModal()">
+          (click)="openCreatePhaseModal()">
           <img src="assets/img/icons/plus-circle.svg" class="me-2" alt="Adicionar" width="15" height="15">
           Adicionar nova etapa
         </a>
       </div>
 
-      <app-create-phase-modal [show]="showCreateModal"
-                              [projectId]="projectId"
-                              [lastPhaseId]="phases.length ? phases[phases.length - 1].id : null"
-                              (close)="showCreateModal = false"
-                              (phaseCreated)="onPhaseCreated($event)">
+      <app-create-phase-modal [show]="showCreateModal" [projectId]="projectId"
+        [lastPhaseId]="phases.length ? phases[phases.length - 1].id : null" (close)="showCreateModal = false"
+        (phaseCreated)="onPhaseCreated($event)">
       </app-create-phase-modal>
 
       <div class="mt-5" *ngIf="phases.length > 0">
-        <h5 class="fw-semibold mb-3">Cronograma Visual (Datas estimadas)</h5>
+
+        <div class="d-flex align-items-center mb-3">
+          <h5 class="mb-0">Cronograma Visual (Datas estimadas)</h5>
+          <select [(ngModel)]="ganttViewMode" (change)="changeGanttView(ganttViewMode)"
+            class="form-select form-select-sm ms-3 w-auto">
+            <option value="Day">Dia</option>
+            <option value="Month">Mês</option>
+            <option value="Year">Ano</option>
+          </select>
+        </div>
+
         <div #ganttContainer id="gantt"></div>
       </div>
     </div>

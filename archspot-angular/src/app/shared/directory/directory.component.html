@@ -1,0 +1,34 @@
+<nav class="mb-1 d-flex justify-content-between align-items-center">
+  <div class="nav nav-tabs fs-5 d-flex align-items-center flex-wrap">
+    <div class="position-relative" *ngFor="let dir of directories">
+      <button class="nav-link py-2 px-3" [class.active]="dir.id === activeTabId" type="button"
+        (click)="setActiveTab(dir)" (contextmenu)="openContextMenu($event, dir)">
+        {{ dir.name }}
+      </button>
+    </div>
+
+    <a *ngIf="!isCustomerInProject" class="btn align-middle ms-2 p-0" (click)="createDirectory()"
+      title="Novo diretório">
+      <img src="/assets/img/icons/plus-circle.svg" alt="+" width="20" height="20">
+    </a>
+  </div>
+
+  <div *ngIf="!isCustomerInProject && activeTabId">
+    <button class="btn btn-sm btn-light d-flex align-items-center me-1" (click)="uploadFile()">
+      <img src="/assets/img/icons/upload.svg" width="16" height="16" class="me-1">
+      Fazer Upload
+    </button>
+  </div>
+</nav>
+
+<div class="tab-content border border-top-0 p-2 pt-0 mt-0">
+  <app-table *ngIf="activeTabId" [directoryId]="activeTabId" [projectId]="projectId"></app-table>
+</div>
+
+<div class="context-menu" *ngIf="contextMenu.visible"
+  [ngStyle]="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
+  <ul class="list-unstyled m-0 p-2 bg-white border rounded shadow">
+    <li (click)="editDirectoryName(contextMenu.dir!,$event)">Renomear</li>
+    <li (click)="deleteDirectory(contextMenu.dir!)">Excluir</li>
+  </ul>
+</div>

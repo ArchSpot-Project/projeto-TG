@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { InstallmentService, InstallmentResponse, PaymentMethod } from '../../core/services/installment.service';
+import { InstallmentService } from '../../core/services/installment.service';
+import { InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
 
 @Component({
   selector: 'app-create-installment-modal',
@@ -57,6 +58,7 @@ export class CreateInstallmentModalComponent {
         alert('Parcela criada com sucesso!');
         this.installmentCreated.emit(created);
         this.cancel();
+        location.reload();
       },
       error: (err) => alert('Erro ao criar parcela: ' + (err.error?.message || err.message))
     });

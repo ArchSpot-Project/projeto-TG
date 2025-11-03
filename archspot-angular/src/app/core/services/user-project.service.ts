@@ -1,20 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface UserProjectResponse {
-  id: number;
-  userId: number;
-  userName: string;
-  projectId: number;
-  projectName: string;
-  role: string;
-}
-
-export interface UserProjectRequest {
-  userId: number;
-  role: string;
-}
+import { UserProjectResponse } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserProjectService {

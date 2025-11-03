@@ -8,6 +8,7 @@ import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
 import { PageLayoutComponent } from './page-layout/page-layout.component';
 import { PublicPageLayoutComponent } from './public-page-layout/public-page-layout.component';
 import { SharedModule } from '../shared/shared.module';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -23,7 +24,8 @@ import { SharedModule } from '../shared/shared.module';
     CommonModule,
     NgbDropdownModule,
     RouterModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ],
   exports: [
     NavbarComponent,

@@ -1,8 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ProjectResponse, ProjectService } from '../../../core/services/project.service';
+import { ProjectService } from '../../../core/services/project.service';
 import { forkJoin } from 'rxjs';
+import { ProjectResponse } from '../../../core/models/project.model';
 
 @Component({
   selector: 'app-home-page',

@@ -14,6 +14,7 @@ import { AddUserModalComponent } from '../users-project/add-user-modal/add-user-
 import { PhaseStatusPipe } from '../core/pipes/phase-status.pipe';
 import { PaymentMethodPipe } from '../core/pipes/payment-method.pipe';
 import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
+import { DirectoryComponent } from './directory/directory.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +25,13 @@ import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
     CreateProjectModalComponent,
     TableComponent,
     StatusTranslatePipe,
+    ProjectStatusBarComponent,
     RoleTranslatePipe,
     PaymentMethodPipe,
     PaymentStatusPipe,
     PhaseStatusPipe,
-    AddUserModalComponent
+    AddUserModalComponent,
+    DirectoryComponent
   ],
   imports: [
     CommonModule,
@@ -43,9 +46,11 @@ import { PaymentStatusPipe } from '../core/pipes/payment-status.pipe';
     TableComponent,
     StatusTranslatePipe,
     PaymentMethodPipe,
+    ProjectStatusBarComponent,
     PaymentStatusPipe,
     PhaseStatusPipe,
     RoleTranslatePipe,
+    DirectoryComponent,
     AddUserModalComponent
   ],
   providers: [
