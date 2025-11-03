@@ -1,7 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.UserProjectRequestDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

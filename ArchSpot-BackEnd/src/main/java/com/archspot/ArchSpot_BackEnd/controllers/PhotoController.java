@@ -1,6 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.services.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

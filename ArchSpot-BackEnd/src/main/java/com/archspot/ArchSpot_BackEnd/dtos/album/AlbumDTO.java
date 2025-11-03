@@ -1,8 +1,10 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.album;
 
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 
 @Getter
 @Setter

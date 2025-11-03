@@ -1,8 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Directory;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;

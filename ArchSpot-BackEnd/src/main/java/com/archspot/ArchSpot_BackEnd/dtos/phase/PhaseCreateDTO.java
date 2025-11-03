@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.phase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

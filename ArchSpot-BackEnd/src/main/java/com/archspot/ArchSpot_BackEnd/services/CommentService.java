@@ -1,7 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.CommentCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.CommentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Comment;
 import com.archspot.ArchSpot_BackEnd.entities.Document;
 import com.archspot.ArchSpot_BackEnd.entities.Project;

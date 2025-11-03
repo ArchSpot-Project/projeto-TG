@@ -1,8 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.AlbumCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.AlbumDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.album.AlbumCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.album.AlbumDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Album;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.repositories.AlbumRepository;

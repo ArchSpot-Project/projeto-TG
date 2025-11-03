@@ -1,6 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Album;
 import com.archspot.ArchSpot_BackEnd.entities.Photo;
 import com.archspot.ArchSpot_BackEnd.entities.User;

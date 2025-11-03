@@ -1,6 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
 import com.archspot.ArchSpot_BackEnd.repositories.*;
 

@@ -8,8 +8,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.archspot.ArchSpot_BackEnd.dtos.UserCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.UserUpdateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.user.UserCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.exceptions.DatabaseException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;

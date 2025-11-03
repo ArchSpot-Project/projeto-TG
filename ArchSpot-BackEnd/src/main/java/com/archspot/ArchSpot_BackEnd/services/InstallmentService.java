@@ -1,7 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.InstallmentRequestDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentRequestDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Installment;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentMethod;

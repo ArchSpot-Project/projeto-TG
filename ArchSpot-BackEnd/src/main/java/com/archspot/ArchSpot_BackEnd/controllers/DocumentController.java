@@ -1,8 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.CommentCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.CommentDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.services.CommentService;
 import com.archspot.ArchSpot_BackEnd.services.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
