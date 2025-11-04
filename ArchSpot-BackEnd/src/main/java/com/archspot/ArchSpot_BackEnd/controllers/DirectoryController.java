@@ -18,7 +18,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/directories")
-@CrossOrigin(origins = "http://localhost:4200")
 public class DirectoryController {
 
   @Autowired

@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/albums")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AlbumController {
 
   @Autowired
