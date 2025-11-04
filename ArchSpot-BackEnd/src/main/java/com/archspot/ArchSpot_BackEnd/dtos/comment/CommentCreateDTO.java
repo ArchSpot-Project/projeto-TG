@@ -11,5 +11,4 @@ public class CommentCreateDTO {
 
   private String text;
   private Long documentId;
-  private Long userId;
 }

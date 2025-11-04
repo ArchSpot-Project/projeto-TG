@@ -5,8 +5,13 @@ import com.archspot.ArchSpot_BackEnd.dtos.album.AlbumDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Album;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.AlbumRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,12 +34,13 @@ public class AlbumService {
   // criar
   public AlbumDTO createAlbum(AlbumCreateDTO dto) {
     Project project = projectRepository.findById(dto.getProjectId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     Album album = Album.builder()
         .name(dto.getName())
         .description(dto.getDescription())
         .creationDate(LocalDateTime.now())
+        .uploadedBy(SecurityUtils.getCurrentUser())
         .project(project)
         .build();
 
@@ -45,7 +51,7 @@ public class AlbumService {
   // listar por projeto
   public List<AlbumDTO> findByProject(Long projectId) {
     projectRepository.findById(projectId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     return albumRepository.findByProjectId(projectId).stream()
         .map(a -> toDTO(a, false)) // false = don't eagerly fetch photos (but we can include them)
@@ -55,14 +61,14 @@ public class AlbumService {
   // buscar por id
   public AlbumDTO findById(Long id) {
     Album album = albumRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
     return toDTO(album, true);
   }
 
   // atualizar name/description
   public AlbumDTO update(Long id, AlbumCreateDTO dto) {
     Album album = albumRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
     if (dto.getName() != null)
       album.setName(dto.getName());
     if (dto.getDescription() != null)
@@ -74,7 +80,23 @@ public class AlbumService {
   // deletar - cascade fotos por JPA; também tentamos remover pasta (silencioso)
   public void delete(Long id) {
     Album album = albumRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
+
+    // Usuário autenticado (vem do token)
+    User currentUser = SecurityUtils.getCurrentUser();
+
+    // Verifica se o usuário é dono do album
+    boolean isOwner = album.getUploadedBy().getId().equals(currentUser.getId());
+
+    // Resgata o projeto associado (album > projeto)
+    Project project = album.getProject();
+
+    // Verifica se o usuário é ADMIN ou STAFF no projeto
+    boolean isProjectAdminOrStaff = ProjectPermissionUtils.isAdminOrStaff(project, currentUser);
+
+    if (!isOwner && !isProjectAdminOrStaff) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not allowed to delete this album");
+    }
 
     // optional: try remove physical folder (best-effort)
     try {
@@ -102,6 +124,7 @@ public class AlbumService {
         .name(album.getName())
         .description(album.getDescription())
         .creationDate(album.getCreationDate())
+        .uploadedById(album.getUploadedBy().getId())
         .projectId(album.getProject() != null ? album.getProject().getId() : null)
         .build();
 

@@ -6,20 +6,17 @@ import com.archspot.ArchSpot_BackEnd.entities.Installment;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentMethod;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.*;
 
 @Service
 public class InstallmentService {
@@ -46,13 +43,13 @@ public class InstallmentService {
   @Transactional(readOnly = true)
   public InstallmentResponseDTO findById(Long id) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     Long projectId = installment.getProject().getId();
     refreshOverdueStatuses(projectId);
     // Garante que a parcela retornada está atualizada após o refresh
     installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     return toDTO(installment);
   }
@@ -70,7 +67,7 @@ public class InstallmentService {
   @Transactional
   public InstallmentResponseDTO create(InstallmentRequestDTO dto) {
     Project project = projectRepository.findById(dto.projectId())
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     Installment installment = new Installment();
     installment.setProject(project);
@@ -90,7 +87,7 @@ public class InstallmentService {
   @Transactional
   public InstallmentResponseDTO update(Long id, InstallmentRequestDTO dto) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     installment.setEstimatedPaymentDate(dto.estimatedPaymentDate());
     installment.setRealPaymentDate(dto.realPaymentDate());
@@ -108,7 +105,7 @@ public class InstallmentService {
   @Transactional
   public void delete(Long id) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     installmentRepository.delete(installment);
     updateProjectTotal(installment.getProject().getId());
@@ -130,7 +127,7 @@ public class InstallmentService {
   @Transactional(readOnly = true)
   public boolean isOverdue(Long id) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
     return installment.isOverdue();
   }
 
@@ -156,7 +153,7 @@ public class InstallmentService {
   @Transactional
   public InstallmentResponseDTO payInstallment(Long id, PaymentMethod method) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     installment.pay(method);
     installmentRepository.save(installment);
@@ -167,7 +164,7 @@ public class InstallmentService {
   @Transactional
   public InstallmentResponseDTO cancelInstallment(Long id) {
     Installment installment = installmentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Installment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
 
     installment.setPaymentStatus(PaymentStatus.CANCELED);
     installmentRepository.save(installment);
@@ -222,7 +219,7 @@ public class InstallmentService {
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     Project project = projectRepository.findById(projectId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     project.setTotalValue(total);
     projectRepository.save(project);

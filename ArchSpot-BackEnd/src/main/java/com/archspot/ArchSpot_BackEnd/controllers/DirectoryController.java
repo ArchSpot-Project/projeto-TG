@@ -88,9 +88,8 @@ public class DirectoryController {
   public ResponseEntity<DocumentDTO> uploadDocument(
       @PathVariable Long directoryId,
       @RequestParam("file") MultipartFile file,
-      @RequestParam("uploadedById") Long uploadedById,
       @RequestParam(value = "description", required = false) String description) throws IOException {
-    DocumentDTO saved = documentService.uploadDocument(directoryId, uploadedById, file, description);
+    DocumentDTO saved = documentService.uploadDocument(directoryId, file, description);
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 }

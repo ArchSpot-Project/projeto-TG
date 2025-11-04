@@ -17,5 +17,6 @@ public class AlbumDTO {
   private String description;
   private LocalDateTime creationDate;
   private Long projectId;
+  private Long uploadedById;
   private List<PhotoDTO> photos;
 }

@@ -8,6 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PhotoUploadDTO {
-  private String name; // opcional
-  private Long uploadedById;
+  private String name;
 }

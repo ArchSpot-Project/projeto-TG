@@ -34,7 +34,7 @@ public class UserService {
 	// Para consultar usuario pelo id
 	public User findById(Long id) {
 		Optional<User> obj = repository.findById(id);
-		return obj.orElseThrow(() -> new ResourceNotFoundException(id));
+		return obj.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 	}
 
 	// Para criar novo usuario
@@ -57,7 +57,7 @@ public class UserService {
 			if (repository.existsById(id)) {
 				repository.deleteById(id);
 			} else {
-				throw new ResourceNotFoundException(id);
+				throw new ResourceNotFoundException("User not found");
 			}
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Usuario já vinculado a um projeto nao podem ser deletados");
@@ -77,7 +77,7 @@ public class UserService {
 			user.setPassword(dto.password());
 			return repository.save(user);
 		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException(id);
+			throw new ResourceNotFoundException("User not found");
 		}
 
 	}

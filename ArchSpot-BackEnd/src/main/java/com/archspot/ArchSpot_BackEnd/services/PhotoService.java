@@ -3,10 +3,14 @@ package com.archspot.ArchSpot_BackEnd.services;
 import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Album;
 import com.archspot.ArchSpot_BackEnd.entities.Photo;
+import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.AlbumRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.PhotoRepository;
-import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,13 +35,10 @@ public class PhotoService {
   @Autowired
   private AlbumRepository albumRepository;
 
-  @Autowired
-  private UserRepository userRepository;
-
   // listar por álbum
   public List<PhotoDTO> findByAlbum(Long albumId) {
     albumRepository.findById(albumId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException( "Album not found"));
 
     return photoRepository.findByAlbumId(albumId).stream()
         .map(this::toDTO)
@@ -46,13 +47,12 @@ public class PhotoService {
 
   // upload (cria registro + salva arquivo)
   @Transactional
-  public PhotoDTO uploadPhoto(Long albumId, Long uploadedById, MultipartFile file, String optionalName)
+  public PhotoDTO uploadPhoto(Long albumId, MultipartFile file, String optionalName)
       throws IOException {
-    Album album = albumRepository.findById(albumId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Album not found"));
+    User currentUser = SecurityUtils.getCurrentUser();
 
-    User user = userRepository.findById(uploadedById)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    Album album = albumRepository.findById(albumId)
+        .orElseThrow(() -> new ResourceNotFoundException( "Album not found"));
 
     if (file.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
@@ -81,7 +81,7 @@ public class PhotoService {
         .fileUrl(destination.toString())
         .size(file.getSize())
         .album(album)
-        .uploadedBy(user)
+        .uploadedBy(currentUser)
         .build();
 
     Photo saved = photoRepository.save(photo);
@@ -91,7 +91,7 @@ public class PhotoService {
   // atualizar metadados (nome)
   public PhotoDTO updateMetadata(Long id, String newName) {
     Photo photo = photoRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Photo not found"));
 
     if (newName != null && !newName.isBlank()) {
       photo.setName(newName);
@@ -104,7 +104,23 @@ public class PhotoService {
   @Transactional
   public void delete(Long id) {
     Photo photo = photoRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Photo not found"));
+
+    // Usuário autenticado (vem do token)
+    User currentUser = SecurityUtils.getCurrentUser();
+
+    // Resgata o projeto associado (documento > diretório > projeto)
+    Project project = photo.getAlbum().getProject();
+
+    // Verifica se o usuário é dono do comentário
+    boolean isOwner = photo.getUploadedBy().getId().equals(currentUser.getId());
+
+    // Verifica se o usuário é ADMIN ou STAFF no projeto
+    boolean isProjectAdminOrStaff = ProjectPermissionUtils.isAdminOrStaff(project, currentUser);
+
+    if (!isOwner && !isProjectAdminOrStaff) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not allowed to delete this photo");
+    }
 
     Path p = Paths.get(photo.getFileUrl());
     try {
@@ -118,13 +134,13 @@ public class PhotoService {
   // buscar por id
   public PhotoDTO findById(Long id) {
     return photoRepository.findById(id).map(this::toDTO)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Photo not found"));
   }
 
   // retorna path para download
   public Path getFilePath(Long photoId) {
     Photo photo = photoRepository.findById(photoId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Photo not found"));
     return Paths.get(photo.getFileUrl());
   }
 

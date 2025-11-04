@@ -62,9 +62,8 @@ public class AlbumController {
   public ResponseEntity<PhotoDTO> uploadPhoto(
       @PathVariable Long albumId,
       @RequestParam("file") MultipartFile file,
-      @RequestParam("uploadedById") Long uploadedById,
       @RequestParam(value = "name", required = false) String name) throws IOException {
-    PhotoDTO saved = photoService.uploadPhoto(albumId, uploadedById, file, name);
+    PhotoDTO saved = photoService.uploadPhoto(albumId, file, name);
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 }

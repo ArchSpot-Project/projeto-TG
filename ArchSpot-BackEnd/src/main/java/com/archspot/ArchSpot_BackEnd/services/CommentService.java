@@ -6,9 +6,9 @@ import com.archspot.ArchSpot_BackEnd.entities.Comment;
 import com.archspot.ArchSpot_BackEnd.entities.Document;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.CommentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.DocumentRepository;
-import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
 import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
 
@@ -28,21 +28,19 @@ public class CommentService {
 
   private final CommentRepository commentRepository;
   private final DocumentRepository documentRepository;
-  private final UserRepository userRepository;
 
   // Criar comentário
   public CommentDTO createComment(Long documentId, CommentCreateDTO dto) {
+    User currentUser = SecurityUtils.getCurrentUser();
+    
     Document document = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
-
-    User user = userRepository.findById(dto.getUserId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
     Comment comment = Comment.builder()
         .text(dto.getText())
         .timestamp(LocalDateTime.now())
         .document(document)
-        .user(user)
+        .user(currentUser)
         .build();
 
     return toDTO(commentRepository.save(comment));
@@ -51,7 +49,7 @@ public class CommentService {
   // Buscar comentários de um documento
   public List<CommentDTO> getCommentsByDocument(Long documentId) {
     Document document = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
     return commentRepository.findByDocument(document)
         .stream()
@@ -63,7 +61,7 @@ public class CommentService {
   @Transactional
   public void deleteComment(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
     // Usuário autenticado (vem do token)
     User currentUser = SecurityUtils.getCurrentUser();

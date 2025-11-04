@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.archspot.ArchSpot_BackEnd.enums.*;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
@@ -162,8 +163,7 @@ public class PhaseService {
   // iniciar etapa
   public PhaseDTO startPhase(Long id) {
     Phase phase = phaseRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(
-            HttpStatus.NOT_FOUND, "Fase não encontrada."));
+        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
 
     // etapa predecessora e validação - se houver e nao foi finalizada, lançar erro 400
     if (phase.getPreviousPhase() != null) {
