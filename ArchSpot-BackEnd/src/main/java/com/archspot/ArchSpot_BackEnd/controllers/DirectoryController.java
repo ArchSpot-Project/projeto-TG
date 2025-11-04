@@ -84,7 +84,7 @@ public class DirectoryController {
   }
 
   // Fazer upload de um documento em um diretório (vários PARAM)
-  @PostMapping("/{directoryId}/documents/upload")
+  @PostMapping("/{directoryId}/documents")
   public ResponseEntity<DocumentDTO> uploadDocument(
       @PathVariable Long directoryId,
       @RequestParam("file") MultipartFile file,
