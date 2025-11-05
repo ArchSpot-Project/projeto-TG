@@ -1,0 +1,75 @@
+<!-- Linha principal: diretórios raiz + botão upload -->
+<nav class="d-flex justify-content-between align-items-center mb-2">
+  <div class="nav nav-tabs fs-5" role="tablist">
+    <button
+      *ngFor="let dir of directories"
+      class="nav-link"
+      [class.active]="dir.id === activeTabId"
+      type="button"
+      (click)="setActiveTab(dir)"
+      (contextmenu)="openContextMenu($event, dir, true)">
+      {{ dir.name }}
+    </button>
+
+    <!-- botão criar diretório raiz -->
+    <a *ngIf="!isCustomerInProject"
+       class="btn align-middle ms-1 p-0"
+       (click)="createDirectory()"
+       title="Novo diretório raiz">
+      <img src="/assets/img/icons/plus-circle.svg" alt="+" width="20" height="20">
+    </a>
+  </div>
+
+  <!-- botão de upload -->
+  <div *ngIf="!isCustomerInProject && activeTabId">
+    <button class="btn btn-sm btn-light d-flex align-items-center me-1" (click)="uploadFile()">
+      <img src="/assets/img/icons/upload.svg" width="16" height="16" class="me-1">
+      Fazer Upload
+    </button>
+  </div>
+</nav>
+
+<!-- Subdiretórios (segunda linha de abas) -->
+<nav *ngIf="activeRoot?.subdirectories?.length">
+  <div class="nav nav-tabs ms-3" role="tablist">
+    <button
+      *ngFor="let sub of activeRoot?.subdirectories"
+      class="nav-link"
+      [class.active]="sub.id === activeTabId"
+      type="button"
+      (click)="setActiveTab(sub)"
+      (contextmenu)="openContextMenu($event, sub, false)">
+      {{ sub.name }}
+    </button>
+
+    <!-- botão criar subdiretório -->
+    <a *ngIf="!isCustomerInProject && activeRoot && directoryType === 'DRAWINGS'"
+       class="btn align-middle ms-1 p-0"
+       (click)="createSubdirectory(activeRoot)"
+       title="Novo subdiretório">
+      <img src="/assets/img/icons/plus-circle.svg" alt="+" width="18" height="18">
+    </a>
+  </div>
+</nav>
+
+<!-- Conteúdo -->
+<div class="tab-content border border-top-0 p-2 pt-0 mt-0">
+  <app-table *ngIf="activeTabId" [directoryId]="activeTabId" [projectId]="projectId"></app-table>
+</div>
+
+<!-- Context Menu -->
+<ul *ngIf="contextMenu.visible"
+    class="context-menu list-unstyled bg-white border rounded shadow-sm"
+    [style.left.px]="contextMenu.x"
+    [style.top.px]="contextMenu.y">
+  <li (click)="editDirectoryName(contextMenu.dir!, $event)">Renomear</li>
+  <li (click)="deleteDirectory(contextMenu.dir!)">Excluir</li>
+
+  <!-- Criar subdiretório apenas se:
+       1. for tipo DRAWINGS
+       2. e for diretório raiz -->
+  <li *ngIf="contextMenu.isRoot && contextMenu.dir?.type === 'DRAWINGS'"
+      (click)="createSubdirectory(contextMenu.dir!)">
+    Criar subdiretório
+  </li>
+</ul>

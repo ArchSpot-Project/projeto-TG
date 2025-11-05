@@ -1,9 +1,10 @@
 import { ActivatedRoute, Router } from "@angular/router";
-import { ProjectResponse, ProjectService } from "../../../core/services/project.service";
+import { ProjectService } from "../../../core/services/project.service";
 import { UserProjectService } from "../../../core/services/user-project.service";
 import { AuthService } from "../../../core/services/auth.service";
 import { Component, Inject } from "@angular/core";
 import { User } from "../../../core/models/user.model";
+import { ProjectResponse } from "../../../core/models/project.model";
 
 @Component({
   selector: 'app-project-details-page',
@@ -49,6 +50,8 @@ export class ProjectDetailsPageComponent {
     this.projectService.getProjectById(id).subscribe({
       next: (project) => {
         this.project = project;
+        this.tempName = project.name;
+        this.tempDescription = project.description || '';
         this.loading = false;
       },
       error: (err) => {

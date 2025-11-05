@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { InstallmentResponse, InstallmentService, PaymentMethod } from '../../core/services/installment.service';
+import { InstallmentService } from '../../core/services/installment.service';
+import { InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
 
 @Component({
   selector: 'app-create-sequence-installments-modal',
@@ -19,7 +20,7 @@ export class CreateSequenceInstallmentsModalComponent {
   paymentMethod: PaymentMethod | null = null;
   sequenceDescription: string | null = null;
 
-  paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO'];
+  paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'CHECK', 'CASH'];
 
   constructor(private installmentService: InstallmentService) { }
 

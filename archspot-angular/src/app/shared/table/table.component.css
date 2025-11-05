@@ -1,0 +1,29 @@
+.document-name {
+  cursor: pointer;
+  position: relative;
+}
+
+.document-name:hover::after {
+  content: attr(data-title);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  z-index: 10;
+  width: max-content;
+  max-width: 250px;
+  margin-bottom: 4px; 
+}
+
+/* desativa o tooltip do navegador */
+.document-name[title]:hover::before {
+  content: attr(title);
+  pointer-events: none;
+}
+.document-name[title]:hover {
+  pointer-events: none;
+}

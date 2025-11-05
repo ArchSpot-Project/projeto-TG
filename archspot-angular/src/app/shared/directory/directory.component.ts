@@ -1,0 +1,170 @@
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DirectoryService } from '../../core/services/directory.service';
+import { DocumentService } from '../../core/services/document.service';
+import { TableComponent } from '../../shared/table/table.component';
+import { DirectoryDTO } from '../../core/models/directory.model';
+
+@Component({
+  selector: 'app-directory',
+  templateUrl: './directory.component.html',
+  styleUrls: ['./directory.component.css']
+})
+export class DirectoryComponent implements OnInit {
+
+  @Input() projectId!: number;
+  @Input() userId!: number | null;
+  @Input() isCustomerInProject: boolean = false;
+  @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' | string = 'DOCUMENTS';
+
+  @Output() directoryChanged = new EventEmitter<number>(); // emite o id do diretório ativo
+
+  directories: DirectoryDTO[] = [];
+  activeTabId: number | null = null;
+
+  contextMenu = {
+    visible: false,
+    x: 0,
+    y: 0,
+    dir: null as DirectoryDTO | null,
+    isRoot: false
+  };
+
+  @ViewChild(TableComponent) tableComponent!: TableComponent;
+
+  constructor(
+    private directoryService: DirectoryService,
+    private documentService: DocumentService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadDirectories();
+  }
+
+  loadDirectories() {
+    this.directoryService.getDirectoriesByProjectAndType(this.projectId, this.directoryType)
+      .subscribe({
+        next: (dirs) => {
+          this.directories = dirs;
+          if (this.directories.length > 0) {
+            this.setActiveTab(this.directories[0]);
+          }
+        },
+        error: err => console.error('Erro ao carregar diretórios', err)
+      });
+  }
+
+  createSubdirectory(parentDir: DirectoryDTO) {
+    const name = prompt(`Nome do novo subdiretório dentro de "${parentDir.name}":`);
+    if (!name) return;
+
+    const dto = { name, projectId: this.projectId, type: 'DRAWINGS' };
+    this.directoryService.createSubdirectory(parentDir.id, dto).subscribe({
+      next: (dir) => {
+        parentDir.subdirectories = parentDir.subdirectories || [];
+        parentDir.subdirectories.push(dir);
+        alert('Subdiretório criado com sucesso!');
+        location.reload();
+      },
+      error: err => { console.error(err); alert('Erro ao criar subdiretório.'); }
+    });
+  }
+
+  activeRoot: DirectoryDTO | null = null;
+
+  setActiveTab(dir: DirectoryDTO) {
+    this.activeTabId = dir.id;
+    this.directoryChanged.emit(dir.id);
+
+    // define o diretório raiz ativo (para exibir subdiretórios)
+    const root = this.directories.find(d =>
+      d.id === dir.id || d.subdirectories?.some(sub => sub.id === dir.id)
+    );
+    this.activeRoot = root || null;
+
+    this.closeContextMenu();
+  }
+
+  createDirectory() {
+    const name = prompt('Digite o nome do novo diretório raiz:');
+    if (!name) return;
+
+    const dto = { name, projectId: this.projectId, type: this.directoryType };
+    this.directoryService.createDirectoryInProject(this.projectId, dto).subscribe({
+      next: (dir) => {
+        this.directories.push(dir);
+        this.setActiveTab(dir);
+        alert('Diretório criado com sucesso!');
+        location.reload();
+      },
+      error: err => { console.error(err); alert('Erro ao criar diretório.'); }
+    });
+  }
+
+
+  editDirectoryName(dir: DirectoryDTO, event: MouseEvent) {
+    event.stopPropagation();
+    const newName = prompt('Renomear diretório:', dir.name);
+    if (!newName || newName === dir.name) return;
+
+    this.directoryService.renameDirectory(dir.id, newName).subscribe({
+      next: (updated) => { dir.name = updated.name; alert('Nome atualizado com sucesso!'); location.reload(); },
+      error: err => { console.error(err); alert('Erro ao renomear diretório.'); }
+    });
+  }
+
+  deleteDirectory(dir: DirectoryDTO) {
+    this.closeContextMenu();
+    if (!confirm(`Deseja excluir o diretório "${dir.name}"?`)) return;
+
+    this.directoryService.deleteDirectory(dir.id).subscribe({
+      next: () => {
+        alert('Diretório excluído!');
+        this.directories = this.directories.filter(d => d.id !== dir.id);
+        if (this.directories.length) this.setActiveTab(this.directories[0]);
+        location.reload();
+      },
+      error: () => alert('Erro ao excluir diretório.')
+    });
+  }
+
+  // ---- Upload ----
+  uploadFile() {
+    if (!this.activeTabId) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const description = prompt('Digite uma descrição para o documento:') || '';
+      this.documentService.uploadDocument(this.activeTabId!, file, this.userId!, description)
+        .subscribe({
+          next: () => {
+            alert(`Documento "${file.name}" enviado com sucesso!`);
+            this.tableComponent.loadDocuments();
+          },
+          error: err => { console.error(err); alert('Erro ao enviar documento.'); }
+        });
+    };
+    input.click();
+  }
+
+  openContextMenu(event: MouseEvent, dir: DirectoryDTO, isRoot: boolean) {
+    event.preventDefault();
+    this.contextMenu.visible = true;
+    this.contextMenu.x = event.clientX;
+    this.contextMenu.y = event.clientY;
+    this.contextMenu.dir = dir;
+    this.contextMenu.isRoot = isRoot;
+  }
+
+  closeContextMenu() {
+    this.contextMenu.visible = false;
+    this.contextMenu.dir = null;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeContextMenu();
+  }
+}

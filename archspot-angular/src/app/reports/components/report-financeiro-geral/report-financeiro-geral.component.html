@@ -1,200 +1,70 @@
-<!-- Formulário em branco habilitado-->
 <div class="row" *ngIf="!isGenerated; else relatorioGerado">
-  <div class="col fs-5 fw-medium">Gerar relatório - Financeiro Geral</div>
+  <div class="col fs-5 fw-medium">Gerar relatório - Pagamentos Gerais</div>
   <hr class="mt-0">
 </div>
 
-<div *ngIf="!isGenerated" class="row">
-  <form class="col">
-    <div class="mb-3">
+<div *ngIf="!isGenerated">
+
+  <!-- datas -->
+  <div class="row mb-3">
+    <div class="col-md-6">
       <label class="form-label">De:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
     </div>
-    <div class="mb-3">
-      <label for="periodoFim" class="form-label">Até:</label>
+
+    <div class="col-md-6">
+      <label class="form-label">Até:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
     </div>
-    <div class="mb-3">
-      <label class="form-label">Status atual:</label>
+  </div>
+
+  <!-- filtros -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Status da parcela:</label>
       <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
-        <option value="todos">todos</option>
-        <option value="em andamento">em andamento</option>
-        <option value="concluído">concluído</option>
-        <option value="cancelado">cancelado</option>
+        <option value="todos" selected>Todos</option>
+        <option value="pendente">Pendente</option>
+        <option value="paga">Paga</option>
+        <option value="em_atraso">Em atraso</option>
       </select>
     </div>
-  </form>
 
-  <form class="col">
-    <div class="mb-3">
-      <label class="form-label">Cliente:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.cliente" name="cliente">
-        <option>todos</option>
-        <option>Beatriz</option>
-        <option>Marcelo</option>
-        <option>Fernanda</option>
-        <option>Márcia</option>
+    <div class="col-md-6">
+      <label class="form-label">Método de pagamento:</label>
+      <select class="form-select shadow-sm" [(ngModel)]="formData.metodoPagamento" name="metodo">
+        <option value="todos" selected>Todos</option>
+        <option value="boleto">Boleto</option>
+        <option value="pix">PIX</option>
+        <option value="cartao_credito">Cartão de Crédito</option>
+        <option value="cartao_debito">Cartão de Débito</option>
+        <option value="transferencia">Transferência</option>
+        <option value="cheque">Cheque</option>
+        <option value="dinheiro">Dinheiro em espécie</option>
       </select>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Projetista:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.projetista" name="projetista">
-        <option>todos</option>
-        <option>Hélio</option>
-        <option>Rubens</option>
-        <option>Mariana</option>
-        <option>Carlos</option>
-      </select>
-    </div>
-  </form>
+  </div>
 
-  <div class="text-end">
-    <button type="button" class="btn btn-success" (click)="gerarRelatorio()">Gerar Relatório</button>
+  <!-- Botões -->
+  <div class="row">
+    <div class="col-12 text-end">
+      <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
+    </div>
   </div>
 </div>
 
-
-<!-- Formulário preenchido desabilitado -->
+<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <div class="row d-flex justify-content-between align-items-end">
-    <div class="col-auto pe-0">
-      <button class="btn p-1" (click)="voltarEdicao()">
-        <img src="/assets/img/icons/chevron-left.svg" alt="" width="20" height="20">
-      </button>
-    </div>
-    <div class="col fs-5 fw-medium">Gerar relatório - Cronograma Geral</div>
-    <div class="col-auto pe-0">
-      <a class="btn p-1"><img src="/assets/img/icons/share-fill.svg" alt="" width="20" height="20"></a>
-    </div>
-    <div class="col-auto">
-      <a class="btn p-1"><img src="/assets/img/icons/download.svg" alt="" width="20" height="20"></a>
-    </div>
-    <hr class="mt-1">
-  </div>
-
-  <div class="row">
-    <form class="col">
-      <fieldset disabled>
-        <div class="mb-3">
-          <label class="form-label">De:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.periodoInicio">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Até:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.periodoFim">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Status atual:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.status">
-        </div>
-      </fieldset>
-    </form>
-    <form class="col">
-      <fieldset disabled>
-        <div class="mb-3">
-          <label class="form-label">Cliente:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.cliente">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Projetista:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.projetista">
-        </div>
-      </fieldset>
-    </form>
-  </div>
-
-  <!-- TODO: Tabela fixa deve virar um componente futuramente -->
-  <table class="table mt-4 align-middle">
-    <thead class="table-light">
-      <tr>
-        <th scope="col">Projeto</th>
-        <th scope="col">Status</th>
-        <th scope="col">Valor Total Projeto</th>
-        <th scope="col">Total Pago</th>
-        <th scope="col">Falta Receber</th>
-
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">Projeto 01 - Lorem ipsum dolor</th>
-        <td>quitado</td>
-        <td>R$ 20.000,00</td>
-        <td>R$ 20.000,00</td>
-        <td> - </td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 02 - In consequat tortor</th>
-        <td>quitado</td>
-        <td>R$ 52.000,00</td>
-        <td>R$ 52.000,00</td>
-        <td> - </td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 03 - Donec ullamcorper</th>
-        <td>quitado</td>
-        <td>R$ 13.000,00</td>
-        <td>R$ 13.000,00</td>
-        <td> - </td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 04 - Proin quis</th>
-        <td>concluído</td>
-        <td>R$ 15.000,00</td>
-        <td>R$ 12.000,00</td>
-        <td>R$ 3.000,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 05 - Mauris varius</th>
-        <td>em andamento</td>
-        <td>R$ 6.000,00</td>
-        <td>R$ 2.000,00</td>
-        <td>R$ 4.000,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 06 - Praesent vitae nisl</th>
-        <td>em andamento</td>
-        <td>R$ 23.000,00</td>
-        <td>R$ 12.000,00</td>
-        <td>R$ 11.000,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 07 - Sed nec elit </th>
-        <td>em andamento</td>
-        <td>R$ 7.500,00</td>
-        <td> - </td>
-        <td>R$ 7.500,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 08 - Pellentesque volutpat</th>
-        <td>concluído</td>
-        <td>R$ 8.000,00</td>
-        <td>R$ 6.500,00</td>
-        <td>R$ 1.500,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 09 - Phasellus at magna</th>
-        <td>em andamento</td>
-        <td>R$ 38.000,00</td>
-        <td>R$ 5.000,00</td>
-        <td>R$ 33.000,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 10 - Fusce accumsan</th>
-        <td>em andamento</td>
-        <td>R$ 15.000,00</td>
-        <td> - </td>
-        <td>R$ 15.000,00</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 11 - Nullam posuer</th>
-        <td>em andamento</td>
-        <td>R$ 45.000,00</td>
-        <td> - </td>
-        <td>R$ 45.000,00</td>
-      </tr>
-
-    </tbody>
-  </table>
-
+  <app-reports-table [titulo]="'ArchSpot - Relatório de Pagamentos Gerais'" [pdfNomeArquivo]="'relatorio_pagamentos_gerais.pdf'" [colunas]="[
+  { campo: 'projectName', label: 'Projeto' },
+  { campo: 'projectStatus', label: 'Status do Projeto', pipe:'statusTranslate' },
+  { campo: 'name', label: 'Nome da Parcela' },
+  { campo: 'amount', label: 'Valor da Parcela' },
+  { campo: 'status', label: 'Status da Parcela', pipe:'paymentStatus' },
+  { campo: 'paymentMethod', label: 'Método de Pagamento', pipe:'paymentMethod' },
+  { campo: 'estimatedPaymentDate', label: 'Data Prevista', pipe:'date' },
+  { campo: 'realPaymentDate', label: 'Data de Pagamento', pipe:'date' }
+]" [registros]="parcelas" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
+  </app-reports-table>
 </ng-template>

@@ -1,34 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-export interface ProjectResponse {
-  id: number;
-  name: string;
-  estimatedStartDate?: Date;
-  estimatedEndDate?: Date;
-  description?: string;
-  totalValue?: number;
-  status?: string;
-  phases?: any[];
-}
-
-export interface UserProjectResponse {
-  id: number;
-  userId: number;
-  userName: string;
-  projectId: number;
-  projectName: string;
-  role: string;
-}
-
-export interface CreateProjectRequest {
-  name: string;
-  estimatedStartDate: string;
-  estimatedEndDate: string;
-  description?: string;
-  status?: string;
-}
+import { catchError, map, Observable, of } from 'rxjs';
+import { CreateProjectRequest, ProjectResponse } from '../models/project.model';
+import { UserProjectResponse } from '../models/user-project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -60,8 +34,31 @@ export class ProjectService {
     );
   }
 
+  userHasAccess(projectId: number, userId: number) {
+    if (!projectId || !userId) {
+      return of(false);
+    }
+
+    return this.getProjectsByUser(userId).pipe(
+      map(projects => {
+        return projects.some(p => Number(p.projectId) === Number(projectId));
+      }),
+      catchError(err => {
+        console.error('Erro ao verificar acesso ao projeto:', err);
+        return of(false);
+      })
+    );
+  }
+
   updateProject(projectId: number, payload: { name: string; description?: string }): Observable<ProjectResponse> {
     return this.http.put<ProjectResponse>(`${this.apiUrl}/${projectId}`, payload);
+  }
+
+  updateProjectRealDates(projectId: number, realStartDate: Date | null, realEndDate: Date | null) {
+    return this.http.patch<ProjectResponse>(`${this.apiUrl}/${projectId}`, {
+      realStartDate,
+      realEndDate
+    });
   }
 
   updateProjectTitleAndDescription(projectId: number, payload: { name: string; description?: string }) {

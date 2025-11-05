@@ -1,223 +1,55 @@
-<!-- Formulário em branco habilitado-->
 <div class="row" *ngIf="!isGenerated; else relatorioGerado">
   <div class="col fs-5 fw-medium">Gerar relatório - Cronograma Geral</div>
   <hr class="mt-0">
 </div>
 
-<div *ngIf="!isGenerated" class="row">
-  <form class="col">
-    <div class="mb-3">
+<!-- formulário de filtros -->
+<div *ngIf="!isGenerated">
+  <form class="row">
+    <div class="col mb-3">
       <label class="form-label">De:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
     </div>
-    <div class="mb-3">
-      <label for="periodoFim" class="form-label">Até:</label>
+
+    <div class="col mb-3">
+      <label class="form-label">Até:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
     </div>
-    <div class="mb-3">
-      <label class="form-label">Status atual:</label>
+
+    <div class="col mb-3">
+      <label class="form-label">Status:</label>
       <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
-        <option value="todos">todos</option>
-        <option value="em andamento">em andamento</option>
-        <option value="concluído">concluído</option>
-        <option value="cancelado">cancelado</option>
+        <option value="todos">Todos</option>
+        <option value="IN_PROGRESS">Em andamento</option>
+        <option value="COMPLETED">Concluído</option>
+        <option value="OVERDUE">Atrasado</option>
       </select>
+    </div>
+
+    <div class="col-12 text-end mt-3">
+      <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
     </div>
   </form>
-
-  <form class="col">
-    <div class="mb-3">
-      <label class="form-label">Cliente:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.cliente" name="cliente">
-        <option>todos</option>
-        <option>Beatriz</option>
-        <option>Marcelo</option>
-        <option>Fernanda</option>
-        <option>Márcia</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Projetista:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.projetista" name="projetista">
-        <option>todos</option>
-        <option>Hélio</option>
-        <option>Rubens</option>
-        <option>Mariana</option>
-        <option>Carlos</option>
-      </select>
-    </div>
-  </form>
-
-  <div class="text-end">
-    <button type="button" class="btn btn-success" (click)="gerarRelatorio()">Gerar Relatório</button>
-  </div>
 </div>
 
-<!-- Formulário preenchido desabilitado -->
+<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <div class="row d-flex justify-content-between align-items-end">
-    <div class="col-auto pe-0">
-      <button class="btn p-1" (click)="voltarEdicao()">
-        <img src="/assets/img/icons/chevron-left.svg" alt="" width="20" height="20">
-      </button>
-    </div>
-    <div class="col fs-5 fw-medium">Gerar relatório - Cronograma Geral</div>
-    <div class="col-auto pe-0">
-      <a class="btn p-1"><img src="/assets/img/icons/share-fill.svg" alt="" width="20" height="20"></a>
-    </div>
-    <div class="col-auto">
-      <a class="btn p-1"><img src="/assets/img/icons/download.svg" alt="" width="20" height="20"></a>
-    </div>
-    <hr class="mt-1">
-  </div>
-
-  <div class="row">
-    <form class="col">
-      <fieldset disabled>
-        <div class="mb-3">
-          <label class="form-label">De:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.periodoInicio">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Até:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.periodoFim">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Status atual:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.status">
-        </div>
-      </fieldset>
-    </form>
-    <form class="col">
-      <fieldset disabled>
-        <div class="mb-3">
-          <label class="form-label">Cliente:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.cliente">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Projetista:</label>
-          <input type="text" class="form-control shadow-sm" [value]="formData.projetista">
-        </div>
-      </fieldset>
-    </form>
-  </div>
-
-  <!-- TODO: Tabela fixa deve virar um componente futuramente -->
-  <table class="table mt-4 align-middle">
-    <thead class="table-light">
-      <tr>
-        <th scope="col">Projeto</th>
-        <th scope="col">Status</th>
-        <th scope="col">% Concluído</th>
-        <th scope="col">% Pago</th>
-        <th scope="col">Data Início</th>
-        <th scope="col">Previsão término</th>
-        <th scope="col">Data Fim</th>
-
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">Projeto 01 - Lorem ipsum dolor</th>
-        <td>quitado</td>
-        <td>100%</td>
-        <td>100%</td>
-        <td>06/08/2023</td>
-        <td>05/10/2024</td>
-        <td>27/10/2024</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 02 - In consequat tortor</th>
-        <td>quitado</td>
-        <td>100%</td>
-        <td>100%</td>
-        <td>28/06/2024</td>
-        <td>05/12/2024</td>
-        <td>05/12/2024</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 03 - Donec ullamcorper</th>
-        <td>quitado</td>
-        <td>100%</td>
-        <td>100%</td>
-        <td>06/08/2023</td>
-        <td>05/10/2024</td>
-        <td>27/10/2024</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 04 - Proin quis</th>
-        <td>concluído</td>
-        <td>100%</td>
-        <td>90%</td>
-        <td>15/09/2023</td>
-        <td>07/06/2024</td>
-        <td>14/06/2024</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 05 - Mauris varius</th>
-        <td>em andamento</td>
-        <td>80%</td>
-        <td>75%</td>
-        <td>14/02/2024</td>
-        <td>25/06/2025</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 06 - Praesent vitae nisl</th>
-        <td>em andamento</td>
-        <td>72%</td>
-        <td>80%</td>
-        <td>28/06/2024</td>
-        <td>05/12/2024</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 07 - Sed nec elit </th>
-        <td>em andamento</td>
-        <td>20%</td>
-        <td>20%</td>
-        <td>20/11/2024</td>
-        <td>06/07/2025</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 08 - Pellentesque volutpat</th>
-        <td>concluído</td>
-        <td>100%</td>
-        <td>90%</td>
-        <td>06/08/2023</td>
-        <td>05/10/2024</td>
-        <td>27/10/2024</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 09 - Phasellus at magna</th>
-        <td>em andamento</td>
-        <td>80%</td>
-        <td>75%</td>
-        <td>14/02/2024</td>
-        <td>25/06/2025</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 10 - Fusce accumsan</th>
-        <td>em andamento</td>
-        <td>72%</td>
-        <td>80%</td>
-        <td>28/06/2024</td>
-        <td>05/12/2024</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <th scope="row">Projeto 11 - Nullam posuer</th>
-        <td>em andamento</td>
-        <td>20%</td>
-        <td>20%</td>
-        <td>20/11/2024</td>
-        <td>06/07/2025</td>
-        <td>-</td>
-      </tr>
-
-    </tbody>
-  </table>
-
+  <app-reports-table
+    [titulo]="'Cronograma Geral'"
+    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'"
+    [colunas]="[
+      { campo: 'projectName', label: 'Projeto' },
+      { campo: 'name', label: 'Etapa' },
+      { campo: 'status', label: 'Status', pipe:'phaseStatus' },
+      { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
+      { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
+      { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
+      { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
+    ]"
+    [registros]="phases"
+    [loading]="loading"
+    [error]="error"
+    (voltar)="voltarEdicao()">
+  </app-reports-table>
 </ng-template>

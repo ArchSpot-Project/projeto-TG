@@ -100,3 +100,18 @@ body {
   .start-90 {
     left: 90%;
   }
+
+  /* tirar o contorno preto ao clicar em alguns botoes/links */
+  a.btn:focus,
+  a.btn:active,
+  button.btn:focus,
+  button.btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  :focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }

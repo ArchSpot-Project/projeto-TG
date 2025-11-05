@@ -1,3 +1,12 @@
-form{
+form {
     font-weight: 500;
+}
+
+::ng-deep .modal-dialog {
+    max-width: 900px;
+}
+
+::ng-deep .modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
 }

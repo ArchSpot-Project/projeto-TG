@@ -10,3 +10,8 @@ export interface Phase {
   projectId: number;
   predecessorId?: number | null;
 }
+
+export interface PhaseWithProject extends Phase {
+  projectName: string;
+  projectStatus: string;
+}
