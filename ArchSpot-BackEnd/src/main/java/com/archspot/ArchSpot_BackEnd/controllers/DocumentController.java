@@ -95,6 +95,28 @@ public class DocumentController {
         .body(resource);
   }
 
+  // Visualização inline de um arquivo
+  @GetMapping("/{id}/view")
+  public ResponseEntity<Resource> viewFile(@PathVariable Long id) throws IOException {
+    Path filePath = documentService.getFilePath(id);
+
+    if (!Files.exists(filePath)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found on server");
+    }
+
+    Resource resource = new UrlResource(filePath.toUri());
+
+    String contentType = Files.probeContentType(filePath);
+    if (contentType == null) {
+      contentType = "application/octet-stream";
+    }
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filePath.getFileName() + "\"")
+        .body(resource);
+  }
+
   /*
    * ENDPOINT DE COMENTÁRIO EM DOCUMENTO
    */
