@@ -15,7 +15,6 @@ import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/photos")
-@CrossOrigin(origins = "http://localhost:4200")
 public class PhotoController {
 
   @Autowired
