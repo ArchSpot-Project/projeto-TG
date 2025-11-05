@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.archspot.ArchSpot_BackEnd.dtos.PhaseCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.enums.PhaseStatus;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
 

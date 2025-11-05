@@ -1,13 +1,13 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.services.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +42,7 @@ public class PhotoController {
   public ResponseEntity<Resource> download(@PathVariable Long id) throws IOException {
     Path filePath = photoService.getFilePath(id);
     if (!Files.exists(filePath))
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+      throw new ResourceNotFoundException("File not found");
 
     Resource resource = new UrlResource(filePath.toUri());
     String contentType = Files.probeContentType(filePath);
@@ -60,7 +60,7 @@ public class PhotoController {
   public ResponseEntity<Resource> view(@PathVariable Long id) throws IOException {
     Path filePath = photoService.getFilePath(id);
     if (!Files.exists(filePath))
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+      throw new ResourceNotFoundException("File not found");
 
     Resource resource = new UrlResource(filePath.toUri());
     String contentType = Files.probeContentType(filePath);

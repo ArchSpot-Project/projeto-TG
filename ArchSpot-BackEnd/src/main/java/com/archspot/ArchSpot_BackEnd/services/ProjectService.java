@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.archspot.ArchSpot_BackEnd.dtos.InstallmentResponseDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.PhaseDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.ProjectRequestDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.ProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectRequestDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 import java.util.Map;

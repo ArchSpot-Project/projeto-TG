@@ -1,8 +1,13 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
+import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.*;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,9 +30,6 @@ public class DocumentService {
   @Autowired
   private DirectoryRepository directoryRepository;
 
-  @Autowired
-  private UserRepository userRepository;
-
   private static final String UPLOAD_BASE_PATH = "./uploads";
 
   /*
@@ -44,8 +46,8 @@ public class DocumentService {
   // buscar documentos por diretório
   public List<DocumentDTO> findByDirectory(Long directoryId) {
     directoryRepository.findById(directoryId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
-        
+        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
+
     return documentRepository.findByDirectoryId(directoryId).stream()
         .map(this::toDTO)
         .collect(Collectors.toList());
@@ -55,16 +57,15 @@ public class DocumentService {
   public DocumentDTO findById(Long id) {
     return documentRepository.findById(id)
         .map(this::toDTO)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
   }
 
   // cria documento sem arquivo para testes
   public DocumentDTO save(DocumentDTO dto) {
-    Directory directory = directoryRepository.findById(dto.getDirectoryId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
+    User currentUser = SecurityUtils.getCurrentUser();
 
-    User user = userRepository.findById(dto.getUploadedById())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    Directory directory = directoryRepository.findById(dto.getDirectoryId())
+        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
 
     Document document = Document.builder()
         .name(dto.getName())
@@ -75,44 +76,60 @@ public class DocumentService {
         .size(dto.getSize())
         .version(dto.getVersion())
         .directory(directory)
-        .uploadedBy(user)
+        .uploadedBy(currentUser)
         .build();
 
     return toDTO(documentRepository.save(document));
   }
 
-  // atualizar metadados de um documento sem alterar o arquivo
-  public DocumentDTO update(Long id, DocumentDTO dto) {
+  // atualizar metadados de um documento (nome, descriçao e modifDate) sem alterar
+  // o arquivo
+  public DocumentDTO update(Long id, DocumentUpdateDTO dto) {
     Document document = documentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
-    if (dto.getName() != null)
-      document.setName(dto.getName());
-    if (dto.getFileUrl() != null)
-      document.setFileUrl(dto.getFileUrl());
-    if (dto.getDescription() != null)
-      document.setDescription(dto.getDescription());
-    if (dto.getSize() != null)
-      document.setSize(dto.getSize());
-    if (dto.getVersion() != null)
-      document.setVersion(dto.getVersion());
-    document.setModificationDate(dto.getModificationDate() != null ? dto.getModificationDate() : LocalDateTime.now());
-    if (dto.getDirectoryId() != null) {
-      Directory directory = directoryRepository.findById(dto.getDirectoryId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
-      document.setDirectory(directory);
-    }
-    if (dto.getUploadedById() != null) {
-      User user = userRepository.findById(dto.getUploadedById())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-      document.setUploadedBy(user);
-    }
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+    if (dto.name() != null)
+      document.setName(dto.name());
+    if (dto.description() != null)
+      document.setDescription(dto.description());
+    document.setModificationDate(LocalDateTime.now());
+
     return toDTO(documentRepository.save(document));
   }
 
   // excluir um documento
   public void delete(Long id) {
     Document document = documentRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+    User currentUser = SecurityUtils.getCurrentUser();
+    Directory directory = document.getDirectory();
+    Project project = directory.getProject();
+    DirectoryType directoryType = directory.getType();
+
+    // Verifica se o usuário é dono do comentário
+    boolean isOwner = document.getUploadedBy().getId().equals(currentUser.getId());
+
+    // Verifica se o usuário é ADMIN ou STAFF no projeto
+    boolean isProjectAdminOrStaff = ProjectPermissionUtils.isAdminOrStaff(project, currentUser);
+
+    // Verifica se o usuário é EXTERNAL_COLLABORATOR no projeto
+    boolean isExternalCollaborator = ProjectPermissionUtils.isExternalCollaborator(project, currentUser);
+
+    // Regras por tipo de diretório:
+    if (directoryType == DirectoryType.DRAWINGS) {
+      // Só admin/staff ou externo (se dono)
+      if (!isProjectAdminOrStaff && !(isOwner && isExternalCollaborator)) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+            "User not allowed to delete this file");
+      }
+    } else if (directoryType == DirectoryType.DOCUMENTS) {
+      // Admin/staff ou owner
+      if (!isProjectAdminOrStaff && !isOwner) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+            "User not allowed to delete this file");
+      }
+    }
 
     // remove o arquivo físico
     try {
@@ -130,13 +147,12 @@ public class DocumentService {
    * SALVAR NOVO DOCUMENTO
    */
 
-  public DocumentDTO uploadDocument(Long directoryId, Long userId, MultipartFile file, String description)
+  public DocumentDTO uploadDocument(Long directoryId, MultipartFile file, String description)
       throws IOException {
-    Directory directory = directoryRepository.findById(directoryId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
+    User currentUser = SecurityUtils.getCurrentUser();
 
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    Directory directory = directoryRepository.findById(directoryId)
+        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
 
     // garante que o diretório está vinculado a um projeto
     if (directory.getProject() == null) {
@@ -163,7 +179,7 @@ public class DocumentService {
     document.setSize(file.getSize());
     document.setVersion(1);
     document.setDirectory(directory);
-    document.setUploadedBy(user);
+    document.setUploadedBy(currentUser);
 
     return toDTO(documentRepository.save(document));
   }
@@ -174,7 +190,7 @@ public class DocumentService {
 
   public DocumentDTO updateDocumentVersion(Long documentId, MultipartFile newFile) throws IOException {
     Document existing = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
     Directory directory = existing.getDirectory();
 
@@ -201,7 +217,7 @@ public class DocumentService {
 
   public Path getFilePath(Long documentId) {
     Document document = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     return Paths.get(document.getFileUrl());
   }
 

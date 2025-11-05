@@ -1,7 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.UserProjectRequestDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
 import com.archspot.ArchSpot_BackEnd.exceptions.AssociationNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.*;

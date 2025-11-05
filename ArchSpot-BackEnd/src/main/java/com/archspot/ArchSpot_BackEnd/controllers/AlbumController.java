@@ -1,8 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.AlbumCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.AlbumDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.PhotoDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.album.AlbumCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.album.AlbumDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.services.AlbumService;
 import com.archspot.ArchSpot_BackEnd.services.PhotoService;
 
@@ -62,9 +62,8 @@ public class AlbumController {
   public ResponseEntity<PhotoDTO> uploadPhoto(
       @PathVariable Long albumId,
       @RequestParam("file") MultipartFile file,
-      @RequestParam("uploadedById") Long uploadedById,
       @RequestParam(value = "name", required = false) String name) throws IOException {
-    PhotoDTO saved = photoService.uploadPhoto(albumId, uploadedById, file, name);
+    PhotoDTO saved = photoService.uploadPhoto(albumId, file, name);
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 }

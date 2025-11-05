@@ -1,8 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.services.DirectoryService;
 import com.archspot.ArchSpot_BackEnd.services.DocumentService;
 
@@ -88,9 +88,8 @@ public class DirectoryController {
   public ResponseEntity<DocumentDTO> uploadDocument(
       @PathVariable Long directoryId,
       @RequestParam("file") MultipartFile file,
-      @RequestParam("uploadedById") Long uploadedById,
       @RequestParam(value = "description", required = false) String description) throws IOException {
-    DocumentDTO saved = documentService.uploadDocument(directoryId, uploadedById, file, description);
+    DocumentDTO saved = documentService.uploadDocument(directoryId, file, description);
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 }

@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.photo;
 
 import lombok.*;
 
@@ -8,6 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PhotoUploadDTO {
-  private String name; // opcional
-  private Long uploadedById;
+  private String name;
 }

@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.userproject;
 
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 

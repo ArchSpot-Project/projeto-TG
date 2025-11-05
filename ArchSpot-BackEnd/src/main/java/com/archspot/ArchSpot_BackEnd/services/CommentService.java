@@ -1,14 +1,16 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.CommentCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.CommentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Comment;
 import com.archspot.ArchSpot_BackEnd.entities.Document;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.CommentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.DocumentRepository;
-import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,21 +28,19 @@ public class CommentService {
 
   private final CommentRepository commentRepository;
   private final DocumentRepository documentRepository;
-  private final UserRepository userRepository;
 
   // Criar comentário
   public CommentDTO createComment(Long documentId, CommentCreateDTO dto) {
+    User currentUser = SecurityUtils.getCurrentUser();
+    
     Document document = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
-
-    User user = userRepository.findById(dto.getUserId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
     Comment comment = Comment.builder()
         .text(dto.getText())
         .timestamp(LocalDateTime.now())
         .document(document)
-        .user(user)
+        .user(currentUser)
         .build();
 
     return toDTO(commentRepository.save(comment));
@@ -49,7 +49,7 @@ public class CommentService {
   // Buscar comentários de um documento
   public List<CommentDTO> getCommentsByDocument(Long documentId) {
     Document document = documentRepository.findById(documentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
     return commentRepository.findByDocument(document)
         .stream()
@@ -59,22 +59,21 @@ public class CommentService {
 
   // Deletar comentário (apenas dono ou admin do projeto)
   @Transactional
-  public void deleteComment(Long commentId, Long userId) {
+  public void deleteComment(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
-    userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    // Usuário autenticado (vem do token)
+    User currentUser = SecurityUtils.getCurrentUser();
 
+    // Resgata o projeto associado (comentário > documento > diretório > projeto)
     Project project = comment.getDocument().getDirectory().getProject();
 
     // Verifica se o usuário é dono do comentário
-    boolean isOwner = comment.getUser().getId().equals(userId);
+    boolean isOwner = comment.getUser().getId().equals(currentUser.getId());
 
     // Verifica se o usuário é ADMIN no projeto
-    boolean isProjectAdmin = project.getUserProjects().stream()
-        .anyMatch(up -> up.getUser().getId().equals(userId)
-            && up.getRole().name().equalsIgnoreCase("ADMIN"));
+    boolean isProjectAdmin = ProjectPermissionUtils.isAdmin(project, currentUser);
 
     if (!isOwner && !isProjectAdmin) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not allowed to delete this comment");
