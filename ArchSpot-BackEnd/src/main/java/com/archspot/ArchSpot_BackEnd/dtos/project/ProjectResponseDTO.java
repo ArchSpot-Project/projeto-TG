@@ -1,9 +1,11 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.project;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.enums.Status;
 
 import lombok.AllArgsConstructor;

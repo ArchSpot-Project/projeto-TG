@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.archspot.ArchSpot_BackEnd.dtos.UserProjectResponseDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.UserUpdateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.services.UserProjectService;

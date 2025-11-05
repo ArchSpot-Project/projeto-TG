@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.user;
 
 public record UserCreateDTO(
   String cpf,

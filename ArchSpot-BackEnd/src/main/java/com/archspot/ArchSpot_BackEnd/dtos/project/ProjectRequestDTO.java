@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.project;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

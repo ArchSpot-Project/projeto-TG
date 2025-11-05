@@ -16,12 +16,10 @@ public class CommentController {
   // Listar comentários de um documento e Criar comentário
   // ficam aninhados em DocumentController
 
-  // Deletar comentário (apenas dono ou admin do projeto - recebe param: ?userId={VALUE})
+  // Deletar comentário (apenas dono ou admin do projeto)
   @DeleteMapping("/{commentId}")
-  public ResponseEntity<Void> delete(
-      @PathVariable Long commentId,
-      @RequestParam("userId") Long userId) {
-    commentService.deleteComment(commentId, userId);
+  public ResponseEntity<Void> delete(@PathVariable Long commentId) {
+    commentService.deleteComment(commentId);
     return ResponseEntity.noContent().build();
   }
 }

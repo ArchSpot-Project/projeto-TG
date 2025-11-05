@@ -1,4 +1,4 @@
-package com.archspot.ArchSpot_BackEnd.dtos;
+package com.archspot.ArchSpot_BackEnd.dtos.comment;
 
 import lombok.*;
 
@@ -11,5 +11,4 @@ public class CommentCreateDTO {
 
   private String text;
   private Long documentId;
-  private Long userId;
 }

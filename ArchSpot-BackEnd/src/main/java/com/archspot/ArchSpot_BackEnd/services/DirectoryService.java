@@ -1,13 +1,18 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DirectoryDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.DocumentDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Directory;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.DirectoryRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +36,7 @@ public class DirectoryService {
   // buscar por projeto e tipo
   public List<DirectoryDTO> findByProjectAndType(Long projectId, DirectoryType type) {
     projectRepository.findById(projectId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     List<Directory> directories = (type != null)
         ? directoryRepository.findByProjectIdAndType(projectId, type)
@@ -44,12 +49,12 @@ public class DirectoryService {
   // criar diretório
   public DirectoryDTO createDirectory(DirectoryCreateDTO dto) {
     Project project = projectRepository.findById(dto.getProjectId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     Directory parent = null;
     if (dto.getParentDirectoryId() != null) {
       parent = directoryRepository.findById(dto.getParentDirectoryId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent directory not found"));
+          .orElseThrow(() -> new ResourceNotFoundException("Parent directory not found"));
 
       // Impede subdiretórios em DOCUMENTS
       if (parent.getType() == DirectoryType.DOCUMENTS) {
@@ -72,7 +77,7 @@ public class DirectoryService {
   // atualizar diretório
   public DirectoryDTO updateDirectory(Long id, DirectoryCreateDTO dto) {
     Directory directory = directoryRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
     directory.setName(dto.getName());
     directory.setType(dto.getType());
     Directory updated = directoryRepository.save(directory);
@@ -82,7 +87,7 @@ public class DirectoryService {
   @Transactional
   public DirectoryDTO updateDirectoryName(Long id, String newName) {
     Directory directory = directoryRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
     directory.setName(newName);
     Directory updated = directoryRepository.save(directory);
     return toDTO(updated);
@@ -91,23 +96,36 @@ public class DirectoryService {
   // buscar diretórios por projeto
   public List<DirectoryDTO> getDirectoriesByProject(Long projectId) {
     projectRepository.findById(projectId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
     return directoryRepository.findByProjectId(projectId)
         .stream().map(this::toDTO).collect(Collectors.toList());
   }
 
   // deletar diretório
   public void delete(Long id) {
-    if (!directoryRepository.existsById(id)) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Directory not found");
+    Directory directory = directoryRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
+
+    // Usuário autenticado (vem do token)
+    User currentUser = SecurityUtils.getCurrentUser();
+
+    // Resgata o projeto associado (diretório > projeto)
+    Project project = directory.getProject();
+
+    // Verifica se o usuário é ADMIN no projeto
+    boolean isAdmin = ProjectPermissionUtils.isAdmin(project, currentUser);
+
+    if (!isAdmin) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not allowed to delete this directory");
     }
+
     directoryRepository.deleteById(id);
   }
 
   // buscar subdiretórios de um diretório
   public List<DirectoryDTO> findSubdirectories(Long directoryId) {
     directoryRepository.findById(directoryId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Parent directory not found"));
 
     List<Directory> subdirs = directoryRepository.findByParentDirectoryId(directoryId);
     return subdirs.stream()

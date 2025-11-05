@@ -65,10 +65,9 @@ public class TestConfig implements CommandLineRunner {
 
                 // ==== USERS ====
                 User user1 = new User(null, "439.779.870-20", "Ana", "9999-9999", "Avenida General Carneiro, 1560",
-                                "Arquiteta",
-                                "ana@email.com", "123");
-                User user2 = new User(null, "847.381.614-58", "Fernando", "9888-9999", "Rua da Penha, 56", "Arquiteto",
-                                "fernando@email.com", "456");
+                                "Arquiteta", "ana@email.com", "123");
+                User user2 = new User(null, "847.381.614-58", "Fernando", "9888-9999", "Rua da Penha, 56",
+                                "Arquiteto", "fernando@email.com", "456");
                 User user3 = new User(null, "887.832.723-99", "Beatriz", "9777-9999", "Avenida Barão de Tatuí, 104",
                                 "Designer Gráfica", "beatriz@email.com", "789");
                 User user4 = new User(null, "397.983.748-35", "Hélio", "9666-8888", "Rua das Palmeiras, 220",
@@ -162,8 +161,9 @@ public class TestConfig implements CommandLineRunner {
                 UserProject up8 = new UserProject(user4, project3, UserRole.ADMIN);
                 UserProject up9 = new UserProject(user4, project4, UserRole.STAFF);
                 UserProject up10 = new UserProject(user1, project4, UserRole.ADMIN);
+                UserProject up11 = new UserProject(user4, project1, UserRole.EXTERNAL_COLLABORATOR);
 
-                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7, up8, up9, up10));
+                userProjectRepository.saveAll(Arrays.asList(up1, up2, up3, up4, up5, up6, up7, up8, up9, up10, up11));
 
                 // ==== INSTALLMENTS ====
                 Installment ins1 = new Installment();
@@ -200,16 +200,22 @@ public class TestConfig implements CommandLineRunner {
                 // ==== DIRECTORIES ====
 
                 // Diretórios raiz por projeto
-                Directory dir1 = new Directory(null, "Arquitetura", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, null, null, null);
-                Directory dir2 = new Directory(null , "Complementares", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, null, null, null);
-                Directory dir3 = new Directory(null, "Contrato", LocalDateTime.now(), DirectoryType.DOCUMENTS, project1, null, null, null);
+                Directory dir1 = new Directory(null, "Arquitetura", LocalDateTime.now(), DirectoryType.DRAWINGS,
+                                project1, null, null, null);
+                Directory dir2 = new Directory(null, "Complementares", LocalDateTime.now(), DirectoryType.DRAWINGS,
+                                project1, null, null, null);
+                Directory dir3 = new Directory(null, "Contrato", LocalDateTime.now(), DirectoryType.DOCUMENTS, project1,
+                                null, null, null);
 
                 directoryRepository.saveAll(Arrays.asList(dir1, dir2, dir3));
 
                 // Subdiretórios
-                Directory subdir1 = new Directory(null, "Estudo Preliminar", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
-                Directory subdir2 = new Directory(null, "Executivo", LocalDateTime.now(), DirectoryType.DRAWINGS, project1, dir1, null, null);
-                Directory subdir3 = new Directory(null, "Engenharia", LocalDateTime.now(), DirectoryType.DOCUMENTS, project1, dir3, null, null);
+                Directory subdir1 = new Directory(null, "Estudo Preliminar", LocalDateTime.now(),
+                                DirectoryType.DRAWINGS, project1, dir1, null, null);
+                Directory subdir2 = new Directory(null, "Executivo", LocalDateTime.now(), DirectoryType.DRAWINGS,
+                                project1, dir1, null, null);
+                Directory subdir3 = new Directory(null, "Engenharia", LocalDateTime.now(), DirectoryType.DRAWINGS,
+                                project1, dir2, null, null);
 
                 directoryRepository.saveAll(Arrays.asList(subdir1, subdir2, subdir3));
 
@@ -223,7 +229,7 @@ public class TestConfig implements CommandLineRunner {
                                 .modificationDate(LocalDateTime.now())
                                 .size(1024L)
                                 .version(1)
-                                .fileUrl("/uploads/projeto_1/DRAWINGS/planta_baixa.pdf")
+                                .fileUrl("/uploads/projeto_1/DRAWINGS/Estudo_Preliminar/planta_baixa.pdf")
                                 .build();
 
                 Document doc2 = Document.builder()
@@ -235,7 +241,7 @@ public class TestConfig implements CommandLineRunner {
                                 .modificationDate(LocalDateTime.now())
                                 .size(2048L)
                                 .version(1)
-                                .fileUrl("/uploads/projeto_1/DOCUMENTS/memorial.pdf")
+                                .fileUrl("/uploads/projeto_1/DRAWINGS/EXECUTIVE/memorial.pdf")
                                 .build();
 
                 Document doc3 = Document.builder()
@@ -250,7 +256,31 @@ public class TestConfig implements CommandLineRunner {
                                 .fileUrl("/uploads/projeto_1/DRAWINGS/EXECUTIVE/detalhamento_eletrico.pdf")
                                 .build();
 
-                documentRepository.saveAll(Arrays.asList(doc1, doc2, doc3));
+                Document doc4 = Document.builder()
+                                .name("desenho user 4")
+                                .description("Desenho técnico com pontos e circuitos elétricos")
+                                .directory(subdir1)
+                                .uploadedBy(user4)
+                                .uploadDate(LocalDateTime.now())
+                                .modificationDate(LocalDateTime.now())
+                                .size(3072L)
+                                .version(1)
+                                .fileUrl("/uploads/projeto_1/DRAWINGS/EXECUTIVE/desenho4.pdf")
+                                .build();
+
+                Document doc5 = Document.builder()
+                                .name("doc user 3")
+                                .description("Desenho técnico com pontos e circuitos elétricos")
+                                .directory(dir3)
+                                .uploadedBy(user3)
+                                .uploadDate(LocalDateTime.now())
+                                .modificationDate(LocalDateTime.now())
+                                .size(3072L)
+                                .version(1)
+                                .fileUrl("/uploads/projeto_1/DOCUMENTS/doc3.pdf")
+                                .build();
+
+                documentRepository.saveAll(Arrays.asList(doc1, doc2, doc3, doc4, doc5));
 
                 // ==== COMMENTS ====
                 Comment c1 = new Comment(null, "Verificar medidas da área de serviço", LocalDateTime.now(), doc1,
