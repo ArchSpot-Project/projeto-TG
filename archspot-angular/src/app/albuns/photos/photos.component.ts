@@ -58,22 +58,33 @@ export class PhotosComponent implements OnInit {
 
         this.loadProjectName();
         this.loadAlbumName();
-
-        this.photoService.getPhotosByAlbum(this.albumId).subscribe({
-          next: data => {
-            this.photos = data.map(p => ({
-              ...p,
-              fileUrl: `http://localhost:8080/photos/${p.id}/view`
-            }));
-            this.loading = false;
-          },
-          error: err => {
-            console.error('Erro ao carregar fotos', err);
-            this.loading = false;
-          }
-        });
+        this.loadPhotos();
       },
       error: err => console.error('Erro ao carregar usuários do projeto', err)
+    });
+  }
+
+  loadPhotos() {
+    this.loading = true;
+
+    this.photoService.getPhotosByAlbum(this.albumId).subscribe({
+      next: data => {
+        const loadPromises = data.map(p =>
+          this.photoService.getPhotoView(p.id!).toPromise().then(url => {
+            p.fileUrl = url;
+            return p;
+          })
+        );
+
+        Promise.all(loadPromises).then(result => {
+          this.photos = result;
+          this.loading = false;
+        });
+      },
+      error: err => {
+        console.error('Erro ao carregar fotos', err);
+        this.loading = false;
+      }
     });
   }
 
@@ -94,23 +105,6 @@ export class PhotosComponent implements OnInit {
     this.albumService.getAlbumById(this.albumId).subscribe({
       next: album => this.albumName = album.name,
       error: err => console.error('Erro ao carregar álbum', err)
-    });
-  }
-
-  loadPhotos() {
-    this.loading = true;
-    this.photoService.getPhotosByAlbum(this.albumId).subscribe({
-      next: data => {
-        this.photos = data.map(p => ({
-          ...p,
-          fileUrl: `http://localhost:8080/photos/${p.id}/view`
-        }));
-        this.loading = false;
-      },
-      error: err => {
-        console.error('Erro ao carregar fotos', err);
-        this.loading = false;
-      }
     });
   }
 
@@ -148,8 +142,10 @@ export class PhotosComponent implements OnInit {
 
       this.photoService.uploadPhoto(this.albumId, file, this.userId!, name).subscribe({
         next: photo => {
-          photo.fileUrl = `http://localhost:8080/photos/${photo.id}/view`;
-          this.photos.push(photo);
+          this.photoService.getPhotoView(photo.id!).subscribe(url => {
+            photo.fileUrl = url;
+            this.photos.push(photo);
+          });
           alert('Foto enviada com sucesso.');
           location.reload();
         },

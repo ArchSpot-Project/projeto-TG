@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Photo } from '../models/photo.model';
 import JSZip from 'jszip';
 
@@ -12,6 +12,12 @@ export class PhotoService {
 
   getPhotosByAlbum(albumId: number): Observable<Photo[]> {
     return this.http.get<Photo[]>(`${this.baseUrl}/albums/${albumId}/photos`);
+  }
+
+  getPhotoView(id: number): Observable<string> {
+    return this.http.get(`${this.baseUrl}/photos/${id}/view`, { responseType: 'blob' }).pipe(
+      map(blob => URL.createObjectURL(blob))
+    );
   }
 
   uploadPhoto(albumId: number, file: File, uploadedById: number, optionalName?: string): Observable<Photo> {
@@ -35,11 +41,13 @@ export class PhotoService {
     const zip = new JSZip();
     const folder = zip.folder(albumName) || zip;
 
-    const photoPromises = photos.map(photo =>
-      fetch(photo.fileUrl)
-        .then(res => res.blob())
-        .then(blob => folder.file(photo.name, blob))
-    );
+    const photoPromises = photos
+      .filter(photo => !!photo.fileUrl)
+      .map(photo =>
+        fetch(photo.fileUrl!)
+          .then(res => res.blob())
+          .then(blob => folder.file(photo.name, blob))
+      );
 
     return Promise.all(photoPromises).then(() => {
       return zip.generateAsync({ type: 'blob' });

@@ -10,7 +10,7 @@ import { LayoutModule } from './layout/layout.module';
 import { UsersProjectModule } from './users-project/users-project.module';
 import { SharedModule } from './shared/shared.module';
 import { PublicModule } from './public/public.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ProjectsModule } from './projects/projects.module';
 import { ReportsModule } from './reports/reports.module';
 import { ProfileModule } from './profile/profile.module';
@@ -21,6 +21,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { AboutModule } from './about/about.module';
 import { AlbunsModule } from './albuns/albuns.module';
+import { AuthInterceptor } from './core/services/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,9 @@ import { AlbunsModule } from './albuns/albuns.module';
     HttpClientModule,
     ContactsModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -22,19 +22,6 @@ export class ModalCadastroComponent implements OnInit {
   @Input() isEditMode: boolean = false;
   @Input() userData: Partial<UserDTO> = {};
 
-  ngOnInit() {
-    if (this.isEditMode && this.userData) {
-      this.cpf = this.userData.cpf || '';
-      this.name = this.userData.name || '';
-      this.phone = this.userData.phone || '';
-      this.address = this.userData.address || '';
-      this.profession = this.userData.profession || '';
-      this.email = this.userData.email || '';
-      this.userRole = this.userData.userRole || 'CUSTOMER';
-      this.password = this.userData.password || '';
-    }
-  }
-
   cpf = '';
   name = '';
   phone = '';
@@ -48,6 +35,18 @@ export class ModalCadastroComponent implements OnInit {
 
   preview: string | ArrayBuffer | null = null;
   selectedFile: File | null = null;
+
+  ngOnInit() {
+    if (this.isEditMode && this.userData) {
+      this.cpf = this.userData.cpf || '';
+      this.name = this.userData.name || '';
+      this.phone = this.userData.phone || '';
+      this.address = this.userData.address || '';
+      this.profession = this.userData.profession || '';
+      this.email = this.userData.email || '';
+      this.userRole = this.userData.userRole || 'CUSTOMER';
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -66,7 +65,7 @@ export class ModalCadastroComponent implements OnInit {
   onSubmit(form: NgForm) {
     this.passwordsDoNotMatch = this.password !== this.confirmPassword;
     if (form.invalid || this.passwordsDoNotMatch) {
-      alert('Formulário inválido.');
+      alert('Formulário inválido ou senhas distintas.');
       return;
     }
 
@@ -90,28 +89,20 @@ export class ModalCadastroComponent implements OnInit {
           location.reload();
         },
         error: (err) => {
-          const errMsg = err?.error?.message || err?.message || '';
-          if (errMsg.toLowerCase().includes('cpf')) {
-            alert('CPF inválido!');
-          } else {
-            alert('Erro ao atualizar perfil.');
-          }
+          const msg = err?.error?.message || err?.message || '';
+          alert(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao atualizar perfil.');
           console.error(err);
         }
       });
     } else {
-      this.userService.createUser(newUser).subscribe({
-        next: () => {
+      this.authService.register(newUser).subscribe({
+        next: (response) => {
           alert('Usuário cadastrado com sucesso!');
           this.activeModal.close();
         },
         error: (err) => {
-          const errMsg = err?.error?.message || err?.message || '';
-          if (errMsg.toLowerCase().includes('cpf')) {
-            alert('CPF inválido!');
-          } else {
-            alert('Erro ao cadastrar usuário.');
-          }
+          const msg = err?.error?.message || err?.message || '';
+          alert(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao cadastrar usuário.');
           console.error(err);
         }
       });

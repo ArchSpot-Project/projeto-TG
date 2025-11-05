@@ -1,0 +1,1 @@
+teste pra ver se a pasta uploads ta caindo no .gitignore

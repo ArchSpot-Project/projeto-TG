@@ -26,7 +26,7 @@ export class DocumentService {
     if (description) formData.append('description', description);
 
     return this.http.post<DocumentDTO>(
-      `http://localhost:8080/directories/${directoryId}/documents/upload`,
+      `http://localhost:8080/directories/${directoryId}/documents`,
       formData
     );
   }

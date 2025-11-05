@@ -15,12 +15,14 @@ export class LoginPageComponent {
   email: string = '';
   password: string = '';
   error: boolean = false;
+  loading: boolean = false;
 
   constructor(
     private authService: AuthService,
-    private userService: UserService, 
-    private router: Router, 
-    private modalService: NgbModal) { }
+    private router: Router,
+    private userService: UserService,
+    private modalService: NgbModal
+  ) { }
 
   login() {
     const credentials: UserCredentials = {
@@ -29,11 +31,19 @@ export class LoginPageComponent {
     };
 
     this.authService.login(credentials).subscribe({
-      next: user => {
-        // busca o perfil completo só após o login
-        this.userService.getUserById(user.id).subscribe(fullUser => {
-          this.authService.setCurrentUser(fullUser);
-          this.router.navigate(['/home']);
+      next: (response) => {
+        const user = response.user;
+
+        this.userService.getUserById(user.id).subscribe({
+          next: (fullUser) => {
+            this.authService.setCurrentUser(fullUser);
+            this.router.navigate(['/home']);
+          },
+          error: (err) => {
+            console.error('Erro ao buscar usuário completo:', err);
+            this.authService.setCurrentUser(user);
+            this.router.navigate(['/home']);
+          }
         });
       },
       error: () => this.error = true
