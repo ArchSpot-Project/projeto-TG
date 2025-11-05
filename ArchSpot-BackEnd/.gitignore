@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ## Armazenamento Local ##
-/uploads
+uploads/
