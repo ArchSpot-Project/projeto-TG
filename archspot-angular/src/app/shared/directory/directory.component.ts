@@ -190,6 +190,20 @@ export class DirectoryComponent implements OnInit {
     this.contextMenu.dir = null;
   }
 
+  shouldShowUploadButton(): boolean {
+    const role = this.getUserRole();
+
+    if (this.directoryType === 'DOCUMENTS') {
+      return role === 'ADMIN' || role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR' || role === 'CUSTOMER';
+    }
+
+    if (this.directoryType === 'DRAWINGS') {
+      return role === 'ADMIN' || role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR';
+    }
+    
+    return false;
+  }
+
   @HostListener('document:click')
   onDocumentClick() {
     this.closeContextMenu();

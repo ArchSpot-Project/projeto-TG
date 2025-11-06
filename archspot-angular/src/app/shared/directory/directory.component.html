@@ -7,16 +7,14 @@
     </button>
 
     <!-- botão criar diretório raiz -->
-    <a *ngIf="!isCustomerInProject || directoryType === 'DOCUMENTS'" 
-       class="btn align-middle ms-1 p-0" 
-       (click)="createDirectory()"
-       title="Novo diretório raiz">
+    <a *ngIf="!isCustomerInProject || directoryType === 'DOCUMENTS'" class="btn align-middle ms-1 p-0"
+      (click)="createDirectory()" title="Novo diretório raiz">
       <img src="/assets/img/icons/plus-circle.svg" alt="+" width="20" height="20">
     </a>
   </div>
 
   <!-- botão de upload -->
-  <div *ngIf="!isCustomerInProject && activeTabId">
+  <div *ngIf="shouldShowUploadButton()">
     <button class="btn btn-sm btn-light d-flex align-items-center me-1" (click)="uploadFile()">
       <img src="/assets/img/icons/upload.svg" width="16" height="16" class="me-1">
       Fazer Upload
@@ -34,9 +32,7 @@
 
     <!-- botão criar subdiretório -->
     <a *ngIf="(isAdminInProject() || isCollaboratorOrAssociated()) && activeRoot && directoryType === 'DRAWINGS'"
-       class="btn align-middle ms-1 p-0"
-       (click)="createSubdirectory(activeRoot)" 
-       title="Novo subdiretório">
+      class="btn align-middle ms-1 p-0" (click)="createSubdirectory(activeRoot)" title="Novo subdiretório">
       <img src="/assets/img/icons/plus-circle.svg" alt="+" width="18" height="18">
     </a>
   </div>
@@ -48,10 +44,8 @@
 </div>
 
 <!-- Context Menu -->
-<ul *ngIf="contextMenu.visible"
-  class="context-menu list-unstyled bg-white border rounded shadow-sm"
-  [style.left.px]="contextMenu.x"
-  [style.top.px]="contextMenu.y">
+<ul *ngIf="contextMenu.visible" class="context-menu list-unstyled bg-white border rounded shadow-sm"
+  [style.left.px]="contextMenu.x" [style.top.px]="contextMenu.y">
 
   <li (click)="editDirectoryName(contextMenu.dir!, $event)">Renomear</li>
 
@@ -60,8 +54,7 @@
 
   <!-- Criar subdiretório: admins, colaboradores, associados -->
   <li *ngIf="contextMenu.isRoot && contextMenu.dir?.type === 'DRAWINGS' && 
-             (isAdminInProject() || isCollaboratorOrAssociated())"
-      (click)="createSubdirectory(contextMenu.dir!)">
+             (isAdminInProject() || isCollaboratorOrAssociated())" (click)="createSubdirectory(contextMenu.dir!)">
     Criar subdiretório
   </li>
 </ul>
