@@ -3,6 +3,7 @@ import { DirectoryService } from '../../core/services/directory.service';
 import { DocumentService } from '../../core/services/document.service';
 import { TableComponent } from '../../shared/table/table.component';
 import { DirectoryDTO } from '../../core/models/directory.model';
+import { UserProjectService } from '../../core/services/user-project.service';
 
 @Component({
   selector: 'app-directory',
@@ -15,8 +16,8 @@ export class DirectoryComponent implements OnInit {
   @Input() userId!: number | null;
   @Input() isCustomerInProject: boolean = false;
   @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' | string = 'DOCUMENTS';
-
-  @Output() directoryChanged = new EventEmitter<number>(); // emite o id do diretório ativo
+  @Input() projectUsers: any[] = [];
+  @Output() directoryChanged = new EventEmitter<number>();
 
   directories: DirectoryDTO[] = [];
   activeTabId: number | null = null;
@@ -33,11 +34,18 @@ export class DirectoryComponent implements OnInit {
 
   constructor(
     private directoryService: DirectoryService,
+    private userProjectService: UserProjectService,
     private documentService: DocumentService
   ) { }
 
   ngOnInit(): void {
-    this.loadDirectories();
+    this.userProjectService.getUsersByProject(this.projectId).subscribe({
+      next: (users) => {
+        this.projectUsers = users;
+        this.loadDirectories();
+      },
+      error: err => console.error('Erro ao carregar usuários do projeto', err)
+    });
   }
 
   loadDirectories() {
@@ -75,7 +83,6 @@ export class DirectoryComponent implements OnInit {
     this.activeTabId = dir.id;
     this.directoryChanged.emit(dir.id);
 
-    // define o diretório raiz ativo (para exibir subdiretórios)
     const root = this.directories.find(d =>
       d.id === dir.id || d.subdirectories?.some(sub => sub.id === dir.id)
     );
@@ -99,7 +106,6 @@ export class DirectoryComponent implements OnInit {
       error: err => { console.error(err); alert('Erro ao criar diretório.'); }
     });
   }
-
 
   editDirectoryName(dir: DirectoryDTO, event: MouseEvent) {
     event.stopPropagation();
@@ -127,7 +133,21 @@ export class DirectoryComponent implements OnInit {
     });
   }
 
-  // ---- Upload ----
+  getUserRole(): string | null {
+    if (!this.userId || !this.projectUsers) return null;
+    const user = this.projectUsers.find(u => u.userId === this.userId);
+    return user?.role?.toUpperCase() || null;
+  }
+
+  isAdminInProject(): boolean {
+    return this.getUserRole() === 'ADMIN';
+  }
+
+  isCollaboratorOrAssociated(): boolean {
+    const role = this.getUserRole();
+    return role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR';
+  }
+
   uploadFile() {
     if (!this.activeTabId) return;
     const input = document.createElement('input');
@@ -151,6 +171,13 @@ export class DirectoryComponent implements OnInit {
 
   openContextMenu(event: MouseEvent, dir: DirectoryDTO, isRoot: boolean) {
     event.preventDefault();
+
+    // Admin, staff e associados podem abrir o menu
+    if (!(this.isAdminInProject() || this.isCollaboratorOrAssociated() ||
+      (this.isCustomerInProject && this.directoryType === 'DOCUMENTS'))) {
+      return;
+    }
+
     this.contextMenu.visible = true;
     this.contextMenu.x = event.clientX;
     this.contextMenu.y = event.clientY;
