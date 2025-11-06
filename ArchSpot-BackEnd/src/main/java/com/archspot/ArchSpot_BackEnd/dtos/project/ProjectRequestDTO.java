@@ -3,7 +3,7 @@ package com.archspot.ArchSpot_BackEnd.dtos.project;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.archspot.ArchSpot_BackEnd.enums.Status;
+import com.archspot.ArchSpot_BackEnd.enums.ProjectStatus;
 
 import lombok.Data;
 
@@ -14,5 +14,5 @@ public class ProjectRequestDTO {
     private LocalDate estimatedEndDate;
     private String description;
     private BigDecimal totalValue;
-    private Status status;
+    private ProjectStatus status;
 }

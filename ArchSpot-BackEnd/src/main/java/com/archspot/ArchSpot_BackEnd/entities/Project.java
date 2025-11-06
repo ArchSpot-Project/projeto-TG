@@ -1,6 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.entities;
 
-import com.archspot.ArchSpot_BackEnd.enums.Status;
+import com.archspot.ArchSpot_BackEnd.enums.ProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -30,7 +30,7 @@ public class Project {
     private LocalDate realEndDate;
 
     private String description;
-    private Status status;
+    private ProjectStatus status;
 
     // valor total do projeto (será calculado a partir das parcelas)
     private BigDecimal totalValue;
@@ -56,12 +56,12 @@ public class Project {
     // Métodos de negócio
     public void finalizeProject() {
         this.realEndDate = LocalDate.now();
-        this.status = Status.COMPLETED;
+        this.status = ProjectStatus.COMPLETED;
     }
 
     public void cancelProject() {
         this.realEndDate = LocalDate.now();
-        this.status = Status.CANCELLED;
+        this.status = ProjectStatus.CANCELLED;
     }
 
     // Método para recalcular datas

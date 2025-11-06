@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
-import com.archspot.ArchSpot_BackEnd.enums.Status;
+import com.archspot.ArchSpot_BackEnd.enums.ProjectStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class ProjectResponseDTO {
     private LocalDate realEndDate;
     private String description;
     private BigDecimal totalValue;
-    private Status status;
+    private ProjectStatus status;
     private List<PhaseDTO> phases;
     private List<InstallmentResponseDTO> installments;
 }
