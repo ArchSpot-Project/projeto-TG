@@ -18,7 +18,7 @@ export class PhotosComponent implements OnInit {
 
   projectId!: number;
   albumId!: number;
-
+  photoId!: number;
   projectName = '';
   albumName = '';
   photos: Photo[] = [];
@@ -62,6 +62,39 @@ export class PhotosComponent implements OnInit {
       },
       error: err => console.error('Erro ao carregar usuários do projeto', err)
     });
+  }
+  private saveCreatedPhotoId(photoId: number): void {
+    const key = 'createdPhotosByUser';
+    const stored = localStorage.getItem(key);
+    const map = stored ? JSON.parse(stored) : {};
+
+    if (!this.userId) return;
+
+    if (!map[this.userId]) map[this.userId] = [];
+    if (!map[this.userId].includes(photoId)) map[this.userId].push(photoId);
+
+    localStorage.setItem(key, JSON.stringify(map));
+  }
+
+  private hasUserCreatedPhoto(photoId: number): boolean {
+    const key = 'createdPhotosByUser';
+    const stored = localStorage.getItem(key);
+    if (!stored || !this.userId) return false;
+
+    const map = JSON.parse(stored);
+    return map[this.userId]?.includes(photoId);
+  }
+
+  private removeCreatedPhotoId(photoId: number): void {
+    const key = 'createdPhotosByUser';
+    const stored = localStorage.getItem(key);
+    if (!stored || !this.userId) return;
+
+    const map = JSON.parse(stored);
+    if (map[this.userId]) {
+      map[this.userId] = map[this.userId].filter((id: number) => id !== photoId);
+      localStorage.setItem(key, JSON.stringify(map));
+    }
   }
 
   loadPhotos() {
@@ -112,8 +145,16 @@ export class PhotosComponent implements OnInit {
     return photo.uploadedById ? (this.userNames[photo.uploadedById] || 'Desconhecido') : 'Desconhecido';
   }
 
-  canEditOrDelete(): boolean {
-    return this.userRole !== 'CUSTOMER';
+  canEditOrDelete(photo: Photo): boolean {
+    if (!this.userId) return false;
+    const isOwner = this.hasUserCreatedPhoto(photo.id);
+    return this.isAdmin() || isOwner;
+  }
+
+  public isAdmin(): boolean {
+    if (!this.userId || !this.projectUsers) return false;
+    const currentUser = this.projectUsers.find(u => u.userId === this.userId);
+    return currentUser?.role?.toUpperCase() === 'ADMIN';
   }
 
   downloadAlbum() {
@@ -142,6 +183,7 @@ export class PhotosComponent implements OnInit {
 
       this.photoService.uploadPhoto(this.albumId, file, this.userId!, name).subscribe({
         next: photo => {
+          this.saveCreatedPhotoId(photo.id);
           this.photoService.getPhotoView(photo.id!).subscribe(url => {
             photo.fileUrl = url;
             this.photos.push(photo);
@@ -155,7 +197,7 @@ export class PhotosComponent implements OnInit {
   }
 
   editPhotoName(photo: Photo) {
-    if (!this.canEditOrDelete()) return;
+    if (!this.canEditOrDelete(photo)) return;
 
     const newName = prompt('Editar nome da foto:', photo.name);
     if (!newName || newName === photo.name) return;
@@ -170,12 +212,13 @@ export class PhotosComponent implements OnInit {
   }
 
   deletePhoto(photo: Photo) {
-    if (!this.canEditOrDelete()) return;
+    if (!this.canEditOrDelete(photo)) return;
     if (!confirm(`Deseja realmente excluir a foto "${photo.name}"?`)) return;
 
     this.photoService.deletePhoto(photo.id!).subscribe({
       next: () => {
         alert(`Foto "${photo.name}" excluída com sucesso`);
+        this.removeCreatedPhotoId(photo.id);
         this.photos = this.photos.filter(p => p.id !== photo.id);
       },
       error: err => console.error('Erro ao deletar foto', err)

@@ -39,11 +39,17 @@
 
           <!-- ações do card -->
           <div class="card-actions">
-            <button *ngIf="!isCustomerInProject" title="Editar"
+            <button 
+              *ngIf="canEditOrDelete(photo)" 
+              title="Editar"
               (click)="editPhotoName(photo); $event.stopPropagation()">
               <img src="assets/img/icons/pencil.svg" alt="Editar">
             </button>
-            <button *ngIf="!isCustomerInProject" title="Excluir" (click)="deletePhoto(photo); $event.stopPropagation()">
+
+            <button 
+              *ngIf="canEditOrDelete(photo)" 
+              title="Excluir"
+              (click)="deletePhoto(photo); $event.stopPropagation()">
               <img src="assets/img/icons/trash3.svg" alt="Excluir">
             </button>
           </div>
