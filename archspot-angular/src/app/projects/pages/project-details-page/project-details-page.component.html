@@ -1,65 +1,101 @@
 <app-page-layout [(title)]="tempName" [showBackButton]="true" [projectId]="project?.id" [editing]="editing">
 
-<div *ngIf="loading" class="text-center py-5 text-muted">
-  <div class="spinner-border" role="status"></div>
-  <p class="mt-2">Carregando informações do projeto...</p>
-</div>
+  <div *ngIf="loading" class="text-center py-5 text-muted">
+    <div class="spinner-border" role="status"></div>
+    <p class="mt-2">Carregando informações do projeto...</p>
+  </div>
 
-<div *ngIf="!loading && errorMessage" class="alert alert-danger">
-  {{ errorMessage }}
-</div>
+  <div *ngIf="!loading && errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
 
-<div *ngIf="!loading && project">
+  <div *ngIf="!loading && project">
 
-  <!-- Card do projeto -->
-  <div class="card bg-light border-0 shadow-sm mb-4 p-3 rounded-md">
-    <div class="card-body d-flex align-items-start justify-content-between">
+    <!-- Card do projeto -->
+    <div class="card bg-light border-0 shadow-sm mb-4 p-3 rounded-md">
+      <div class="card-body d-flex align-items-start justify-content-between">
 
-      <!-- Descrição editável -->
-      <div class="me-3 flex-grow-1">
-        <p class="card-text text-muted">
-          <span *ngIf="!editing" class="fw-semibold text-dark">{{ project.description }}</span>
-          <textarea *ngIf="editing" [(ngModel)]="tempDescription" class="form-control form-control-sm"></textarea>
-        </p>
-      </div>
-
-      <!-- Dropdown e botões (admin) -->
-      <div class="d-flex align-items-center">
-        <div *ngIf="isAdminInProject && !editing" class="dropdown">
-          <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle" role="button"
-            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" width="20" height="20">
-          <ul class="dropdown-menu dropdown-menu-end align-middle me-2" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" (click)="renameProject()">Renomear</a></li>
-            <li><a class="dropdown-item" (click)="finalizeProject()">Finalizar projeto</a></li>
-            <li><a class="dropdown-item" (click)="cancelProject()">Cancelar projeto</a></li>
-            <li><a class="dropdown-item" (click)="deleteProject()">Excluir projeto</a></li>
-          </ul>
+        <!-- Descrição -->
+        <div class="me-3 flex-grow-1">
+          <p class="card-text text-muted">
+            <span *ngIf="!editing" class="fw-semibold text-dark">{{ project.description }}</span>
+            <textarea *ngIf="editing" [(ngModel)]="tempDescription" class="form-control form-control-sm"></textarea>
+          </p>
         </div>
 
-        <button *ngIf="editing" class="btn btn-sm btn-light ms-2" (click)="saveEdit()" alt="Salvar">
-          <img src="assets/img/icons/14-save.png" alt="" width="20" height="20">
-        </button>
-        <button *ngIf="editing" class="btn btn-sm btn-secondary ms-1" (click)="cancelEdit()">Cancelar</button>
-      </div>
+        <!-- Dropdown e botões -->
+        <div class="d-flex align-items-center">
+          <div *ngIf="isAdminInProject && !editing" class="dropdown">
+            <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle" role="button"
+              id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" width="20" height="20">
+            <ul class="dropdown-menu dropdown-menu-end align-middle me-2" aria-labelledby="dropdownMenuButton">
+              <li><a class="dropdown-item" (click)="renameProject()">Renomear</a></li>
+              <li><a class="dropdown-item" (click)="finalizeProject()">Finalizar projeto</a></li>
+              <li><a class="dropdown-item" (click)="cancelProject()">Cancelar projeto</a></li>
+              <li><a class="dropdown-item" (click)="deleteProject()">Excluir projeto</a></li>
+            </ul>
+          </div>
 
+          <button *ngIf="editing" class="btn btn-sm btn-light ms-2" (click)="saveEdit()">
+            <img src="assets/img/icons/14-save.png" alt="Salvar" width="20" height="20">
+          </button>
+          <button *ngIf="editing" class="btn btn-sm btn-secondary ms-1" (click)="cancelEdit()">Cancelar</button>
+        </div>
+      </div>
     </div>
 
     <!-- Detalhes do projeto -->
     <div class="row small mt-3">
+      <!-- Início -->
       <div class="col-md-4">
-        <strong>Início estimado:</strong> {{ project.estimatedStartDate | date:'dd-MM-yyyy' }}
+        <strong>
+          {{
+          project.realStartDate
+          ? 'Início:'
+          : project.estimatedStartDate
+          ? 'Início estimado:'
+          : 'Início:'
+          }}
+        </strong>
+        {{
+        project.realStartDate
+        ? (project.realStartDate | date: 'dd-MM-yyyy')
+        : project.estimatedStartDate
+        ? (project.estimatedStartDate | date: 'dd-MM-yyyy')
+        : '-'
+        }}
       </div>
+
+      <!-- Fim -->
       <div class="col-md-4">
-        <strong>Fim estimado:</strong> {{ project.estimatedEndDate | date:'dd-MM-yyyy' }}
+        <strong>
+          {{
+          project.realEndDate
+          ? 'Fim:'
+          : project.estimatedEndDate
+          ? 'Fim estimado:'
+          : 'Fim:'
+          }}
+        </strong>
+        {{
+        project.realEndDate
+        ? (project.realEndDate | date: 'dd-MM-yyyy')
+        : project.estimatedEndDate
+        ? (project.estimatedEndDate | date: 'dd-MM-yyyy')
+        : '-'
+        }}
       </div>
+
+      <!-- Status -->
       <div class="col-md-4">
         <strong>Status:</strong> {{ project.status | statusTranslate }}
       </div>
     </div>
+
+
+    <!-- Status bar -->
+    <app-project-status-bar [projectId]="project.id"></app-project-status-bar>
+
+
   </div>
-
-  <!-- Status bar -->
-  <app-project-status-bar [projectId]="project.id"></app-project-status-bar>
-
-</div>
 </app-page-layout>

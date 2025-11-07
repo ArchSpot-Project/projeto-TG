@@ -23,3 +23,26 @@
   letter-spacing: 0.3px;
   text-transform: uppercase;
 }
+
+.status-badge {
+  color: #fff;
+  font-weight: 500;
+  border-radius: 0.5rem;
+}
+
+.status-planned {
+  background-color: #0d6efd;
+}
+
+.status-in_progress {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+}
+
+.status-completed {
+  background-color: #198754;
+}
