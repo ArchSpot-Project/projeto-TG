@@ -45,7 +45,7 @@
     <!-- Coluna 2 - Foto -->
     <div class="col-4">
       <div class="text-center">
-        <img src="/assets/img/personas/ana.jpeg" class="rounded-circle border" alt="Foto de perfil" width="220"
+        <img [src]="'http://localhost:8080/' + user?.fileUrl" class="rounded-circle border" alt="Foto de perfil" width="220"
           height="220" />
       </div>
     </div>

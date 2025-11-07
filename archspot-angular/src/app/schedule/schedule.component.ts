@@ -44,7 +44,6 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
 
     const currentUser = this.authService.getUser();
     this.userId = currentUser?.id || null;
-    this.userRole = currentUser?.userRole || null;
 
     this.loadProject();
     this.loadProjectUsers();

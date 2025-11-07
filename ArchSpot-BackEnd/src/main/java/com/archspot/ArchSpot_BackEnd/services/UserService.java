@@ -1,5 +1,10 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
@@ -19,6 +25,8 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
+
+	private static final String UPLOAD_DIR = "uploads/profile";
 
 	@Autowired
 	private UserRepository repository;
@@ -47,6 +55,17 @@ public class UserService {
 		user.setProfession(dto.profession());
 		user.setEmail(dto.email());
 		user.setPassword(passwordEncoder.encode(dto.password())); // criptografa aqui
+
+		// Salvar imagem (se existir)
+		if (dto.profileImage() != null && !dto.profileImage().isEmpty()) {
+			try {
+				String imagePath = saveProfileImage(dto.profileImage(), dto.email());
+				user.setFileUrl(imagePath);
+			} catch (IOException e) {
+				throw new RuntimeException("Erro ao salvar imagem de perfil", e);
+			}
+		}
+
 		return repository.save(user);
 	}
 
@@ -79,6 +98,24 @@ public class UserService {
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("User not found");
 		}
+	}
 
+	private String saveProfileImage(MultipartFile file, String email) throws IOException {
+		Path uploadPath = Paths.get(UPLOAD_DIR);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+
+		String fileExtension = getFileExtension(file.getOriginalFilename());
+		String fileName = email.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + "." + fileExtension;
+		Path filePath = uploadPath.resolve(fileName);
+
+		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		return filePath.toString().replace("\\", "/"); // retorna caminho normalizado
+	}
+
+	private String getFileExtension(String filename) {
+		int dotIndex = filename.lastIndexOf('.');
+		return (dotIndex > 0) ? filename.substring(dotIndex + 1) : "jpg";
 	}
 }
