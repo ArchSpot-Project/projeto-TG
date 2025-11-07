@@ -67,12 +67,6 @@ export class AlbunsComponent implements OnInit {
     });
   }
 
-  get isCustomerInProject(): boolean {
-    if (!this.userId) return false;
-    const user = this.projectUsers.find(u => u.userId === this.userId);
-    return user?.role === 'CUSTOMER';
-  }
-
   openAlbum(albumId: number) {
     this.router.navigate([`/projects/${this.projectId}/albuns/${albumId}`]);
   }
@@ -80,23 +74,67 @@ export class AlbunsComponent implements OnInit {
   createAlbum() {
     if (!this.newAlbum.name) return;
 
-    this.albumService.createAlbum(this.projectId, this.newAlbum).subscribe({
+    const albumData: Partial<Album> = {
+      ...this.newAlbum
+    };
+
+    this.albumService.createAlbum(this.projectId, albumData).subscribe({
       next: (album) => {
         this.albums.push(album);
+        this.saveCreatedAlbumId(album.id);
         const modal = document.getElementById('modalCriarAlbum');
         if (modal) (window as any).bootstrap.Modal.getInstance(modal).hide();
         alert(`Álbum "${album.name}" criado com sucesso.`);
         this.newAlbum = { name: '', description: '' };
-        location.reload();
       },
       error: (err) => console.error('Erro ao criar álbum', err)
     });
   }
 
-  canEditOrDeleteAlbum(): boolean {
+  public isAdmin(): boolean {
     if (!this.userId || !this.projectUsers) return false;
     const currentUser = this.projectUsers.find(u => u.userId === this.userId);
     return currentUser?.role?.toUpperCase() === 'ADMIN';
+  }
+
+  canDeleteAlbum(album: Album): boolean {
+    if (!this.userId) return false;
+    const isOwner = this.hasUserCreatedAlbum(album.id);
+    return this.isAdmin() || isOwner;
+  }
+
+  private saveCreatedAlbumId(albumId: number): void {
+    const key = 'createdAlbumsByUser';
+    const stored = localStorage.getItem(key);
+    const map = stored ? JSON.parse(stored) : {};
+
+    if (!this.userId) return;
+
+    if (!map[this.userId]) map[this.userId] = [];
+    if (!map[this.userId].includes(albumId)) map[this.userId].push(albumId);
+
+    localStorage.setItem(key, JSON.stringify(map));
+  }
+
+  private hasUserCreatedAlbum(albumId: number): boolean {
+    const key = 'createdAlbumsByUser';
+    const stored = localStorage.getItem(key);
+    if (!stored || !this.userId) return false;
+
+    const map = JSON.parse(stored);
+    return map[this.userId]?.includes(albumId);
+  }
+
+  private removeCreatedAlbumId(albumId: number): void {
+    const key = 'createdAlbumsByUser';
+    const stored = localStorage.getItem(key);
+    if (!stored || !this.userId) return;
+
+    const map = JSON.parse(stored);
+    if (map[this.userId]) {
+      map[this.userId] = map[this.userId].filter((id: number) => id !== albumId);
+      localStorage.setItem(key, JSON.stringify(map));
+    }
   }
 
   editAlbum(album: Album) {
@@ -121,11 +159,21 @@ export class AlbunsComponent implements OnInit {
   }
 
   deleteAlbum(album: Album) {
+    if (!this.canDeleteAlbum(album)) {
+      alert('Você não tem permissão para excluir este álbum.');
+      return;
+    }
+
     const confirmDelete = confirm(`Deseja realmente excluir o álbum "${album.name}"?`);
     if (!confirmDelete) return;
 
     this.albumService.deleteAlbum(album.id!).subscribe({
-      next: () => this.albums = this.albums.filter(a => a.id !== album.id),
+      next: () => {
+        this.albums = this.albums.filter(a => a.id !== album.id);
+        this.removeCreatedAlbumId(album.id);
+        alert("Álbum excluído com sucesso.");
+        location.reload();
+      },
       error: (err) => console.error('Erro ao deletar álbum', err)
     });
   }

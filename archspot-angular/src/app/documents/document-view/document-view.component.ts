@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommentService } from '../../core/services/comment.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
@@ -37,7 +37,8 @@ export class DocumentViewComponent implements OnInit {
     private documentService: DocumentService,
     private authService: AuthService,
     private userService: UserService,
-    private userProjectService: UserProjectService
+    private userProjectService: UserProjectService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -60,16 +61,6 @@ export class DocumentViewComponent implements OnInit {
     });
   }
 
-  loadItem(): void {
-  this.documentService.getDocumentById(this.itemId).subscribe({
-    next: (data) => {
-      this.item = data;
-      this.documentName = data.name;
-    },
-    error: err => console.error('Erro ao carregar documento', err)
-  });
-}
-
   get document() {
     return this.item;
   }
@@ -90,19 +81,23 @@ export class DocumentViewComponent implements OnInit {
     });
   }
 
-  // loadItem(): void {
-  //   const url = `http://localhost:8080/${this.itemType}s/${this.itemId}/view`;
-  //   this.documentService.getDocumentById(this.itemId).subscribe({
-  //     next: (data) => {
-  //       this.item = data;
-  //       if (data.name) {
-  //         this.itemBlobUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  //         this.fileType = this.getMimeTypeFromName(data.name);
-  //       }
-  //     },
-  //     error: err => console.error(`Erro ao carregar ${this.itemType}`, err)
-  //   });
-  // }
+  loadItem(): void {
+    this.documentService.getDocumentById(this.itemId).subscribe({
+      next: (data) => {
+        this.item = data;
+        this.documentName = data.name;
+        this.documentService.viewDocument(this.itemId).subscribe({
+          next: (blob) => {
+            const blobUrl = URL.createObjectURL(blob);
+            this.itemBlobUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+            this.fileType = blob.type;
+          },
+          error: (err) => console.error('Erro ao visualizar documento', err)
+        });
+      },
+      error: (err) => console.error('Erro ao buscar documento', err)
+    });
+  }
 
   getMimeTypeFromName(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();

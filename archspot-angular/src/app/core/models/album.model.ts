@@ -4,5 +4,6 @@ export interface Album {
   description?: string;
   creationDate?: string;
   projectId: number;
+  createdBy?: number;
   photos?: any[];
 }
