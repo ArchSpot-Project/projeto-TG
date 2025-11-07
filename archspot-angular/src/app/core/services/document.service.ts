@@ -50,4 +50,8 @@ export class DocumentService {
   deleteDocument(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/documents/${id}`);
   }
+
+  viewDocument(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/documents/${id}/view`, { responseType: 'blob' });
+  }
 }
