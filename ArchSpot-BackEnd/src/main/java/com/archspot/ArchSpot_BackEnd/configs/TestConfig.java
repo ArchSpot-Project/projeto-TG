@@ -21,7 +21,7 @@ import com.archspot.ArchSpot_BackEnd.entities.UserProject;
 import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentMethod;
 import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
-import com.archspot.ArchSpot_BackEnd.enums.Status;
+import com.archspot.ArchSpot_BackEnd.enums.ProjectStatus;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.repositories.CommentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.DirectoryRepository;
@@ -102,28 +102,28 @@ public class TestConfig implements CommandLineRunner {
                 project1.setEstimatedStartDate(LocalDate.of(2025, 2, 3));
                 project1.setEstimatedEndDate(LocalDate.of(2025, 6, 2));
                 project1.setDescription("Projeto residencial unifamiliar para Beatriz");
-                project1.setStatus(Status.IN_PROGRESS);
+                project1.setStatus(ProjectStatus.IN_PROGRESS);
 
                 Project project2 = new Project();
                 project2.setName("Loja Fernando Sports");
                 project2.setEstimatedStartDate(LocalDate.of(2025, 3, 1));
                 project2.setEstimatedEndDate(LocalDate.of(2025, 5, 15));
                 project2.setDescription("Projeto comercial de loja esportiva");
-                project2.setStatus(Status.PLANNED);
+                project2.setStatus(ProjectStatus.PLANNED);
 
                 Project project3 = new Project();
                 project3.setName("Dimas Assistência Técnica");
                 project3.setEstimatedStartDate(LocalDate.of(2025, 5, 2));
                 project3.setEstimatedEndDate(LocalDate.of(2025, 6, 19));
                 project3.setDescription("Projeto de loja de assistência técnica");
-                project3.setStatus(Status.COMPLETED);
+                project3.setStatus(ProjectStatus.COMPLETED);
 
                 Project project4 = new Project();
                 project4.setName("Munari Coworking");
                 project4.setEstimatedStartDate(LocalDate.of(2025, 1, 2));
                 project4.setEstimatedEndDate(LocalDate.of(2025, 3, 2));
                 project4.setDescription("Projeto de escritório compartilhado");
-                project4.setStatus(Status.CANCELLED);
+                project4.setStatus(ProjectStatus.CANCELLED);
 
                 projectRepository.saveAll(Arrays.asList(project1, project2, project3, project4));
 
@@ -141,7 +141,7 @@ public class TestConfig implements CommandLineRunner {
                                 null, null, 45, phase2, project1);
 
                 Phase phase4 = new Phase(null, "Estudo de Layout", "Definição espacial inicial",
-                                LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15),
+                                LocalDate.of(2025, 3, 1), LocalDate.of(2025, 11, 15),
                                 null, null, 15, null, project2);
 
                 Phase phase5 = new Phase(null, "Fase 5", "Definição fase 5",

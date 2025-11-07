@@ -2,23 +2,36 @@ package com.archspot.ArchSpot_BackEnd.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+
 import java.util.Map;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class ProjectService {
 
-  private final ProjectRepository projectRepository;
+  @Autowired
+  private ProjectRepository projectRepository;
+
+  @Autowired
+  private PhaseService phaseService;
+
+  @Autowired
+  private InstallmentService installmentService;
+
+  @Autowired
+  private UserProjectService userProjectService;
 
   public List<ProjectResponseDTO> findAll() {
     return projectRepository.findAll()
@@ -36,12 +49,18 @@ public class ProjectService {
   public ProjectResponseDTO create(ProjectRequestDTO dto) {
     Project project = new Project();
     project.setName(dto.getName());
-    project.setEstimatedStartDate(dto.getEstimatedStartDate());
-    project.setEstimatedEndDate(dto.getEstimatedEndDate());
     project.setDescription(dto.getDescription());
-    project.setTotalValue(dto.getTotalValue());
-    project.setStatus(dto.getStatus());
-    return toResponseDTO(projectRepository.save(project));
+    project.updateDatesAndStatus();
+    projectRepository.save(project);
+
+    // vincula o criador como ADMIN
+    UserProjectRequestDTO userProjectDto = new UserProjectRequestDTO(
+        SecurityUtils.getCurrentUser().getId(),
+        project.getId(),
+        UserRole.ADMIN);
+    userProjectService.assignUserToProject(userProjectDto);
+
+    return toResponseDTO(project);
   }
 
   public ProjectResponseDTO update(Long id, ProjectRequestDTO dto) {
@@ -49,11 +68,9 @@ public class ProjectService {
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
 
     project.setName(dto.getName());
-    project.setEstimatedStartDate(dto.getEstimatedStartDate());
-    project.setEstimatedEndDate(dto.getEstimatedEndDate());
     project.setDescription(dto.getDescription());
     project.setTotalValue(dto.getTotalValue());
-    project.setStatus(dto.getStatus());
+    project.updateDatesAndStatus();
 
     return toResponseDTO(projectRepository.save(project));
   }
@@ -69,6 +86,7 @@ public class ProjectService {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
     project.finalizeProject();
+    project.updateDatesAndStatus(); // redundante, melhorar no futuro
     return toResponseDTO(projectRepository.save(project));
   }
 
@@ -76,55 +94,36 @@ public class ProjectService {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
     project.cancelProject();
+    project.updateDatesAndStatus(); // redundante, melhorar no futuro
     return toResponseDTO(projectRepository.save(project));
   }
 
   public ProjectResponseDTO updateTitleAndDescription(Long id, Map<String, String> updates) {
-    Project project = projectRepository.findById(id) 
+    Project project = projectRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
 
     if (updates.containsKey("name")) {
-        project.setName(updates.get("name"));
+      project.setName(updates.get("name"));
     }
     if (updates.containsKey("description")) {
-        project.setDescription(updates.get("description"));
+      project.setDescription(updates.get("description"));
     }
 
-    projectRepository.save(project); 
-    return toResponseDTO(project);     
-}
+    projectRepository.save(project);
+    return toResponseDTO(project);
+  }
 
   // mapeamento entidade -> DTO
   private ProjectResponseDTO toResponseDTO(Project project) {
     List<PhaseDTO> phaseDTOs = project.getPhases() != null
         ? project.getPhases().stream()
-            .map(phase -> new PhaseDTO(
-                phase.getId(),
-                phase.getName(),
-                phase.getDescription(),
-                phase.getEstimatedStartDate(),
-                phase.getEstimatedEndDate(),
-                phase.getRealStartDate(),
-                phase.getRealEndDate(),
-                phase.getDuration(),
-                phase.getPreviousPhase() != null ? phase.getPreviousPhase().getId() : null,
-                phase.getProject() != null ? phase.getProject().getId() : null,
-                PhaseService.calculateStatus(phase).name() 
-            ))
+            .map(phaseService::toDTO)
             .toList()
         : List.of();
 
     List<InstallmentResponseDTO> installmentDTOs = project.getInstallments() != null
         ? project.getInstallments().stream()
-            .map(installment -> new InstallmentResponseDTO(
-                installment.getId(),
-                installment.getEstimatedPaymentDate(),
-                installment.getRealPaymentDate(),
-                installment.getPaymentMethod(),
-                installment.getPaymentStatus(),
-                installment.getAmount(),
-                installment.getDescription(),
-                installment.getProject() != null ? installment.getProject().getId() : null))
+            .map(installmentService::toDTO)
             .toList()
         : List.of();
 

@@ -3,8 +3,12 @@ package com.archspot.ArchSpot_BackEnd.services;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
+import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.exceptions.AssociationNotFoundException;
+import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
+import com.archspot.ArchSpot_BackEnd.exceptions.UnauthorizedException;
 import com.archspot.ArchSpot_BackEnd.repositories.*;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,16 +49,27 @@ public class UserProjectService {
         .toList();
   }
 
-  /*
-    TODO Validações: adicionar checagens (p.ex. somente project admin pode adicionar/alterar membros). 
-    ou via @PreAuthorize quando integrar Spring Security.
-  */
   @Transactional
   public UserProjectResponseDTO assignUserToProject(UserProjectRequestDTO dto) {
     User user = userRepository.findById(dto.userId())
-        .orElseThrow(() -> new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.userId()));
+
     Project project = projectRepository.findById(dto.projectId())
-        .orElseThrow(() -> new RuntimeException("Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + dto.projectId()));
+
+    // verifica se é o primeiro membro associado (libera para criar o ADMIN)
+    boolean isFirstMember = userProjectRepository.findByProjectId(project.getId()).isEmpty();
+
+    if (!isFirstMember) {
+      Long currentUserId = SecurityUtils.getCurrentUserId();
+      UserProject currentUserLink = userProjectRepository.findByUserIdAndProjectId(currentUserId, project.getId())
+          .orElseThrow(() -> new UnauthorizedException("You are not a member of this project"));
+
+      // verifica se user atual é ADMIN (permissão para gerenciar membros)
+      if (currentUserLink.getRole() != UserRole.ADMIN) {
+        throw new UnauthorizedException("Only ADMIN users can manage project members");
+      }
+    }
 
     // evita duplicação: se existir, atualiza role
     var existing = userProjectRepository.findByUserIdAndProjectId(user.getId(), project.getId());
@@ -68,8 +83,8 @@ public class UserProjectService {
       entity.setProject(project);
       entity.setRole(dto.role());
     }
-    userProjectRepository.save(entity);
-    return toResponseDTO(entity);
+    UserProject saved = userProjectRepository.save(entity);
+    return toResponseDTO(saved);
   }
 
   @Transactional

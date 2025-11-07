@@ -1,6 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.enums;
 
-public enum Status {
+public enum ProjectStatus {
     PLANNED("Planned"),          // planejado, ainda não iniciado
     IN_PROGRESS("In progress"),  // em andamento
     COMPLETED("Completed"),      // concluído
@@ -8,7 +8,7 @@ public enum Status {
 
     private final String label;
 
-    Status(String label) {
+    ProjectStatus(String label) {
         this.label = label;
     }
 
