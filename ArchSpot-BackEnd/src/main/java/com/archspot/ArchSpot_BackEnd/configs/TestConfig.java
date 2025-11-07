@@ -141,7 +141,7 @@ public class TestConfig implements CommandLineRunner {
                                 null, null, 45, phase2, project1);
 
                 Phase phase4 = new Phase(null, "Estudo de Layout", "Definição espacial inicial",
-                                LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15),
+                                LocalDate.of(2025, 3, 1), LocalDate.of(2025, 11, 15),
                                 null, null, 15, null, project2);
 
                 Phase phase5 = new Phase(null, "Fase 5", "Definição fase 5",

@@ -226,7 +226,7 @@ public class InstallmentService {
   }
 
   // mapeamente entidade para DTO
-  private InstallmentResponseDTO toDTO(Installment installment) {
+  public InstallmentResponseDTO toDTO(Installment installment) {
     return new InstallmentResponseDTO(
         installment.getId(),
         installment.getEstimatedPaymentDate(),

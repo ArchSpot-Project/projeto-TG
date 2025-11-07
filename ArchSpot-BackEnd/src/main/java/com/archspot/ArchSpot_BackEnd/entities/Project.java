@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,8 +27,8 @@ public class Project {
 
     private LocalDate estimatedStartDate;
     private LocalDate estimatedEndDate;
-    private LocalDate realStartDate;
-    private LocalDate realEndDate;
+    private LocalDateTime realStartDate;
+    private LocalDateTime realEndDate;
 
     private String description;
     private ProjectStatus status;
@@ -54,36 +55,76 @@ public class Project {
     private List<Directory> directories = new ArrayList<>();
 
     // Métodos de negócio
+    public void startProject() {
+        this.realStartDate = LocalDateTime.now();
+        this.status = ProjectStatus.IN_PROGRESS;
+    }
+
     public void finalizeProject() {
-        this.realEndDate = LocalDate.now();
+        this.realEndDate = LocalDateTime.now();
         this.status = ProjectStatus.COMPLETED;
     }
 
     public void cancelProject() {
-        this.realEndDate = LocalDate.now();
+        this.realEndDate = LocalDateTime.now();
         this.status = ProjectStatus.CANCELLED;
     }
 
-    // Método para recalcular datas
-    public void updateEstimatedDates() {
+    // Método para recalcular datas e status
+    public void updateDatesAndStatus() {
         if (phases == null || phases.isEmpty()) {
             this.estimatedStartDate = null;
             this.estimatedEndDate = null;
+            this.realStartDate = null;
+            this.realEndDate = null;
+            this.status = ProjectStatus.PLANNED;
             return;
         }
 
-        // Menor data de início estimada entre as fases
+        // Menor data estimada de início entre as fases
         this.estimatedStartDate = phases.stream()
                 .map(Phase::getEstimatedStartDate)
                 .filter(Objects::nonNull)
                 .min(LocalDate::compareTo)
                 .orElse(null);
 
-        // Maior data de fim estimada entre as fases
+        // Maior data estimada de fim entre as fases
         this.estimatedEndDate = phases.stream()
                 .map(Phase::getEstimatedEndDate)
                 .filter(Objects::nonNull)
                 .max(LocalDate::compareTo)
                 .orElse(null);
+
+        // Menor data real de início entre as fases
+        this.realStartDate = phases.stream()
+                .map(Phase::getRealStartDate)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        // Determinando status
+        boolean allPlanned = phases.stream().allMatch(p -> p.getRealStartDate() == null);
+        boolean anyInProgress = phases.stream()
+                .anyMatch(p -> p.getRealStartDate() != null && p.getRealEndDate() == null);
+        boolean allCompleted = phases.stream().allMatch(p -> p.getRealEndDate() != null);
+
+        if (allPlanned) {
+            this.status = ProjectStatus.PLANNED; // Nenhuma fase começou
+        } else if (anyInProgress) {
+            this.status = ProjectStatus.IN_PROGRESS; // Pelo menos uma fase em andamento
+        } else if (allCompleted) {
+            this.status = ProjectStatus.COMPLETED; // Todas as fases concluídas
+
+            // Maior data real de fim entre as fases
+            this.realEndDate = phases.stream()
+                    .map(Phase::getRealEndDate)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+
+        } else {
+            this.status = ProjectStatus.IN_PROGRESS; // fallback
+            this.realEndDate = null;
+        }
     }
 }

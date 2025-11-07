@@ -2,6 +2,7 @@ package com.archspot.ArchSpot_BackEnd.dtos.project;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
@@ -20,8 +21,8 @@ public class ProjectResponseDTO {
     private String name;
     private LocalDate estimatedStartDate;
     private LocalDate estimatedEndDate;
-    private LocalDate realStartDate;
-    private LocalDate realEndDate;
+    private LocalDateTime realStartDate;
+    private LocalDateTime realEndDate;
     private String description;
     private BigDecimal totalValue;
     private ProjectStatus status;
