@@ -54,11 +54,7 @@ public class PhaseService {
     Project project = projectRepository.findById(dto.projectId())
         .orElseThrow(() -> new RuntimeException("Project not found"));
 
-    // pega a última fase do projeto como predecessora automaticamente
-    Phase previous = phaseRepository.findFirstByProjectIdOrderByIdDesc(dto.projectId())
-        .orElse(null);
-
-    // validação: data de fim não pode ser menor que data de início - lança erro 400
+    // validação: data de fim não pode ser menor que data de início
     if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
       if (dto.estimatedEndDate().isBefore(dto.estimatedStartDate())) {
         throw new ResponseStatusException(
@@ -67,36 +63,47 @@ public class PhaseService {
       }
     }
 
-    // validação: data de inicio da nova fase deve ser maior que a da predecessora - lança erro 400
-    if (previous != null && previous.getEstimatedStartDate() != null && dto.estimatedStartDate() != null) {
-      if (!dto.estimatedStartDate().isAfter(previous.getEstimatedStartDate())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "A data estimada de início da nova etapa deve ser maior que a data estimada de início da etapa predecessora.");
+    /*
+     * TODO: Verificar lógica de negócio:
+     * O código ainda não implementa a possibilidade de criação de fases com
+     * vínculos COMPLEXOS:
+     * antes, no meio ou depois das existentes, atualizando a sequencia de
+     * associações adequadamente.
+     * Deixei aqui para lembrar de refatorar no futuro.
+     */
+
+    // atribuição de predecessora SIMPLIFICADA (não considera a ordem das fases
+    // existentes)
+    Phase previous = null;
+    if (dto.previousPhaseId() != null) {
+      previous = phaseRepository.findById(dto.previousPhaseId())
+          .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Etapa predecessora inválida."));
+
+      if (!previous.getProject().getId().equals(project.getId())) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Etapa predecessora deve pertencer ao mesmo projeto.");
       }
     }
 
-    Phase entity = new Phase();
-    entity.setName(dto.name());
-    entity.setDescription(dto.description());
-    entity.setEstimatedStartDate(dto.estimatedStartDate());
-    entity.setEstimatedEndDate(dto.estimatedEndDate());
-    entity.setRealStartDate(dto.realStartDate());
-    entity.setRealEndDate(dto.realEndDate());
+    // cria nova fase
+    Phase newPhase = new Phase();
+    newPhase.setName(dto.name());
+    newPhase.setDescription(dto.description());
+    newPhase.setEstimatedStartDate(dto.estimatedStartDate());
+    newPhase.setEstimatedEndDate(dto.estimatedEndDate());
+    newPhase.setRealStartDate(dto.realStartDate());
+    newPhase.setRealEndDate(dto.realEndDate());
+    newPhase.setDuration(
+        (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null)
+            ? (int) java.time.temporal.ChronoUnit.DAYS.between(dto.estimatedStartDate(), dto.estimatedEndDate())
+            : null);
+    newPhase.setPreviousPhase(previous);
+    newPhase.setProject(project);
+    newPhase.setStatus(PhaseStatus.NOT_STARTED);
 
-    // cálculo de duração da etapa
-    if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
-      entity.setDuration(
-          (int) java.time.temporal.ChronoUnit.DAYS.between(dto.estimatedStartDate(), dto.estimatedEndDate()));
-    }
+    Phase saved = phaseRepository.save(newPhase);
 
-    entity.setPreviousPhase(previous);
-    entity.setProject(project);
-    entity.setStatus(PhaseStatus.NOT_STARTED);
-
-    Phase saved = phaseRepository.save(entity);
-
-    project.updateEstimatedDates();
+    project.updateDatesAndStatus();
     projectRepository.save(project);
 
     return toDTO(saved);
@@ -111,14 +118,12 @@ public class PhaseService {
     entity.setDescription(dto.description());
     entity.setEstimatedStartDate(dto.estimatedStartDate());
     entity.setEstimatedEndDate(dto.estimatedEndDate());
-    entity.setRealStartDate(dto.realStartDate());
-    entity.setRealEndDate(dto.realEndDate());
     entity.setDuration(dto.duration());
 
     Phase updated = phaseRepository.save(entity);
 
     Project project = updated.getProject();
-    project.updateEstimatedDates();
+    project.updateDatesAndStatus();
     projectRepository.save(project);
 
     return toDTO(updated);
@@ -133,7 +138,7 @@ public class PhaseService {
 
     phaseRepository.delete(entity);
 
-    project.updateEstimatedDates();
+    project.updateDatesAndStatus();
     projectRepository.save(project);
   }
 
@@ -152,7 +157,8 @@ public class PhaseService {
       return PhaseStatus.IN_PROGRESS;
     }
 
-    // etapa ainda não COMPLETED = em atraso se a data atual está após a data de término estimada
+    // etapa ainda não COMPLETED = em atraso se a data atual está após a data de
+    // término estimada
     if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
       return PhaseStatus.OVERDUE;
     }
@@ -165,7 +171,8 @@ public class PhaseService {
     Phase phase = phaseRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
 
-    // etapa predecessora e validação - se houver e nao foi finalizada, lançar erro 400
+    // etapa predecessora e validação - se houver e nao foi finalizada, lançar erro
+    // 400
     if (phase.getPreviousPhase() != null) {
       Phase previous = phase.getPreviousPhase();
       if (previous.getRealEndDate() == null) {
@@ -177,8 +184,13 @@ public class PhaseService {
 
     phase.setRealStartDate(LocalDateTime.now());
     phase.setStatus(PhaseStatus.IN_PROGRESS);
-
     Phase updated = phaseRepository.save(phase);
+
+    // inicia o projeto se for o caso
+    Project project = phase.getProject();
+    project.updateDatesAndStatus();
+    projectRepository.save(project);
+
     return toDTO(updated);
   }
 
@@ -192,22 +204,21 @@ public class PhaseService {
     }
     phase.setRealEndDate(LocalDateTime.now());
     phase.setStatus(PhaseStatus.COMPLETED);
-
     Phase updated = phaseRepository.save(phase);
+
+    // finaliza projeto se for o caso
+    Project project = phase.getProject();
+    project.updateDatesAndStatus();
+    projectRepository.save(project);
+
     return toDTO(updated);
   }
 
-  private PhaseDTO toDTO(Phase entity) {
+  public PhaseDTO toDTO(Phase entity) {
     Long previousId = entity.getPreviousPhase() != null ? entity.getPreviousPhase().getId() : null;
     Long projectId = entity.getProject() != null ? entity.getProject().getId() : null;
 
-    PhaseStatus status = entity.getStatus();
-    if (status == PhaseStatus.NOT_STARTED && entity.getEstimatedEndDate() != null
-        && LocalDate.now().isAfter(entity.getEstimatedEndDate())) {
-      status = PhaseStatus.OVERDUE;
-      entity.setStatus(status);
-      phaseRepository.save(entity);
-    }
+    PhaseStatus status = PhaseService.calculateStatus(entity);
 
     return new PhaseDTO(
         entity.getId(),

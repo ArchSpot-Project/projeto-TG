@@ -11,4 +11,5 @@ public interface PhaseRepository extends JpaRepository<Phase, Long> {
 
   List<Phase> findByProjectId(Long projectId);
   Optional<Phase> findFirstByProjectIdOrderByIdDesc(Long projectId);
+  List<Phase> findByProjectIdOrderByEstimatedStartDateAsc(Long projectId);
 }
