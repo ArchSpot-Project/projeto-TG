@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { InstallmentService } from '../../core/services/installment.service';
 import { InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-create-installment-modal',
@@ -28,7 +29,10 @@ export class CreateInstallmentModalComponent {
     'CASH'
   ];
 
-  constructor(private installmentService: InstallmentService) { }
+  constructor(
+    private installmentService: InstallmentService,
+    private toast: ToastService
+  ) { }
 
   onAmountChange(value: string) {
     const numeric = Number(value.replace(/\D/g, '')) / 100;
@@ -60,7 +64,7 @@ export class CreateInstallmentModalComponent {
         this.cancel();
         location.reload();
       },
-      error: (err) => alert('Erro ao criar parcela: ' + (err.error?.message || err.message))
+      error: (err) => this.toast.showError('Erro ao criar parcela: ' + (err.error?.message || err.message))
     });
   }
 

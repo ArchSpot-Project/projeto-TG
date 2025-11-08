@@ -5,6 +5,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserProjectService } from '../../core/services/user-project.service';
 import { DocumentDTO } from '../../core/models/document.model';
 import { Router } from '@angular/router';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-table',
@@ -28,7 +29,8 @@ export class TableComponent implements OnChanges {
     private userProjectService: UserProjectService,
     private userService: UserService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -155,7 +157,7 @@ export class TableComponent implements OnChanges {
         a.click();
         window.URL.revokeObjectURL(url);
       },
-      error: () => alert('Erro ao baixar o documento.')
+      error: () => this.toast.showError('Erro ao baixar o documento.')
     });
   }
 
@@ -178,7 +180,7 @@ export class TableComponent implements OnChanges {
         },
         error: (err) => {
           console.error('Erro ao substituir documento:', err);
-          alert('Erro ao enviar nova versão.');
+          this.toast.showError('Erro ao enviar nova versão.');
         }
       });
     };
@@ -196,7 +198,7 @@ export class TableComponent implements OnChanges {
         alert('Documento renomeado com sucesso!');
         this.loadDocuments();
       },
-      error: () => alert('Erro ao renomear documento.')
+      error: () => this.toast.showError('Erro ao renomear documento.')
     });
   }
 
@@ -209,7 +211,7 @@ export class TableComponent implements OnChanges {
         this.documents = this.documents.filter((d) => d.id !== doc.id);
         alert('Documento deletado com sucesso!');
       },
-      error: () => alert('Erro ao deletar documento.')
+      error: () => this.toast.showError('Erro ao deletar documento.')
     });
   }
 }

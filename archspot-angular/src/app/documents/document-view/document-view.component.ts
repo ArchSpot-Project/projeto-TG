@@ -8,6 +8,7 @@ import { UserProjectService } from '../../core/services/user-project.service';
 import { DocumentDTO } from '../../core/models/document.model';
 import { CommentDTO } from '../../core/models/comment.model';
 import { DocumentService } from '../../core/services/document.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-document-view',
@@ -38,7 +39,8 @@ export class DocumentViewComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private userProjectService: UserProjectService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -139,7 +141,7 @@ export class DocumentViewComponent implements OnInit {
       next: comment => {
         this.comments.push(comment);
         this.newCommentText = '';
-        alert("Comentário adicionado com sucesso.");
+        this.toast.showSuccess("Comentário adicionado com sucesso.");
         location.reload();
         this.loadComments();
       },
@@ -156,7 +158,7 @@ export class DocumentViewComponent implements OnInit {
       next: () => {
         location.reload();
       },
-      error: err => alert('Não foi possível deletar este comentário.')
+      error: err => this.toast.showWarning('Não foi possível deletar este comentário.')
     });
   }
 

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { InstallmentService } from '../../core/services/installment.service';
 import { InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-create-sequence-installments-modal',
@@ -22,7 +23,7 @@ export class CreateSequenceInstallmentsModalComponent {
 
   paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'CHECK', 'CASH'];
 
-  constructor(private installmentService: InstallmentService) { }
+  constructor(private installmentService: InstallmentService, private toast: ToastService) { }
 
   cancel() {
     this.reset();
@@ -86,7 +87,7 @@ export class CreateSequenceInstallmentsModalComponent {
       })
       .catch(err => {
         console.error('Erro ao criar sequência', err);
-        alert('Erro ao criar sequência de parcelas.');
+        this.toast.showError('Erro ao criar sequência de parcelas.');
       });
   }
 }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { PhaseService } from '../../core/services/phase.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-edit-phase-modal',
@@ -22,7 +23,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
 
   private originalPhase: any = {};
 
-  constructor(private phaseService: PhaseService) { }
+  constructor(private phaseService: PhaseService, private toast: ToastService) { }
 
   ngOnInit(): void { }
 
@@ -88,7 +89,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         console.error('Erro ao atualizar fase:', err);
-        alert('Erro ao atualizar a etapa. Veja console.');
+        this.toast.showError('Erro ao atualizar a etapa. Veja console.');
       }
     });
   }
@@ -103,7 +104,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         console.error(err);
-        alert('Erro ao excluir a etapa. Não é possível excluir uma etapa predecessora de outra.');
+        this.toast.showError('Erro ao excluir a etapa. Não é possível excluir uma etapa predecessora de outra.');
       }
     });
   }

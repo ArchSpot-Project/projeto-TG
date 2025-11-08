@@ -7,6 +7,7 @@ import { UserProjectService } from '../../core/services/user-project.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Photo } from '../../core/models/photo.model';
 import saveAs from 'file-saver';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-photos',
@@ -37,7 +38,8 @@ export class PhotosComponent implements OnInit {
     private projectService: ProjectService,
     private albumService: AlbumService,
     private userProjectService: UserProjectService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -158,7 +160,7 @@ export class PhotosComponent implements OnInit {
 
   downloadAlbum() {
     if (this.photos.length === 0) {
-      alert('O álbum está vazio.');
+      this.toast.showWarning('O álbum está vazio.');
       return;
     }
     this.photoService.downloadAlbumZip(this.albumName, this.photos)
@@ -187,7 +189,7 @@ export class PhotosComponent implements OnInit {
             photo.fileUrl = url;
             this.photos.push(photo);
           });
-          alert('Foto enviada com sucesso.');
+          this.toast.showSuccess('Foto enviada com sucesso.');
           location.reload();
         },
         error: err => console.error('Erro ao enviar foto', err)
@@ -204,7 +206,7 @@ export class PhotosComponent implements OnInit {
     this.photoService.updatePhotoName(photo.id!, newName).subscribe({
       next: updated => {
         photo.name = updated.name;
-        alert(`Nome da foto "${updated.name}" alterado com sucesso`);
+        this.toast.showSuccess(`Nome da foto "${updated.name}" alterado com sucesso`);
       },
       error: err => console.error('Erro ao atualizar nome', err)
     });
@@ -216,7 +218,7 @@ export class PhotosComponent implements OnInit {
 
     this.photoService.deletePhoto(photo.id!).subscribe({
       next: () => {
-        alert(`Foto "${photo.name}" excluída com sucesso`);
+        this.toast.showSuccess(`Foto "${photo.name}" excluída com sucesso`);
         this.removeCreatedPhotoId(photo.id);
         this.photos = this.photos.filter(p => p.id !== photo.id);
       },

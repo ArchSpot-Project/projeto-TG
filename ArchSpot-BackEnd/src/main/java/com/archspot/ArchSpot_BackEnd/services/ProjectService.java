@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
@@ -33,6 +34,9 @@ public class ProjectService {
   @Autowired
   private UserProjectService userProjectService;
 
+  @Autowired
+  private DirectoryService directoryService;
+
   public List<ProjectResponseDTO> findAll() {
     return projectRepository.findAll()
         .stream()
@@ -46,6 +50,7 @@ public class ProjectService {
     return toResponseDTO(project);
   }
 
+  @Transactional
   public ProjectResponseDTO create(ProjectRequestDTO dto) {
     Project project = new Project();
     project.setName(dto.getName());
@@ -59,6 +64,8 @@ public class ProjectService {
         project.getId(),
         UserRole.ADMIN);
     userProjectService.assignUserToProject(userProjectDto);
+
+    directoryService.createDefaultDirectories(project);
 
     return toResponseDTO(project);
   }
