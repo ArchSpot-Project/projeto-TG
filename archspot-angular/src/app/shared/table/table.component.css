@@ -1,6 +1,7 @@
 .document-name {
   cursor: pointer;
   position: relative;
+  word-break: break-word;
 }
 
 .document-name:hover::after {
@@ -8,7 +9,7 @@
   position: absolute;
   bottom: 100%;
   left: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0, 0, 0, 0.85);
   color: #fff;
   padding: 4px 8px;
   border-radius: 4px;
@@ -16,7 +17,8 @@
   z-index: 10;
   width: max-content;
   max-width: 250px;
-  margin-bottom: 4px; 
+  margin-bottom: 4px;
+  font-size: 0.85rem;
 }
 
 /* desativa o tooltip do navegador */
@@ -26,4 +28,86 @@
 }
 .document-name[title]:hover {
   pointer-events: none;
+}
+
+.dropdown {
+  position: static !important;
+}
+
+.dropdown-menu {
+  position: absolute !important;
+  z-index: 9999 !important;
+  inset: auto !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 991px) {
+  .table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .table thead {
+    display: table-header-group;
+  }
+
+  .table tbody tr td {
+    font-size: 0.9rem;
+  }
+
+  .document-name:hover::after {
+    max-width: 180px;
+    font-size: 0.8rem;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 576px) {
+  .table {
+    font-size: 0.85rem;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .document-name:hover::after {
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90vw;
+    font-size: 0.8rem;
+    text-align: center;
+    word-wrap: break-word;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 0;
+    z-index: 9999;
+    white-space: normal;
+  }
+
+  th:last-child,
+  td:last-child {
+    display: none !important;
+  }
+
+  .table::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .table::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+  }
 }

@@ -90,3 +90,87 @@
 .timeline-item.card-pending .installment-card {
   background-color: #f7f7f7;
 }
+
+/* RESPONSIVIDADE */
+@media (max-width: 992px) {
+  .timeline-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .timeline-left {
+    width: 100%;
+    padding-left: 30px;
+  }
+
+  .timeline-left::before {
+    left: 15px;
+  }
+
+  .timeline-dot {
+    left: 8px;
+  }
+
+  .installment-card {
+    max-width: 100%;
+    margin-left: 40px;
+  }
+
+  .d-flex.justify-content-between.align-items-center {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .d-flex.flex-column.align-items-end {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .installment-card {
+    width: 90%;
+    max-width: 360px;
+    margin-left: 28px;
+    margin-right: auto;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+  }
+
+  .installment-card .card-body {
+    padding: 0.75rem;
+  }
+
+  .installment-card h6 {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .installment-card p {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .installment-card .small,
+  .installment-card strong:not(:first-child),
+  .installment-card .form-check,
+  .installment-card button.btn-outline-secondary,
+  .installment-card button.btn-danger {
+    display: none !important;
+  }
+
+  .installment-card button.btn-success {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+
+  .timeline-left::before {
+    left: 10px;
+  }
+
+  .timeline-dot {
+    left: 2px;
+    width: 14px;
+    height: 14px;
+  }
+}
