@@ -84,7 +84,7 @@ public class UserService {
 	}
 
 	// Para atualizar usuario
-	public User update(Long id, UserUpdateDTO dto) {
+	public User update(Long id, UserUpdateDTO dto, MultipartFile profileImage) {
 		try {
 			User user = repository.getReferenceById(id);
 			user.setCpf(dto.cpf());
@@ -94,6 +94,26 @@ public class UserService {
 			user.setProfession(dto.profession());
 			user.setEmail(dto.email());
 			user.setPassword(dto.password());
+
+			// Atualizar imagem, se enviada
+			if (profileImage != null && !profileImage.isEmpty()) {
+				try {
+					// Deleta imagem antiga, se existir
+					if (user.getFileUrl() != null) {
+						Path oldImagePath = Paths.get(user.getFileUrl());
+						if (Files.exists(oldImagePath)) {
+							Files.delete(oldImagePath);
+						}
+					}
+
+					// Salva nova imagem
+					String imagePath = saveProfileImage(profileImage, dto.email());
+					user.setFileUrl(imagePath);
+				} catch (IOException e) {
+					throw new RuntimeException("Erro ao salvar imagem de perfil", e);
+				}
+			}
+
 			return repository.save(user);
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("User not found");

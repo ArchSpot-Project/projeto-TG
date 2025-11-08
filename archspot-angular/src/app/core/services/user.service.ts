@@ -23,7 +23,14 @@ export class UserService {
     return this.http.post<User>(`${this.apiUrl}/create`, user);
   }
 
-  updateUser(id: number, data: UserCreateDTO): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, data);
+  updateUser(id: number, user: UserCreateDTO, file?: File): Observable<User> {
+    const formData = new FormData();
+    formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+
+    if (file) {
+      formData.append('profileImage', file);
+    }
+
+    return this.http.put<User>(`${this.apiUrl}/${id}`, formData);
   }
 }

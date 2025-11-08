@@ -23,8 +23,8 @@ public class WebConfig {
 
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/uploads/**")
-                        .addResourceLocations("file:uploads/"); // ou caminho absoluto
+                registry.addResourceHandler("/uploads/profile/**")
+                        .addResourceLocations("file:uploads/profile/");
             }
         };
     }

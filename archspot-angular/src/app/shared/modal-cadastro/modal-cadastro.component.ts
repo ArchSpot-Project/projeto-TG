@@ -81,7 +81,7 @@ export class ModalCadastroComponent implements OnInit {
     };
 
     if (this.isEditMode && this.userData?.id) {
-      this.userService.updateUser(this.userData.id, newUser).subscribe({
+      this.userService.updateUser(this.userData.id, newUser, this.selectedFile!).subscribe({
         next: (updatedUser) => {
           this.authService.setCurrentUser(updatedUser);
           alert('Perfil atualizado com sucesso!');

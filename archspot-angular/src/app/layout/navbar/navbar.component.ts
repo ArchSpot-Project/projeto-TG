@@ -45,16 +45,11 @@ export class NavbarComponent {
   }
 
   goToUserAccount() {
-    this.router.navigate(['/user-account']);
+    this.router.navigate(['/profile']);
   }
 
   get user() {
     return this.authService.getUser();
-  }
-
-  // TODO: No futuro esse método deve carregar a foto vinda do BD
-  get userImage(): string {
-    return `/assets/img/personas/${this.user?.name.toLowerCase().replaceAll(' ', '-')}.jpeg`;
   }
 
   isLoggedIn() {
