@@ -22,9 +22,10 @@ export class SidebarMenuComponent implements OnInit {
   projectMenuItems = [
     { key: 'drawings', icon: 'assets/img/icons/10-desenhos.png', label: 'Desenhos' },
     { key: 'documents', icon: 'assets/img/icons/07-documentos.png', label: 'Documentos' },
-    { key: 'payments', icon: 'assets/img/icons/13-financeiro.png', label: 'Pagamentos' },
     { key: 'albuns', icon: 'assets/img/icons/11-fotos.png', label: 'Fotos' },
     { key: 'schedule', icon: 'assets/img/icons/09-cronograma2.png', label: 'Cronograma' },
+    { key: 'payments', icon: 'assets/img/icons/13-financeiro.png', label: 'Pagamentos' },
+    { key: 'users-project', icon: 'assets/img/icons/person-add.svg', label: 'Equipe' },
   ];
 
   generalMenuItems = [
@@ -35,7 +36,6 @@ export class SidebarMenuComponent implements OnInit {
   profileMenuItems = [
     { icon: 'assets/img/icons/04-perfil.png', label: 'Perfil', action: () => this.goToProfile() },
     { icon: 'assets/img/icons/gear.svg', label: 'Configurações', action: () => this.goToProfile() },
-    { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() },
   ];
 
   helpMenuItems = [
