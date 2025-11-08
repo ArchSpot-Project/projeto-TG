@@ -46,7 +46,6 @@ export class PaymentsComponent implements OnInit {
 
     const currentUser = this.authService.getUser();
     this.userId = currentUser?.id || null;
-    this.userRole = currentUser?.userRole || null;
 
     this.loadProject();
     this.loadInstallments();

@@ -35,9 +35,15 @@
         </li>
       </ul>
 
-      <a (click)="goToUserAccount()" role="button" class="fs-5 link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+      <a (click)="goToUserAccount()" role="button"
+        class="fs-5 link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
         <span class="me-2">{{ user?.name }}</span>
-        <img [src]="userImage" class="rounded-circle ms-2" width="35" height="35">
+        <img *ngIf="user?.fileUrl; else defaultAvatar" [src]="'http://localhost:8080/' + user?.fileUrl"
+          class="rounded-circle ms-2" alt="Foto de perfil" width="35" height="35" />
+
+        <ng-template #defaultAvatar>
+          <img src="assets/img/default-avatar.png" class="rounded-circle ms-2" width="35" height="35" />
+        </ng-template>
       </a>
     </div>
 

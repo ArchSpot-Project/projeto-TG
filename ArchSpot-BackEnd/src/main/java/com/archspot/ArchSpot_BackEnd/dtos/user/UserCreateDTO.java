@@ -1,5 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.dtos.user;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public record UserCreateDTO(
   String cpf,
   String name,
@@ -7,5 +9,6 @@ public record UserCreateDTO(
   String address,
   String profession,
   String email,
-  String password
+  String password,
+  MultipartFile profileImage
 ) {}

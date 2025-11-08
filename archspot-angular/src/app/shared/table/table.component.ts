@@ -34,7 +34,6 @@ export class TableComponent implements OnChanges {
   ngOnInit(): void {
     const currentUser = this.authService.getUser();
     this.userId = currentUser?.id || null;
-    this.userRole = currentUser?.userRole || null;
 
     if (this.projectId) {
       this.loadProjectUsers();

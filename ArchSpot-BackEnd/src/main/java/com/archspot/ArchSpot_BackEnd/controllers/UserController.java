@@ -4,13 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
@@ -69,9 +64,19 @@ public class UserController {
     }
 
     // Para atualizar um usuario
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
-        User user = service.update(id, dto);
+    // @PutMapping(value = "/{id}")
+    // public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody
+    // UserUpdateDTO dto) {
+    // User user = service.update(id, dto);
+    // return ResponseEntity.ok().body(user);
+    // }
+    @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
+    public ResponseEntity<User> update(
+            @PathVariable Long id,
+            @RequestPart("user") UserUpdateDTO dto,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+
+        User user = service.update(id, dto, profileImage);
         return ResponseEntity.ok().body(user);
     }
 }

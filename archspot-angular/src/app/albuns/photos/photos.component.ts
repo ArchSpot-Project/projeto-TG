@@ -43,7 +43,6 @@ export class PhotosComponent implements OnInit {
   ngOnInit(): void {
     const currentUser = this.authService.getUser();
     this.userId = currentUser?.id || null;
-    this.userRole = currentUser?.userRole || null;
 
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.albumId = Number(this.route.snapshot.paramMap.get('albumId'));

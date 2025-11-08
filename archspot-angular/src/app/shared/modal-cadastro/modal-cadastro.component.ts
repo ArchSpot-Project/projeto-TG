@@ -28,8 +28,8 @@ export class ModalCadastroComponent implements OnInit {
   address = '';
   profession = '';
   email = '';
-  userRole: Role = 'CUSTOMER';
   password = '';
+  fileUrl = '';
   confirmPassword = '';
   passwordsDoNotMatch = false;
 
@@ -44,7 +44,7 @@ export class ModalCadastroComponent implements OnInit {
       this.address = this.userData.address || '';
       this.profession = this.userData.profession || '';
       this.email = this.userData.email || '';
-      this.userRole = this.userData.userRole || 'CUSTOMER';
+      this.fileUrl = this.userData.fileUrl || '';
     }
   }
 
@@ -76,12 +76,12 @@ export class ModalCadastroComponent implements OnInit {
       phone: this.phone,
       address: this.address,
       profession: this.profession,
-      userRole: this.userRole,
-      password: this.password
+      password: this.password,
+      fileUrl: this.fileUrl
     };
 
     if (this.isEditMode && this.userData?.id) {
-      this.userService.updateUser(this.userData.id, newUser).subscribe({
+      this.userService.updateUser(this.userData.id, newUser, this.selectedFile!).subscribe({
         next: (updatedUser) => {
           this.authService.setCurrentUser(updatedUser);
           alert('Perfil atualizado com sucesso!');
@@ -95,7 +95,7 @@ export class ModalCadastroComponent implements OnInit {
         }
       });
     } else {
-      this.authService.register(newUser).subscribe({
+      this.authService.register(newUser, this.selectedFile!).subscribe({
         next: (response) => {
           alert('Usuário cadastrado com sucesso!');
           this.activeModal.close();
