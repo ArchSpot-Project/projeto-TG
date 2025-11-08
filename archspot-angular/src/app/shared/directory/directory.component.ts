@@ -16,7 +16,7 @@ export class DirectoryComponent implements OnInit {
   @Input() projectId!: number;
   @Input() userId!: number | null;
   @Input() isCustomerInProject: boolean = false;
-  @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' | string = 'DOCUMENTS';
+  @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' = 'DOCUMENTS';
   @Input() projectUsers: any[] = [];
   @Output() directoryChanged = new EventEmitter<number>();
 
@@ -73,7 +73,6 @@ export class DirectoryComponent implements OnInit {
         parentDir.subdirectories = parentDir.subdirectories || [];
         parentDir.subdirectories.push(dir);
         this.toast.showSuccess('Subdiretório criado com sucesso!');
-        location.reload();
       },
       error: err => { console.error(err); this.toast.showError('Erro ao criar subdiretório.'); }
     });
@@ -103,7 +102,6 @@ export class DirectoryComponent implements OnInit {
         this.directories.push(dir);
         this.setActiveTab(dir);
         this.toast.showSuccess('Diretório criado com sucesso!');
-        location.reload();
       },
       error: err => { console.error(err); this.toast.showError('Erro ao criar diretório.'); }
     });
@@ -129,7 +127,6 @@ export class DirectoryComponent implements OnInit {
         this.toast.show('Diretório excluído!');
         this.directories = this.directories.filter(d => d.id !== dir.id);
         if (this.directories.length) this.setActiveTab(this.directories[0]);
-        location.reload();
       },
       error: () => this.toast.showError('Erro ao excluir diretório.')
     });
@@ -148,27 +145,6 @@ export class DirectoryComponent implements OnInit {
   isCollaboratorOrAssociated(): boolean {
     const role = this.getUserRole();
     return role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR';
-  }
-
-  uploadFile() {
-    if (!this.activeTabId) return;
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = (event: any) => {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const description = prompt('Digite uma descrição para o documento:') || '';
-      this.documentService.uploadDocument(this.activeTabId!, file, this.userId!, description)
-        .subscribe({
-          next: () => {
-            this.toast.showSuccess(`Documento "${file.name}" enviado com sucesso!`);
-            this.tableComponent.loadDocuments();
-          },
-          error: err => { console.error(err); this.toast.showError('Erro ao enviar documento.'); }
-        });
-    };
-    input.click();
   }
 
   openContextMenu(event: MouseEvent, dir: DirectoryDTO, isRoot: boolean) {
@@ -190,20 +166,6 @@ export class DirectoryComponent implements OnInit {
   closeContextMenu() {
     this.contextMenu.visible = false;
     this.contextMenu.dir = null;
-  }
-
-  shouldShowUploadButton(): boolean {
-    const role = this.getUserRole();
-
-    if (this.directoryType === 'DOCUMENTS') {
-      return role === 'ADMIN' || role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR' || role === 'CUSTOMER';
-    }
-
-    if (this.directoryType === 'DRAWINGS') {
-      return role === 'ADMIN' || role === 'STAFF' || role === 'EXTERNAL_COLLABORATOR';
-    }
-    
-    return false;
   }
 
   @HostListener('document:click')

@@ -90,8 +90,10 @@ export class PaymentsComponent implements OnInit {
   private isOverdue(estimatedDate: string | Date): boolean {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const est = new Date(estimatedDate);
-    est.setHours(0, 0, 0, 0);
+
+    const [year, month, day] = estimatedDate.toString().split('T')[0].split('-').map(Number);
+    const est = new Date(year, month - 1, day);
+
     return est < today;
   }
 
@@ -108,11 +110,18 @@ export class PaymentsComponent implements OnInit {
           .filter(i => i.projectId === this.projectId)
           .map(i => {
             let paymentStatus: PaymentStatus = 'PENDING';
-            if (i.realPaymentDate) paymentStatus = 'PAID';
-            else if (this.isOverdue(i.estimatedPaymentDate)) paymentStatus = 'OVERDUE';
+            if (i.realPaymentDate) {
+              paymentStatus = 'PAID';
+            } else if (this.isOverdue(i.estimatedPaymentDate)) {
+              paymentStatus = 'OVERDUE';
+            }
             return { ...i, selected: false, paymentStatus };
           })
-          .sort((a, b) => (a.estimatedPaymentDate > b.estimatedPaymentDate ? 1 : -1));
+          .sort((a, b) => {
+            const aDate = new Date(a.estimatedPaymentDate).getTime();
+            const bDate = new Date(b.estimatedPaymentDate).getTime();
+            return aDate - bDate;
+          });
 
         this.recalculateProjectTotal();
       },
@@ -153,15 +162,25 @@ export class PaymentsComponent implements OnInit {
       }
     } else {
       const today = new Date();
+      const todayNum = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+
+      const est = new Date(updated.estimatedPaymentDate);
+      const estNum = est.getFullYear() * 10000 + (est.getMonth() + 1) * 100 + est.getDate();
+
       let status: PaymentStatus = 'PENDING';
-      if (updated.realPaymentDate) status = 'PAID';
-      else if (new Date(updated.estimatedPaymentDate) < today) status = 'OVERDUE';
+      if (updated.realPaymentDate) {
+        status = 'PAID';
+      } else if (estNum < todayNum) {
+        status = 'OVERDUE';
+      }
 
       const installmentWithStatus: SelectableInstallment = { ...updated, selected: false, paymentStatus: status };
       const idx = this.installments.findIndex(i => i.id === updated.id);
       if (idx >= 0) this.installments[idx] = installmentWithStatus;
+      else this.installments.push(installmentWithStatus);
     }
     this.closeEditModal();
+    this.recalculateProjectTotal();
   }
 
   deleteSelectedInstallments() {
@@ -172,16 +191,17 @@ export class PaymentsComponent implements OnInit {
           error: err => console.error('Erro ao excluir parcela', err)
         });
       });
-    alert('Parcelas excluídas com sucesso!'); this.clearSelection(); location.reload();
+    this.toast.showSuccess('Parcelas excluídas com sucesso!'); this.clearSelection(); location.reload();
+    this.recalculateProjectTotal();
   }
 
   deleteInstallment(id: number): void {
     if (!confirm('Deseja realmente excluir esta parcela?')) return;
     this.installmentService.deleteInstallment(id).subscribe({
       next: () => {
-        alert('Parcela excluída com sucesso!');
+        this.toast.showSuccess('Parcela excluída com sucesso!');
         this.installments = this.installments.filter(i => i.id !== id);
-        location.reload();
+        this.recalculateProjectTotal();
       },
       error: (err) => this.toast.showError('Erro ao excluir parcela: ' + (err.error?.message || err.message))
     });
@@ -189,7 +209,7 @@ export class PaymentsComponent implements OnInit {
 
   payInstallment(installment: SelectableInstallment): void {
     if (!installment.paymentMethod) {
-      alert('Esta parcela não possui método de pagamento definido.');
+      this.toast.showError('Esta parcela não possui método de pagamento definido.');
       return;
     }
 

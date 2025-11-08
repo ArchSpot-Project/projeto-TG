@@ -12,14 +12,6 @@
       <img src="/assets/img/icons/plus-circle.svg" alt="+" width="20" height="20">
     </a>
   </div>
-
-  <!-- botão de upload -->
-  <div *ngIf="shouldShowUploadButton()">
-    <button class="btn btn-sm btn-light d-flex align-items-center me-1" (click)="uploadFile()">
-      <img src="/assets/img/icons/upload.svg" width="16" height="16" class="me-1">
-      <span>Fazer Upload</span>
-    </button>
-  </div>
 </nav>
 
 <!-- Subdiretórios (segunda linha de abas) -->
@@ -40,7 +32,9 @@
 
 <!-- Conteúdo -->
 <div class="tab-content border border-top-0 p-2 pt-0 mt-0">
-  <app-table *ngIf="activeTabId" [directoryId]="activeTabId" [projectId]="projectId"></app-table>
+  <app-table *ngIf="activeTabId" [directoryId]="activeTabId" [directoryType]="directoryType" [projectId]="projectId"
+    [activeRootId]="activeRoot?.id">
+  </app-table>
 </div>
 
 <!-- Context Menu -->

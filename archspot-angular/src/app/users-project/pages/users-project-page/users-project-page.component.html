@@ -4,7 +4,7 @@
     <div class="mb-6">
       <h3 class="fw-light text-gray-600">{{ project?.name || 'Carregando projeto...' }}</h3>
       <hr class="my-3 w-48 mx-auto" />
-      <h3 class="font-semibold text-lg mb-4">Colaboradores do Projeto</h3>
+      <h3 class="font-semibold text-lg mb-4">Participantes do Projeto</h3>
     </div>
 
     <div *ngIf="!loading" class="w-full max-w-5xl flex flex-col items-center">
@@ -47,7 +47,7 @@
       </div>
 
       <button class="btn btn-success mt-4" *ngIf="isAdmInProject" (click)="openAddUserModal()">
-        Adicionar colaborador
+        Adicionar participante
       </button>
     </div>
 

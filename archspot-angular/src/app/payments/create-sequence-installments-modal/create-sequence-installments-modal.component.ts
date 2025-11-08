@@ -45,7 +45,7 @@ export class CreateSequenceInstallmentsModalComponent {
 
   createSequence() {
     if (!this.totalAmount || !this.numberOfInstallments || !this.startDate || !this.paymentMethod || !this.sequenceDescription) {
-      alert('Preencha todos os campos.');
+      this.toast.showError('Preencha todos os campos.');
       return;
     }
 

@@ -25,6 +25,15 @@
     </div>
 
     <div class="mb-3">
+      <label class="form-label">Status</label>
+      <select class="form-select" [(ngModel)]="cloned.paymentStatus">
+        <option *ngFor="let status of paymentStatuses" [ngValue]="status">
+          {{ status | paymentStatus }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
       <label class="form-label">Previsão de Pagamento</label>
       <input type="date" class="form-control" [(ngModel)]="cloned.estimatedPaymentDate" />
     </div>

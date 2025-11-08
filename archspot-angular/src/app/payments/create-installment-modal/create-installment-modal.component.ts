@@ -46,7 +46,7 @@ export class CreateInstallmentModalComponent {
 
   createInstallment(): void {
     if (!this.amount || !this.estimatedPaymentDate) {
-      alert('Preencha todos os campos obrigatórios!');
+      this.toast.showError('Preencha todos os campos obrigatórios!');
       return;
     }
 
@@ -59,10 +59,9 @@ export class CreateInstallmentModalComponent {
       paymentStatus: 'PENDING'
     }).subscribe({
       next: (created) => {
-        alert('Parcela criada com sucesso!');
         this.installmentCreated.emit(created);
         this.cancel();
-        location.reload();
+        this.toast.showSuccess('Parcela criada com sucesso!');
       },
       error: (err) => this.toast.showError('Erro ao criar parcela: ' + (err.error?.message || err.message))
     });

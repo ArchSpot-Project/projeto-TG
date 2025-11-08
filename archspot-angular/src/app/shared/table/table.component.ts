@@ -17,6 +17,7 @@ export class TableComponent implements OnChanges {
   @Input() directoryId!: number;
   @Input() directoryType: 'DOCUMENTS' | 'DRAWINGS' = 'DOCUMENTS';
   @Input() projectId!: number;
+  @Input() activeRootId?: number;
 
   documents: DocumentDTO[] = [];
   userCache: { [id: number]: string } = {};
@@ -173,10 +174,25 @@ export class TableComponent implements OnChanges {
 
       const description = prompt('Descrição da nova versão:', doc.description) ?? '';
 
+      let baseName = doc.name.replace(/\s\(\d+\)(\.[^/.]+)?$/, '');
+      const ext = doc.name.includes('.') ? doc.name.slice(doc.name.lastIndexOf('.')) : '';
+
+      const sameBase = this.documents
+        .map(d => this.getDisplayName(d.name))
+        .filter(name => name.startsWith(baseName));
+
+      const nextVersion = sameBase.length + 1;
+      const newFileName = `${baseName} (${nextVersion})${ext}`;
+
       this.documentService.uploadNewVersion(doc.id, file, description).subscribe({
         next: () => {
-          alert('Nova versão enviada com sucesso!');
-          this.loadDocuments();
+          this.documentService.updateDocument(doc.id, { ...doc, name: newFileName }).subscribe({
+            next: () => {
+              alert(`Nova versão "${newFileName}" enviada com sucesso!`);
+              this.loadDocuments();
+            },
+            error: () => this.toast.showError('Erro ao renomear nova versão.')
+          });
         },
         error: (err) => {
           console.error('Erro ao substituir documento:', err);
@@ -213,5 +229,47 @@ export class TableComponent implements OnChanges {
       },
       error: () => this.toast.showError('Erro ao deletar documento.')
     });
+  }
+
+  uploadFile() {
+    if (!this.directoryId || !this.userId) return;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const description = prompt('Digite uma descrição para o documento:') || '';
+      this.documentService.uploadDocument(this.directoryId, file, this.userId!, description)
+        .subscribe({
+          next: () => {
+            this.toast.showSuccess(`Documento "${file.name}" enviado com sucesso!`);
+            this.loadDocuments();
+          },
+          error: (err) => {
+            console.error(err);
+            this.toast.showError('Erro ao enviar documento.');
+          }
+        });
+    };
+    input.click();
+  }
+
+  shouldShowUploadButton(): boolean {
+    const role = this.currentUserRoleInProject;
+    if (!role || !this.directoryId) return false;
+
+    if (this.directoryType === 'DOCUMENTS') {
+      return ['ADMIN', 'STAFF', 'EXTERNAL_COLLABORATOR', 'CUSTOMER'].includes(role);
+    }
+
+    if (this.directoryType === 'DRAWINGS') {
+      // não permitir upload na raiz
+      const isRoot = this.activeRootId === this.directoryId;
+      return ['ADMIN', 'STAFF', 'EXTERNAL_COLLABORATOR'].includes(role) && !isRoot;
+    }
+
+    return false;
   }
 }
