@@ -4,6 +4,7 @@ import { DocumentService } from '../../core/services/document.service';
 import { TableComponent } from '../../shared/table/table.component';
 import { DirectoryDTO } from '../../core/models/directory.model';
 import { UserProjectService } from '../../core/services/user-project.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-directory',
@@ -35,7 +36,8 @@ export class DirectoryComponent implements OnInit {
   constructor(
     private directoryService: DirectoryService,
     private userProjectService: UserProjectService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -70,10 +72,10 @@ export class DirectoryComponent implements OnInit {
       next: (dir) => {
         parentDir.subdirectories = parentDir.subdirectories || [];
         parentDir.subdirectories.push(dir);
-        alert('Subdiretório criado com sucesso!');
+        this.toast.showSuccess('Subdiretório criado com sucesso!');
         location.reload();
       },
-      error: err => { console.error(err); alert('Erro ao criar subdiretório.'); }
+      error: err => { console.error(err); this.toast.showError('Erro ao criar subdiretório.'); }
     });
   }
 
@@ -100,10 +102,10 @@ export class DirectoryComponent implements OnInit {
       next: (dir) => {
         this.directories.push(dir);
         this.setActiveTab(dir);
-        alert('Diretório criado com sucesso!');
+        this.toast.showSuccess('Diretório criado com sucesso!');
         location.reload();
       },
-      error: err => { console.error(err); alert('Erro ao criar diretório.'); }
+      error: err => { console.error(err); this.toast.showError('Erro ao criar diretório.'); }
     });
   }
 
@@ -113,8 +115,8 @@ export class DirectoryComponent implements OnInit {
     if (!newName || newName === dir.name) return;
 
     this.directoryService.renameDirectory(dir.id, newName).subscribe({
-      next: (updated) => { dir.name = updated.name; alert('Nome atualizado com sucesso!'); location.reload(); },
-      error: err => { console.error(err); alert('Erro ao renomear diretório.'); }
+      next: (updated) => { dir.name = updated.name; this.toast.showSuccess('Nome atualizado com sucesso!'); location.reload(); },
+      error: err => { console.error(err); this.toast.showError('Erro ao renomear diretório.'); }
     });
   }
 
@@ -124,12 +126,12 @@ export class DirectoryComponent implements OnInit {
 
     this.directoryService.deleteDirectory(dir.id).subscribe({
       next: () => {
-        alert('Diretório excluído!');
+        this.toast.show('Diretório excluído!');
         this.directories = this.directories.filter(d => d.id !== dir.id);
         if (this.directories.length) this.setActiveTab(this.directories[0]);
         location.reload();
       },
-      error: () => alert('Erro ao excluir diretório.')
+      error: () => this.toast.showError('Erro ao excluir diretório.')
     });
   }
 
@@ -160,10 +162,10 @@ export class DirectoryComponent implements OnInit {
       this.documentService.uploadDocument(this.activeTabId!, file, this.userId!, description)
         .subscribe({
           next: () => {
-            alert(`Documento "${file.name}" enviado com sucesso!`);
+            this.toast.showSuccess(`Documento "${file.name}" enviado com sucesso!`);
             this.tableComponent.loadDocuments();
           },
-          error: err => { console.error(err); alert('Erro ao enviar documento.'); }
+          error: err => { console.error(err); this.toast.showError('Erro ao enviar documento.'); }
         });
     };
     input.click();

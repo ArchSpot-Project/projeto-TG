@@ -5,6 +5,7 @@ import { Album } from '../core/models/album.model';
 import { ProjectService } from '../core/services/project.service';
 import { AuthService } from '../core/services/auth.service';
 import { UserProjectService } from '../core/services/user-project.service';
+import { ToastService } from '../core/services/toast.service';
 
 @Component({
   selector: 'app-album',
@@ -31,7 +32,8 @@ export class AlbunsComponent implements OnInit {
     private albumService: AlbumService,
     private projectService: ProjectService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class AlbunsComponent implements OnInit {
         this.saveCreatedAlbumId(album.id);
         const modal = document.getElementById('modalCriarAlbum');
         if (modal) (window as any).bootstrap.Modal.getInstance(modal).hide();
-        alert(`Álbum "${album.name}" criado com sucesso.`);
+        this.toast.showSuccess(`Álbum "${album.name}" criado com sucesso.`);
         this.newAlbum = { name: '', description: '' };
       },
       error: (err) => console.error('Erro ao criar álbum', err)
@@ -160,7 +162,7 @@ export class AlbunsComponent implements OnInit {
 
   deleteAlbum(album: Album) {
     if (!this.canDeleteAlbum(album)) {
-      alert('Você não tem permissão para excluir este álbum.');
+      this.toast.showWarning('Você não tem permissão para excluir este álbum.');
       return;
     }
 
@@ -171,7 +173,7 @@ export class AlbunsComponent implements OnInit {
       next: () => {
         this.albums = this.albums.filter(a => a.id !== album.id);
         this.removeCreatedAlbumId(album.id);
-        alert("Álbum excluído com sucesso.");
+        this.toast.showSuccess("Álbum excluído com sucesso.");
         location.reload();
       },
       error: (err) => console.error('Erro ao deletar álbum', err)

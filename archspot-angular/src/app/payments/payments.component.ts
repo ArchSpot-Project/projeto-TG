@@ -6,6 +6,7 @@ import { InstallmentResponse, PaymentMethod, PaymentStatus } from '../core/model
 import { ProjectResponse } from '../core/models/project.model';
 import { InstallmentService } from '../core/services/installment.service';
 import { ProjectService } from '../core/services/project.service';
+import { ToastService } from '../core/services/toast.service';
 
 interface SelectableInstallment extends InstallmentResponse {
   selected?: boolean;
@@ -36,7 +37,8 @@ export class PaymentsComponent implements OnInit {
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private userProjectService: UserProjectService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -182,7 +184,7 @@ export class PaymentsComponent implements OnInit {
         this.installments = this.installments.filter(i => i.id !== id);
         location.reload();
       },
-      error: (err) => alert('Erro ao excluir parcela: ' + (err.error?.message || err.message))
+      error: (err) => this.toast.showError('Erro ao excluir parcela: ' + (err.error?.message || err.message))
     });
   }
 
@@ -201,7 +203,7 @@ export class PaymentsComponent implements OnInit {
       },
       error: err => {
         console.error('Erro ao pagar parcela', err);
-        alert('Erro ao marcar parcela como paga.');
+        this.toast.showError('Erro ao marcar parcela como paga.');
       }
     });
   }
