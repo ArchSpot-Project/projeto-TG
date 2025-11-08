@@ -58,7 +58,21 @@ export class AuthService {
     sessionStorage.setItem(this.userKey, JSON.stringify(user));
   }
 
-  register(data: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data);
+  register(data: any, file?: File): Observable<any> {
+    const formData = new FormData();
+
+    // adiciona campos de texto
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) {
+        formData.append(key, data[key]);
+      }
+    });
+
+    // adiciona a imagem (se houver)
+    if (file) {
+      formData.append('profileImage', file);
+    }
+
+    return this.http.post(`${this.apiUrl}/register`, formData);
   }
 }

@@ -49,7 +49,11 @@ public class User {
     @ToString.Exclude
     private String password;
 
-    // Método para encriptar a senha automaticamente de toda instância que for persistida ou atualziada
+    @Column(name = "profile_image")
+    private String fileUrl;
+
+    // Método para encriptar a senha automaticamente de toda instância que for
+    // persistida ou atualziada
     @PrePersist
     @PreUpdate
     private void encryptPassword() {

@@ -12,7 +12,7 @@ export interface User {
   address: string;
   profession: string;
   email: string;
-  userRole: Role;
+  fileUrl: string;
 }
 
 export interface UserDTO {
@@ -23,8 +23,8 @@ export interface UserDTO {
   address: string;
   profession: string;
   email: string;
-  userRole: Role;
   password: string;
+  fileUrl: string;
 }
 
 export interface UserCreateDTO {
@@ -34,8 +34,8 @@ export interface UserCreateDTO {
   address: string;
   profession: string;
   email: string;
-  userRole: Role;
   password: string;
+  fileUrl: string;
 }
 
 // Interface opcional só para criação/login (sugestao GPT):

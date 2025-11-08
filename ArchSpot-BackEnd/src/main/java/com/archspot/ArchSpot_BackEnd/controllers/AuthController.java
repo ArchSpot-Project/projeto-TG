@@ -39,8 +39,8 @@ public class AuthController {
     }
   }
 
-  @PostMapping("/register")
-  public ResponseEntity<UserDTO> register(@RequestBody UserCreateDTO dto) {
+  @PostMapping(value = "/register", consumes = "multipart/form-data")
+  public ResponseEntity<UserDTO> register(@ModelAttribute UserCreateDTO dto) {
 
     // criptografa a senha no service
     User user = userService.create(dto);
