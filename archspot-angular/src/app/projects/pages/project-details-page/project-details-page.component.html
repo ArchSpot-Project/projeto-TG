@@ -21,6 +21,11 @@
             <span *ngIf="!editing" class="fw-semibold text-dark">{{ project.description }}</span>
             <textarea *ngIf="editing" [(ngModel)]="tempDescription" class="form-control form-control-sm"></textarea>
           </p>
+
+          <!-- role do usuário logado -->
+          <div *ngIf="currentUserRole" class="text-muted mt-1 fw-normal">
+            Você é: <strong>{{ currentUserRole | roleTranslate }}</strong>
+          </div>
         </div>
 
         <!-- Dropdown e botões -->
