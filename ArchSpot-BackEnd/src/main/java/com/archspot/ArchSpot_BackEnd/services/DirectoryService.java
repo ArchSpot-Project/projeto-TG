@@ -194,4 +194,46 @@ public class DirectoryService {
     }
     return roots;
   }
+
+  // cria diretórios-padrão de projeto
+  @Transactional
+  public void createDefaultDirectories(Project project) {
+    // === DESENHOS ===
+    Directory rootArquitetonico = createDirectoryInternal("Projeto Arquitetônico", DirectoryType.DRAWINGS, project,
+        null);
+    createDirectoryInternal("Estudo Preliminar", DirectoryType.DRAWINGS, project, rootArquitetonico);
+    createDirectoryInternal("Anteprojeto", DirectoryType.DRAWINGS, project, rootArquitetonico);
+    createDirectoryInternal("Projeto Legal", DirectoryType.DRAWINGS, project, rootArquitetonico);
+    createDirectoryInternal("Projeto Executivo", DirectoryType.DRAWINGS, project, rootArquitetonico);
+
+    Directory rootInteriores = createDirectoryInternal("Projeto de Interiores", DirectoryType.DRAWINGS, project, null);
+    createDirectoryInternal("Estudo Preliminar", DirectoryType.DRAWINGS, project, rootInteriores);
+    createDirectoryInternal("Detalhamento Executivo", DirectoryType.DRAWINGS, project, rootInteriores);
+
+    Directory rootComplementares = createDirectoryInternal("Projetos Complementares", DirectoryType.DRAWINGS, project,
+        null);
+    createDirectoryInternal("Projeto Elétrico", DirectoryType.DRAWINGS, project, rootComplementares);
+    createDirectoryInternal("Projeto Hidráulico", DirectoryType.DRAWINGS, project, rootComplementares);
+    createDirectoryInternal("Projeto Estrutural", DirectoryType.DRAWINGS, project, rootComplementares);
+    createDirectoryInternal("Paisagismo", DirectoryType.DRAWINGS, project, rootComplementares);
+
+    // === DOCUMENTOS ===
+    createDirectoryInternal("Proposta Orçamentária", DirectoryType.DOCUMENTS, project, null);
+    createDirectoryInternal("Contrato", DirectoryType.DOCUMENTS, project, null);
+    createDirectoryInternal("Documentação do Terreno", DirectoryType.DOCUMENTS, project, null);
+    createDirectoryInternal("Regimento do Condomínio", DirectoryType.DOCUMENTS, project, null);
+  }
+
+  // Criação interna, sem DTO, usada apenas para a estrutura padrão
+  private Directory createDirectoryInternal(String name, DirectoryType type, Project project, Directory parent) {
+    Directory dir = Directory.builder()
+        .name(name)
+        .type(type)
+        .project(project)
+        .parentDirectory(parent)
+        .creationDate(LocalDateTime.now())
+        .build();
+
+    return directoryRepository.save(dir);
+  }
 }
