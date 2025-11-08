@@ -46,7 +46,7 @@ public class DocumentService {
   // buscar documentos por diretório
   public List<DocumentDTO> findByDirectory(Long directoryId) {
     directoryRepository.findById(directoryId)
-        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
 
     return documentRepository.findByDirectoryId(directoryId).stream()
         .map(this::toDTO)
@@ -65,7 +65,7 @@ public class DocumentService {
     User currentUser = SecurityUtils.getCurrentUser();
 
     Directory directory = directoryRepository.findById(dto.getDirectoryId())
-        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
 
     Document document = Document.builder()
         .name(dto.getName())
@@ -152,7 +152,13 @@ public class DocumentService {
     User currentUser = SecurityUtils.getCurrentUser();
 
     Directory directory = directoryRepository.findById(directoryId)
-        .orElseThrow(() -> new ResourceNotFoundException( "Directory not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Directory not found"));
+
+    // Validação: proibir upload em diretórios raiz de DRAWINGS
+    if (directory.getType() == DirectoryType.DRAWINGS && directory.getParentDirectory() == null) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+          "Uploads are not allowed in root DRAWINGS directories.");
+    }
 
     // garante que o diretório está vinculado a um projeto
     if (directory.getProject() == null) {
