@@ -3,6 +3,7 @@ import { forkJoin } from 'rxjs';
 import { ProjectService } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserResponse } from '../../core/services/search-user.service';
+import { CreateProjectRequest } from '../../core/models/project.model';
 
 @Component({
   selector: 'app-create-project-modal',
@@ -19,8 +20,6 @@ export class CreateProjectModalComponent implements OnInit {
   roles: string[] = ['STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
   projectName: string = '';
   projectDescription: string = '';
-  estimatedStartDate: string = '';
-  estimatedEndDate: string = '';
 
   showAddModal: boolean = false;
   users: { id: number; name: string; role: string }[] = [];
@@ -28,7 +27,7 @@ export class CreateProjectModalComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     if (!this.currentUserId || !this.currentUserName) {
@@ -56,7 +55,6 @@ export class CreateProjectModalComponent implements OnInit {
     this.showAddModal = false;
   }
 
-  //adicionar usuarios ao projeto - incluindo o usuário corrente
   handleAddUser(data: { user: UserResponse; role: string }) {
     const userObj = {
       id: data.user.id,
@@ -78,34 +76,14 @@ export class CreateProjectModalComponent implements OnInit {
     if (!this.projectName.trim()) {
       alert('O nome do projeto é obrigatório.');
       return;
-    } else if (!this.estimatedStartDate) {
-      alert('A data de início é obrigatória.');
-      return;
-    } else if (!this.estimatedEndDate) {
-      alert('A data de término é obrigatória.');
-      return;
     }
 
-    //validação de datas
-    if (this.estimatedStartDate && this.estimatedEndDate) {
-      const start = new Date(this.estimatedStartDate);
-      const end = new Date(this.estimatedEndDate);
-      if (start > end) {
-        alert('A data de início não pode ser maior que a data de término.');
-        return;
-      }
-    }
-
-    //dados do projeto a ser criado
-    const projectData = {
+    const projectData: CreateProjectRequest = {
       name: this.projectName,
       description: this.projectDescription,
-      estimatedStartDate: this.estimatedStartDate,
-      estimatedEndDate: this.estimatedEndDate,
       status: 'PLANNED'
     };
 
-    //criando projeto
     this.projectService.createProject(projectData).subscribe({
       next: (project) => {
         const assignments = [];
@@ -153,7 +131,5 @@ export class CreateProjectModalComponent implements OnInit {
   private resetForm(): void {
     this.projectName = '';
     this.projectDescription = '';
-    this.estimatedStartDate = '';
-    this.estimatedEndDate = '';
   }
 }

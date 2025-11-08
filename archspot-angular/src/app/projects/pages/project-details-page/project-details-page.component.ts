@@ -11,7 +11,6 @@ import { ProjectResponse } from "../../../core/models/project.model";
   templateUrl: './project-details-page.component.html',
   styleUrls: ['./project-details-page.component.css']
 })
-
 export class ProjectDetailsPageComponent {
   currentUser?: User | null;
   project?: ProjectResponse;
@@ -102,7 +101,7 @@ export class ProjectDetailsPageComponent {
     });
   }
 
-  //cancela a edição
+  // cancela a edição
   cancelEdit(): void {
     this.editing = false;
   }
@@ -145,4 +144,29 @@ export class ProjectDetailsPageComponent {
       error: (err) => console.error('Erro ao excluir projeto:', err)
     });
   }
+
+  getDateLabel(type: 'start' | 'end'): string {
+    if (!this.project) return type === 'start' ? 'Início:' : 'Fim:';
+
+    const hasReal = type === 'start' ? this.project.realStartDate : this.project.realEndDate;
+    const hasEstimated = type === 'start' ? this.project.estimatedStartDate : this.project.estimatedEndDate;
+
+    if (hasReal) return type === 'start' ? 'Início real:' : 'Término real:';
+    if (hasEstimated) return type === 'start' ? 'Início estimado:' : 'Término estimado:';
+    return type === 'start' ? 'Início:' : 'Fim:';
+  }
+
+  getDateToDisplay(type: 'start' | 'end'): string | null {
+    if (!this.project) return null;
+
+    const real = type === 'start' ? this.project.realStartDate : this.project.realEndDate;
+    const estimated = type === 'start' ? this.project.estimatedStartDate : this.project.estimatedEndDate;
+
+    const dateValue = real || estimated;
+    if (!dateValue) return null;
+
+    const parsedDate = new Date(dateValue);
+    return parsedDate.toLocaleDateString('pt-BR');
+  }
+
 }

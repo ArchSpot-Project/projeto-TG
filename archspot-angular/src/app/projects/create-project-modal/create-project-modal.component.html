@@ -4,34 +4,37 @@
     <hr />
 
     <label class="fs-6 fw-semibold modal-label2">Nome</label>
-    <input type="text" class="form-control mt-1 mb-3" [(ngModel)]="projectName" placeholder="Nome do projeto" />
+    <input
+      type="text"
+      class="form-control mt-1 mb-3"
+      [(ngModel)]="projectName"
+      placeholder="Nome do projeto"
+    />
 
     <label class="fs-6 fw-semibold modal-label">Descrição</label>
-    <textarea class="form-control mt-1 mb-3" [(ngModel)]="projectDescription"
-      placeholder="Descrição do projeto"></textarea>
+    <textarea
+      class="form-control mt-1 mb-3"
+      [(ngModel)]="projectDescription"
+      placeholder="Descrição do projeto"
+    ></textarea>
 
-    <div class="row mb-3">
-      <div class="col">
-        <label class="fs-6 fw-semibold modal-label2">Previsão de início</label>
-        <input type="date" class="form-control mt-1" [(ngModel)]="estimatedStartDate"
-          [max]="estimatedEndDate || null"/>
-      </div>
-      <div class="col">
-        <label class="fs-6 fw-semibold modal-label2">Previsão de término</label>
-        <input type="date" class="form-control mt-1" [(ngModel)]="estimatedEndDate"
-          [min]="estimatedStartDate || null"/>
-      </div>
-    </div>
+    <button class="btn btn-secondary mb-3" (click)="openAddUserModal()">
+      Adicionar colaboradores
+    </button>
 
-    <button class="btn btn-secondary mb-3" (click)="openAddUserModal()">Adicionar colaboradores</button>
+    <app-add-user-modal
+      [roles]="roles"
+      [show]="showAddModal"
+      (close)="cancelAdd()"
+      (addUser)="handleAddUser($event)"
+    ></app-add-user-modal>
 
-    <app-add-user-modal [roles]="roles" [show]="showAddModal" (close)="cancelAdd()" (addUser)="handleAddUser($event)">
-    </app-add-user-modal>
-
-    <!-- equipe (colaboradores adicionados até o momento) -->
     <label class="fs-6 fw-semibold modal-label2">Equipe</label>
     <div class="collaborators-container">
-      <table class="table table-zebra w-full table-auto" *ngIf="users.length > 0; else emptyState">
+      <table
+        class="table table-zebra w-full table-auto"
+        *ngIf="users.length > 0; else emptyState"
+      >
         <thead>
           <tr>
             <th class="w-1/12">ID</th>
@@ -44,18 +47,18 @@
           <tr *ngFor="let user of users">
             <td>{{ user.id }}</td>
             <td>{{ user.name }}</td>
-            <td>{{ user.role | roleTranslate}}</td>
+            <td>{{ user.role | roleTranslate }}</td>
             <td class="text-center">
-              <button class="btn btn-sm btn-danger" (click)="removeUser(user.id)">Remover</button>
+              <button class="btn btn-sm btn-danger" (click)="removeUser(user.id)">
+                Remover
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
 
       <ng-template #emptyState>
-        <div class="empty-state">
-          Nenhum colaborador adicionado.
-        </div>
+        <div class="empty-state">Nenhum colaborador adicionado.</div>
       </ng-template>
     </div>
 

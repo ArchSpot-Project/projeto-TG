@@ -37,3 +37,97 @@
 .context-menu li:hover {
   background-color: #f0f0f0;
 }
+
+/* RESPONSIVIDADE */
+@media (max-width: 991px) {
+  .nav-tabs {
+    flex-wrap: wrap;
+  }
+
+  .nav-tabs .nav-link {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  nav.d-flex {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  nav .btn {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .nav-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #dee2e6;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .nav-tabs::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+  }
+
+  .nav-tabs .nav-link {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+    flex-shrink: 0;
+  }
+
+  nav.d-flex {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  nav.d-flex::-webkit-scrollbar {
+    display: none;
+  }
+
+  nav .btn {
+    flex-shrink: 0;
+    padding: 0.35rem;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  nav .btn span,
+  nav .btn img + * {
+    display: none !important;
+  }
+
+  nav .btn img {
+    margin-right: 0 !important;
+  }
+
+  nav.d-flex .nav {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .context-menu {
+    min-width: 140px;
+    font-size: 0.85rem;
+  }
+
+  .context-menu li {
+    padding: 8px;
+  }
+}

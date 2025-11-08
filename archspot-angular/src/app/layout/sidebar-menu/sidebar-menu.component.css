@@ -1,0 +1,25 @@
+@media (max-width: 991px) {
+  nav ul li a {
+    font-size: 0 !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+  }
+
+  nav ul li a img {
+    margin: 0 !important;
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  nav ul li.fw-semibold.text-secondary {
+    display: none !important;
+  }
+
+  nav ul {
+    padding-left: 0;
+  }
+
+  nav.bg-white.rounded-2.p-4 {
+    padding: 0.5rem !important;
+  }
+}

@@ -1,14 +1,15 @@
 export interface ProjectResponse {
   id: number;
   name: string;
+  description?: string;
   estimatedStartDate?: Date;
   estimatedEndDate?: Date;
   realStartDate?: Date;
   realEndDate?: Date;
-  description?: string;
   totalValue?: number;
-  status?: string;
+  status: string;
   phases?: any[];
+  installments?: any[];
 }
 
 export interface UserProjectResponse {
@@ -22,8 +23,8 @@ export interface UserProjectResponse {
 
 export interface CreateProjectRequest {
   name: string;
-  estimatedStartDate: string;
-  estimatedEndDate: string;
   description?: string;
+  estimatedStartDate?: string | null;
+  estimatedEndDate?: string | null;
   status?: string;
 }
