@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { InstallmentService } from '../../core/services/installment.service';
 import { InstallmentRequest, InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-edit-installment-modal',
@@ -24,7 +25,7 @@ export class EditInstallmentModalComponent implements OnChanges {
 
   cloned!: InstallmentResponse;
 
-  constructor(private installmentService: InstallmentService) { }
+  constructor(private installmentService: InstallmentService, private toast: ToastService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['installment'] && this.installment) {
@@ -57,7 +58,7 @@ export class EditInstallmentModalComponent implements OnChanges {
         this.updated.emit(res);
         location.reload();
       },
-      error: (err) => alert('Erro ao atualizar parcela: ' + (err.error?.message || err.message))
+      error: (err) => this.toast.showError('Erro ao atualizar parcela: ' + (err.error?.message || err.message))
     });
   }
 }

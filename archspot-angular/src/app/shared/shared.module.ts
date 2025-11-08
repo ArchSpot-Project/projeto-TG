@@ -18,6 +18,8 @@ import { DirectoryComponent } from './directory/directory.component';
 import { DateDashPipe } from '../core/pipes/date.pipe';
 import { DirectoryNodeComponent } from './directory/directory-node/directory-node.component';
 import { SafeUrlPipe } from '../core/pipes/safe-url.pipe';
+import { ToastContainerComponent } from './toast-container/toast-container.component';
+import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -37,12 +39,14 @@ import { SafeUrlPipe } from '../core/pipes/safe-url.pipe';
     DateDashPipe,
     AddUserModalComponent,
     DirectoryComponent,
-    DirectoryNodeComponent
+    DirectoryNodeComponent,
+    ToastContainerComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
-    NgxMaskDirective
+    NgxMaskDirective,
+    NgbToastModule,
   ],
   exports: [
     ProjectStatusBarComponent,
@@ -50,6 +54,7 @@ import { SafeUrlPipe } from '../core/pipes/safe-url.pipe';
     SectionTitleComponent,
     CreateProjectModalComponent,
     TableComponent,
+    ToastContainerComponent,
     StatusTranslatePipe,
     SafeUrlPipe,
     PaymentMethodPipe,

@@ -4,6 +4,7 @@ import { ProjectService } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserResponse } from '../../core/services/search-user.service';
 import { CreateProjectRequest } from '../../core/models/project.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-create-project-modal',
@@ -26,7 +27,8 @@ export class CreateProjectModalComponent implements OnInit {
 
   constructor(
     private projectService: ProjectService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +39,7 @@ export class CreateProjectModalComponent implements OnInit {
         this.currentUserName = user.name;
       } else {
         console.error('Usuário não autenticado');
-        alert('Erro: usuário não logado.');
+        this.toast.showError('Erro: usuário não logado.');
       }
     }
   }
@@ -74,7 +76,7 @@ export class CreateProjectModalComponent implements OnInit {
 
   createProject(): void {
     if (!this.projectName.trim()) {
-      alert('O nome do projeto é obrigatório.');
+      this.toast.showWarning('O nome do projeto é obrigatório.');
       return;
     }
 
@@ -104,7 +106,7 @@ export class CreateProjectModalComponent implements OnInit {
 
         forkJoin(assignments).subscribe({
           next: () => {
-            alert(`Projeto "${project.name}" criado com sucesso!`);
+            this.toast.showSuccess(`Projeto "${project.name}" criado com sucesso!`);
             this.projectCreated.emit();
             this.resetForm();
             this.users = [];
@@ -113,7 +115,7 @@ export class CreateProjectModalComponent implements OnInit {
           },
           error: (err) => {
             console.error('Erro ao associar usuários:', err);
-            alert('Projeto criado, mas os usuários não foram associados.');
+            this.toast.showWarning('Projeto criado, mas os usuários não foram associados.');
             this.projectCreated.emit();
             this.resetForm();
             this.users = [];
@@ -123,7 +125,7 @@ export class CreateProjectModalComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao criar projeto:', err);
-        alert('Erro ao criar projeto.');
+        this.toast.showError('Erro ao criar projeto.');
       }
     });
   }

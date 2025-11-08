@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserService } from '../../core/services/user.service';
 import { Role, UserCreateDTO, UserDTO } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-modal-cadastro',
@@ -16,7 +17,8 @@ export class ModalCadastroComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) { }
 
   @Input() isEditMode: boolean = false;
@@ -65,7 +67,7 @@ export class ModalCadastroComponent implements OnInit {
   onSubmit(form: NgForm) {
     this.passwordsDoNotMatch = this.password !== this.confirmPassword;
     if (form.invalid || this.passwordsDoNotMatch) {
-      alert('Formulário inválido ou senhas distintas.');
+      this.toast.showWarning('Formulário inválido ou senhas distintas.');
       return;
     }
 
@@ -84,25 +86,25 @@ export class ModalCadastroComponent implements OnInit {
       this.userService.updateUser(this.userData.id, newUser, this.selectedFile!).subscribe({
         next: (updatedUser) => {
           this.authService.setCurrentUser(updatedUser);
-          alert('Perfil atualizado com sucesso!');
+          this.toast.showSuccess('Perfil atualizado com sucesso!');
           this.activeModal.close();
           location.reload();
         },
         error: (err) => {
           const msg = err?.error?.message || err?.message || '';
-          alert(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao atualizar perfil.');
+          this.toast.showError(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao atualizar perfil.');
           console.error(err);
         }
       });
     } else {
       this.authService.register(newUser, this.selectedFile!).subscribe({
         next: (response) => {
-          alert('Usuário cadastrado com sucesso!');
+          this.toast.showSuccess('Usuário cadastrado com sucesso!');
           this.activeModal.close();
         },
         error: (err) => {
           const msg = err?.error?.message || err?.message || '';
-          alert(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao cadastrar usuário.');
+          this.toast.showError(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao cadastrar usuário.');
           console.error(err);
         }
       });
