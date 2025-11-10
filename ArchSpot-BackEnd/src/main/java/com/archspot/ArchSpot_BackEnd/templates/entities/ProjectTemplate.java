@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.util.*;
 
+import com.archspot.ArchSpot_BackEnd.entities.User;
+
 @Entity
 @Table(name = "tb_project_template")
 @Getter
@@ -22,13 +24,19 @@ public class ProjectTemplate {
 
   private String description;
 
+  @ManyToOne
+  @JoinColumn(name = "created_by_id")
+  private User createdBy;
+
+  private boolean isDefault = false;
+
   @ManyToMany
   @JoinTable(name = "project_template_phase_template", joinColumns = @JoinColumn(name = "project_template_id"), inverseJoinColumns = @JoinColumn(name = "phase_template_id"))
-  @OrderBy("sortOrder ASC")
   private List<PhaseTemplate> phaseTemplates = new ArrayList<>();
 
-  public ProjectTemplate(String name, String description) {
+  public ProjectTemplate(String name, String description, User createdBy) {
     this.name = name;
     this.description = description;
+    this.createdBy = createdBy;
   }
 }

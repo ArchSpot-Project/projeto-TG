@@ -3,7 +3,9 @@ package com.archspot.ArchSpot_BackEnd.configs;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -31,6 +33,10 @@ import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserProjectRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.templates.entities.PhaseTemplate;
+import com.archspot.ArchSpot_BackEnd.templates.entities.ProjectTemplate;
+import com.archspot.ArchSpot_BackEnd.templates.repositories.PhaseTemplateRepository;
+import com.archspot.ArchSpot_BackEnd.templates.repositories.ProjectTemplateRepository;
 
 @Configuration
 @Profile("test")
@@ -59,6 +65,12 @@ public class TestConfig implements CommandLineRunner {
 
         @Autowired
         private CommentRepository commentRepository;
+
+        @Autowired
+        private ProjectTemplateRepository projectTemplateRepository;
+
+        @Autowired
+        private PhaseTemplateRepository phaseTemplateRepository;
 
         @Override
         public void run(String... args) throws Exception {
@@ -289,6 +301,59 @@ public class TestConfig implements CommandLineRunner {
                 Comment c3 = new Comment(null, "Ajustar descrição de revestimentos", LocalDateTime.now(), doc2, user1);
 
                 commentRepository.saveAll(Arrays.asList(c1, c2, c3));
+
+                /*
+                 * PHASE TEMPLATES PADRÃO
+                 */
+                List<PhaseTemplate> phases = List.of(
+                                new PhaseTemplate("Levantamento", 15, null),
+                                new PhaseTemplate("Estudo Preliminar", 30, null),
+                                new PhaseTemplate("Anteprojeto", 30, null),
+                                new PhaseTemplate("Projeto Legal", 15, null),
+                                new PhaseTemplate("Projeto Executivo", 45, null),
+                                new PhaseTemplate("Detalhamento de Mobiliário", 20, null),
+                                new PhaseTemplate("Estudo de Layout", 7, null),
+                                new PhaseTemplate("As Built", 7, null),
+                                new PhaseTemplate("Interiores", 40, null),
+                                new PhaseTemplate("Paisagismo", 20, null),
+                                new PhaseTemplate("Pontos Elétricos", 15, null),
+                                new PhaseTemplate("Pontos Hidráulicos", 15, null));
+                phases.forEach(p -> p.setDefault(true));
+                phaseTemplateRepository.saveAll(phases);
+
+                /*
+                 * PROJECT TEMPLATES PADRÃO
+                 * (usam os índices das fases conforme ordem acima, base 1)
+                 */
+                List<ProjectTemplate> projects = new ArrayList<>();
+
+                // Projeto Arquitetônico → [1, 2, 3, 4, 11, 12, 5, 9, 10]
+                ProjectTemplate t1 = new ProjectTemplate("Projeto Arquitetônico", null, null);
+                t1.setDefault(true);
+                t1.getPhaseTemplates().addAll(List.of(
+                                phases.get(0), phases.get(1), phases.get(2), phases.get(3),
+                                phases.get(10), phases.get(11), phases.get(4), phases.get(8), phases.get(9)));
+
+                // Projeto de Interiores → [8, 7, 6]
+                ProjectTemplate t2 = new ProjectTemplate("Projeto de Interiores", null, null);
+                t2.setDefault(true);
+                t2.getPhaseTemplates().addAll(List.of(
+                                phases.get(7), phases.get(6), phases.get(5)));
+
+                // Projeto Comercial → [8, 2, 11, 6]
+                ProjectTemplate t3 = new ProjectTemplate("Projeto Comercial", null, null);
+                t3.setDefault(true);
+                t3.getPhaseTemplates().addAll(List.of(
+                                phases.get(7), phases.get(1), phases.get(10), phases.get(5)));
+
+                // Projeto de Reforma → [8, 2, 11, 12, 4]
+                ProjectTemplate t4 = new ProjectTemplate("Projeto de Reforma", null, null);
+                t4.setDefault(true);
+                t4.getPhaseTemplates().addAll(List.of(
+                                phases.get(7), phases.get(1), phases.get(10), phases.get(11), phases.get(3)));
+
+                projects.addAll(List.of(t1, t2, t3, t4));
+                projectTemplateRepository.saveAll(projects);
         }
 
 }

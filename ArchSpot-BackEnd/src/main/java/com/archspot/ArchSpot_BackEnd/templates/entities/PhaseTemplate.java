@@ -1,5 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.templates.entities;
 
+import com.archspot.ArchSpot_BackEnd.entities.User;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +22,15 @@ public class PhaseTemplate {
 
   private Integer defaultDurationDays;
 
-  private Integer sortOrder;
+  @ManyToOne
+  @JoinColumn(name = "created_by_id")
+  private User createdBy;
 
-  public PhaseTemplate(String name, Integer defaultDurationDays, Integer sortOrder) {
+  private boolean isDefault = false;
+
+  public PhaseTemplate(String name, Integer defaultDurationDays, User createdBy) {
     this.name = name;
     this.defaultDurationDays = defaultDurationDays;
-    this.sortOrder = sortOrder;
+    this.createdBy = createdBy;
   }
 }

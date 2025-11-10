@@ -1,5 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.templates.services;
 
+import com.archspot.ArchSpot_BackEnd.entities.User;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.templates.dtos.PhaseTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.templates.dtos.ProjectTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.templates.entities.*;
@@ -8,9 +10,12 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TemplateService {
@@ -45,6 +50,8 @@ public class TemplateService {
     ProjectTemplate projectTemplate = new ProjectTemplate();
     projectTemplate.setName(dto.getName());
     projectTemplate.setDescription(dto.getDescription());
+    projectTemplate.setCreatedBy(SecurityUtils.getCurrentUser());
+    projectTemplate.setDefault(false);
     if (dto.getPhases() != null) {
       List<PhaseTemplate> phases = dto.getPhases().stream()
           .map(p -> phaseTemplateRepository.findById(p.getId())
@@ -108,6 +115,8 @@ public class TemplateService {
     PhaseTemplate phaseTemplate = new PhaseTemplate();
     phaseTemplate.setName(dto.getName());
     phaseTemplate.setDefaultDurationDays((dto.getDefaultDurationDays()));
+    phaseTemplate.setCreatedBy(SecurityUtils.getCurrentUser());
+    phaseTemplate.setDefault(false);
     PhaseTemplate saved = phaseTemplateRepository.save(phaseTemplate);
     return toPhaseTemplateDTO(saved);
   }
@@ -137,19 +146,15 @@ public class TemplateService {
     dto.setId(projectTemplate.getId());
     dto.setName(projectTemplate.getName());
     dto.setDescription(projectTemplate.getDescription());
-
-    // Evita NPE e garante lista ordenada
-    if (projectTemplate.getPhaseTemplates() != null && !projectTemplate.getPhaseTemplates().isEmpty()) {
-      dto.setPhases(
-          projectTemplate.getPhaseTemplates().stream()
-              .filter(Objects::nonNull)
-              .sorted(Comparator.comparing(
-                  pt -> pt.getSortOrder() != null ? pt.getSortOrder() : Integer.MAX_VALUE))
-              .map(this::toPhaseTemplateDTO)
-              .toList());
-    } else {
-      dto.setPhases(List.of());
-    }
+    dto.setPhases(
+        Optional.ofNullable(projectTemplate.getPhaseTemplates())
+            .orElse(List.of())
+            .stream()
+            .filter(Objects::nonNull)
+            .map(this::toPhaseTemplateDTO)
+            .toList());
+    dto.setCreatedBy(projectTemplate.getCreatedBy() != null ? projectTemplate.getCreatedBy().getId() : null);
+    dto.setDefault(projectTemplate.isDefault());
     return dto;
   }
 
@@ -160,4 +165,46 @@ public class TemplateService {
     dto.setDefaultDurationDays(phaseTemplate.getDefaultDurationDays());
     return dto;
   }
+
+  /*
+   * Clonagem de templates para um novo usuário
+   */
+
+  @Transactional
+  public void cloneDefaultTemplatesForUser(User newUser) {
+    // Clonar PhaseTemplates padrão
+    List<PhaseTemplate> defaultPhases = phaseTemplateRepository.findByIsDefaultTrue();
+    Map<Long, PhaseTemplate> clonedPhaseMap = new HashMap<>();
+
+    for (PhaseTemplate original : defaultPhases) {
+      PhaseTemplate clone = new PhaseTemplate();
+      clone.setName(original.getName());
+      clone.setDefaultDurationDays(original.getDefaultDurationDays());
+      clone.setCreatedBy(newUser);
+      clone.setDefault(false);
+      clonedPhaseMap.put(original.getId(), phaseTemplateRepository.save(clone));
+    }
+
+    // Clonar ProjectTemplates padrão
+    List<ProjectTemplate> defaultProjects = projectTemplateRepository.findByIsDefaultTrue();
+
+    for (ProjectTemplate original : defaultProjects) {
+      ProjectTemplate clone = new ProjectTemplate();
+      clone.setName(original.getName());
+      clone.setDescription(original.getDescription());
+      clone.setCreatedBy(newUser);
+      clone.setDefault(false);
+
+      // Relaciona as fases clonadas (mantém referência aos clones correspondentes)
+      List<PhaseTemplate> clonedPhases = Optional.ofNullable(original.getPhaseTemplates())
+          .orElse(List.of())
+          .stream()
+          .map(pt -> clonedPhaseMap.getOrDefault(pt.getId(), pt))
+          .collect(Collectors.toList());
+      clone.setPhaseTemplates(clonedPhases);
+
+      projectTemplateRepository.save(clone);
+    }
+  }
+
 }

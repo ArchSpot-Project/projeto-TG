@@ -20,6 +20,7 @@ import com.archspot.ArchSpot_BackEnd.entities.User;
 import com.archspot.ArchSpot_BackEnd.exceptions.DatabaseException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.UserRepository;
+import com.archspot.ArchSpot_BackEnd.templates.services.TemplateService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -33,6 +34,9 @@ public class UserService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private TemplateService templateService;
 
 	// Para consultar todos os usuarios
 	public List<User> findAll() {
@@ -66,7 +70,12 @@ public class UserService {
 			}
 		}
 
-		return repository.save(user);
+		User savedUser = repository.save(user);
+
+		// clonar templates padrão
+		templateService.cloneDefaultTemplatesForUser(savedUser);
+
+		return savedUser;
 	}
 
 	// Para deletar usuario
@@ -79,7 +88,7 @@ public class UserService {
 				throw new ResourceNotFoundException("User not found");
 			}
 		} catch (DataIntegrityViolationException e) {
-			throw new DatabaseException("Usuario já vinculado a um projeto nao podem ser deletados");
+			throw new DatabaseException("Usuário vinculado a projetos não pode ser deletado.");
 		}
 	}
 
@@ -92,8 +101,17 @@ public class UserService {
 			user.setPhone(dto.phone());
 			user.setAddress(dto.address());
 			user.setProfession(dto.profession());
+
+			// Verificar duplicidade de e-mail
+			if (!user.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())) {
+				throw new DatabaseException("E-mail já está em uso");
+			}
 			user.setEmail(dto.email());
-			user.setPassword(dto.password());
+
+			// atualizar senha apenas se infromada
+			if (dto.password() != null && !dto.password().isBlank()) {
+				user.setPassword(passwordEncoder.encode(dto.password()));
+			}
 
 			// Atualizar imagem, se enviada
 			if (profileImage != null && !profileImage.isEmpty()) {
@@ -110,7 +128,7 @@ public class UserService {
 					String imagePath = saveProfileImage(profileImage, dto.email());
 					user.setFileUrl(imagePath);
 				} catch (IOException e) {
-					throw new RuntimeException("Erro ao salvar imagem de perfil", e);
+					throw new DatabaseException("Erro ao salvar imagem de perfil");
 				}
 			}
 
