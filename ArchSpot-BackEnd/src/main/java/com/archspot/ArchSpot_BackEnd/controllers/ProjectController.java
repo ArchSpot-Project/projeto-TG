@@ -25,6 +25,7 @@ import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectCreateFromTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
@@ -111,6 +112,14 @@ public class ProjectController {
       @RequestBody Map<String, String> updates) {
     ProjectResponseDTO updatedProject = projectService.updateTitleAndDescription(id, updates);
     return ResponseEntity.ok(updatedProject);
+  }
+
+  /*
+   * CRIAR PROJETO PELO TEMPLATE
+   */
+  @PostMapping("/from-template")
+  public ResponseEntity<ProjectResponseDTO> createFromTemplate(@RequestBody @Valid ProjectCreateFromTemplateDTO dto) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createFromTemplate(dto));
   }
 
   /*
