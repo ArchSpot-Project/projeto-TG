@@ -17,6 +17,7 @@ export class ProjectDetailsPageComponent {
   loading = true;
   errorMessage = '';
   isAdminInProject = false;
+  currentUserRole: string = '';
 
   // edição
   editing = false;
@@ -36,7 +37,25 @@ export class ProjectDetailsPageComponent {
     this.loadProject();
     const projectId = Number(this.route.snapshot.paramMap.get('id'));
     if (projectId) this.checkIfUserIsAdmin(projectId);
+    if (projectId) this.loadCurrentUserRole(projectId);
   }
+
+  private loadCurrentUserRole(projectId: number): void {
+    if (!this.currentUser?.id) return;
+
+    this.userProjectService.getUsersByProject(projectId).subscribe({
+      next: (users) => {
+        const user = users.find(u => u.userId === this.currentUser?.id);
+        this.currentUserRole = user ? user.role : '';
+        this.isAdminInProject = this.currentUserRole === '';
+      },
+      error: () => {
+        this.currentUserRole = '';
+        this.isAdminInProject = false;
+      }
+    });
+  }
+
 
   loadProject(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

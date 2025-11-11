@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SearchUserService, UserResponse } from '../../core/services/search-user.service';
 import { UserProjectResponse } from '../../core/models/project.model';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -20,7 +21,7 @@ export class AddUserModalComponent {
   selectedUser: UserResponse | null = null;
   selectedRole: string | null = null;
 
-  constructor(private searchUserService: SearchUserService) { }
+  constructor(private searchUserService: SearchUserService, private toast: ToastService) { }
 
   cancel(): void {
     this.show = false;
@@ -70,8 +71,8 @@ export class AddUserModalComponent {
 
     const alreadyAdded = this.existingUsers.some(u => Number(u.userId) === Number(this.selectedUser!.id));
     if (alreadyAdded) {
-      alert('Usuário já está associado ao projeto.');
-      this.cancel();
+      this.toast.showError('Usuário já está associado ao projeto.');
+      this.reset();
       return;
     }
 
@@ -81,7 +82,7 @@ export class AddUserModalComponent {
       if (currentAdmin) {
         const confirmed = confirm(
           `⚠️ ATENÇÃO: você está adicionando o usuário ${this.selectedUser!.name} como GERENTE.\n` +
-          `Sua função será alterada para COLABORADOR.\n` +
+          `Sua função será alterada para COLABORADOR INTERNO.\n` +
           `Deseja continuar?`
         );
         if (!confirmed) return;

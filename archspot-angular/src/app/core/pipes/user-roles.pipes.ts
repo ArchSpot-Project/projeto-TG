@@ -10,11 +10,11 @@ export class RoleTranslatePipe implements PipeTransform {
       case 'ADMIN':
         return 'Gerente';
       case 'STAFF':
-        return 'Colaborador';
+        return 'Colaborador interno';
       case 'CUSTOMER':
         return 'Cliente';
       case 'EXTERNAL_COLLABORATOR':
-        return 'Associado';
+        return 'Colaborador externo';
       default:
         return value;
     }
