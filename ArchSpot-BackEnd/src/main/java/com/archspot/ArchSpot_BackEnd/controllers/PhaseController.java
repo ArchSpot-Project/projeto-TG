@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateAllDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.enums.PhaseStatus;
 import com.archspot.ArchSpot_BackEnd.services.PhaseService;
@@ -40,7 +40,7 @@ public class PhaseController {
   }
 
   @PostMapping
-  public ResponseEntity<PhaseDTO> create(@RequestBody PhaseCreateDTO dto) {
+  public ResponseEntity<PhaseDTO> create(@RequestBody PhaseCreateAllDTO dto) {
     PhaseDTO saved = service.create(dto);
     URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
         .path("/{id}")
@@ -51,7 +51,7 @@ public class PhaseController {
 
   @PutMapping("/{id}")
   public ResponseEntity<PhaseDTO> update(@PathVariable Long id,
-      @RequestBody PhaseCreateDTO dto) {
+      @RequestBody PhaseCreateAllDTO dto) {
     return ResponseEntity.ok(service.update(id, dto));
   }
 

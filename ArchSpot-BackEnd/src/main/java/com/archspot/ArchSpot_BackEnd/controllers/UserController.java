@@ -14,8 +14,6 @@ import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.services.UserProjectService;
 import com.archspot.ArchSpot_BackEnd.services.UserService;
 
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {

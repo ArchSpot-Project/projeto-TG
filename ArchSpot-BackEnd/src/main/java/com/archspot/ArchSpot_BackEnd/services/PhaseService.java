@@ -1,10 +1,12 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -13,11 +15,14 @@ import java.time.LocalDateTime;
 import com.archspot.ArchSpot_BackEnd.enums.*;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateAllDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.templates.dtos.PhaseTemplateDTO;
+import com.archspot.ArchSpot_BackEnd.templates.services.TemplateService;
 
 @Service
 public class PhaseService {
@@ -27,6 +32,9 @@ public class PhaseService {
 
   @Autowired
   private ProjectRepository projectRepository;
+
+  @Autowired
+  private TemplateService templateService;
 
   // consultar todas as fases
   public List<PhaseDTO> findAll() {
@@ -50,7 +58,7 @@ public class PhaseService {
   }
 
   // criar fase
-  public PhaseDTO create(PhaseCreateDTO dto) {
+  public PhaseDTO create(PhaseCreateAllDTO dto) {
     Project project = projectRepository.findById(dto.projectId())
         .orElseThrow(() -> new RuntimeException("Project not found"));
 
@@ -91,8 +99,6 @@ public class PhaseService {
     newPhase.setDescription(dto.description());
     newPhase.setEstimatedStartDate(dto.estimatedStartDate());
     newPhase.setEstimatedEndDate(dto.estimatedEndDate());
-    newPhase.setRealStartDate(dto.realStartDate());
-    newPhase.setRealEndDate(dto.realEndDate());
     newPhase.setDuration(
         (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null)
             ? (int) java.time.temporal.ChronoUnit.DAYS.between(dto.estimatedStartDate(), dto.estimatedEndDate())
@@ -109,8 +115,75 @@ public class PhaseService {
     return toDTO(saved);
   }
 
+  // criar fases pelo template
+  @Transactional
+  public List<Phase> createPhasesFromTemplate(Long projectId, LocalDate estimatedStartDate,
+      List<PhaseCreateDTO> phaseTemplates) {
+    Project project = projectRepository.findById(projectId)
+        .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado: " + projectId));
+
+    if (phaseTemplates == null || phaseTemplates.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nenhum template de etapa foi informado.");
+    }
+
+    // início da primeira fase (se não informado, usa hoje)
+    LocalDate currentStart = estimatedStartDate != null ? estimatedStartDate : LocalDate.now();
+
+    Phase previous = null;
+    List<Phase> savedPhases = new ArrayList<>();
+
+    for (int i = 0; i < phaseTemplates.size(); i++) {
+      PhaseCreateDTO dto = phaseTemplates.get(i);
+
+      if (dto == null || dto.phaseTemplateId() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Cada fase deve informar phaseTemplateId.");
+      }
+
+      // busca o template correspondente (lança 404 se não existir)
+      PhaseTemplateDTO tpl = templateService.findPhaseTemplateById(dto.phaseTemplateId());
+
+      // monta a Phase baseada no template + duração enviada (se houver)
+      Phase phase = new Phase();
+      phase.setProject(project);
+      phase.setName(tpl.getName());
+      phase.setDescription(tpl.getDescription()); // se existir
+      phase.setStatus(PhaseStatus.NOT_STARTED);
+
+      // duração: usa a duração passada pelo front (dto.duration()) se presente,
+      // caso contrário usa a do template; se nenhuma, considera 0
+      Integer durationDays = dto.estimatedDurationDays() != null ? dto.estimatedDurationDays()
+          : (tpl.getDefaultDurationDays() != null ? tpl.getDefaultDurationDays() : 0);
+      phase.setDuration(durationDays);
+
+      // datas estimadas encadeadas:
+      phase.setEstimatedStartDate(currentStart);
+      // definimos fim = start + duration - 1 (subtrai 1 para incluir data de inicio
+      // na duração)
+      phase.setEstimatedEndDate(currentStart.plusDays(durationDays - 1));
+
+      // vincula predecessor encadeado
+      if (previous != null) {
+        phase.setPreviousPhase(previous);
+      }
+
+      // salva imediatamente e obtem id
+      Phase saved = phaseRepository.save(phase);
+      // adiciona à lista de persistência e avança ponteiros
+      savedPhases.add(saved);
+      previous = saved;
+      currentStart = phase.getEstimatedEndDate(); // próxima começa quando esta termina
+    }
+
+    // Depois de salvar, atualiza as datas/status do projeto
+    project.updateDatesAndStatus();
+    projectRepository.save(project);
+
+    return savedPhases;
+  }
+
   // atualizar fase
-  public PhaseDTO update(Long id, PhaseCreateDTO dto) {
+  public PhaseDTO update(Long id, PhaseCreateAllDTO dto) {
     Phase entity = phaseRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Phase not found"));
 
