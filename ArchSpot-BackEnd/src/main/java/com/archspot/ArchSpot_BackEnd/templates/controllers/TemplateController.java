@@ -21,6 +21,11 @@ public class TemplateController {
   }
 
   // === Project Templates ===
+
+  /**
+   * Lista todos os templates de projeto visíveis para o usuário autenticado.
+   * Não inclui templates padrão do sistema (isDefault = true).
+   */
   @GetMapping("/project")
   public ResponseEntity<List<ProjectTemplateDTO>> listProjectTemplates() {
     List<ProjectTemplateDTO> templates = templateService.findAllProjectTemplates();
@@ -55,10 +60,21 @@ public class TemplateController {
   }
 
   // === Phase Templates ===
+
+  /**
+   * Lista todos os templates de etapa visíveis para o usuário autenticado.
+   * Não inclui templates padrão do sistema (isDefault = true).
+   */
   @GetMapping("/phase")
   public ResponseEntity<List<PhaseTemplateDTO>> listPhaseTemplates() {
     List<PhaseTemplateDTO> templates = templateService.findAllPhaseTemplates();
     return ResponseEntity.ok(templates);
+  }
+  
+  @GetMapping("/phase/{id}")
+  public ResponseEntity<PhaseTemplateDTO> getPhaseTemplate(@PathVariable Long id) {
+    PhaseTemplateDTO dto = templateService.findPhaseTemplateById(id);
+    return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
   }
 
   @PostMapping("/phase")

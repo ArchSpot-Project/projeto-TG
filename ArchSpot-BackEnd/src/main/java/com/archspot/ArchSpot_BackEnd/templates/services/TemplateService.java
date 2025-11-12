@@ -34,7 +34,9 @@ public class TemplateService {
    */
 
   public List<ProjectTemplateDTO> findAllProjectTemplates() {
-    return projectTemplateRepository.findAll().stream()
+    User currentUser = SecurityUtils.getCurrentUser();
+    return projectTemplateRepository.findAllByUserId(currentUser.getId())
+        .stream()
         .map(this::toProjectTemplateDTO)
         .toList();
   }
@@ -93,7 +95,9 @@ public class TemplateService {
    */
 
   public List<PhaseTemplateDTO> findAllPhaseTemplates() {
-    return phaseTemplateRepository.findAll().stream()
+    User currentUser = SecurityUtils.getCurrentUser();
+    return phaseTemplateRepository.findAllByUserId(currentUser.getId())
+        .stream()
         .map(this::toPhaseTemplateDTO)
         .toList();
   }
