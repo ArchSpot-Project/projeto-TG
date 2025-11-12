@@ -1,0 +1,84 @@
+<!-- CRIANDO UM NOVO PROJETO -->
+<div class="modal-overlay" *ngIf="show" (click)="onCancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h4 class="modal-title font-logo">Criar Novo Projeto</h4>
+    <hr />
+
+    <label class="fs-6 fw-semibold modal-label2">Nome</label>
+    <input type="text" class="form-control mt-1 mb-3" [(ngModel)]="projectName" placeholder="Nome do projeto" />
+
+    <label class="fs-6 fw-semibold modal-label2">Data de Início Estimada</label>
+    <input type="date" class="form-control mt-1 mb-3" [(ngModel)]="estimatedStartDate" />
+
+    <label class="fs-6 fw-semibold modal-label2">Etapas</label>
+    <p class="text-muted fs-6 mb-2 small">
+      Você pode editar as etapas posteriormente em "Cronograma"
+    </p>
+
+    <div class="etapas-container mb-4">
+      <div class="etapa-item" *ngFor="let etapa of etapas" [ngClass]="{ selected: isSelected(etapa.nome) }">
+        <button type="button" class="btn btn-sm etapa-btn" [ngClass]="{
+            'btn-success': isSelected(etapa.nome),
+            'btn-outline-success': !isSelected(etapa.nome)
+          }" (click)="toggleEtapa(etapa.nome)">
+          {{ etapa.nome }}
+        </button>
+
+        <div class="etapa-duracao">
+          <label class="form-label m-0 me-1">Duração:</label>
+          <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="etapa.duracao"
+            placeholder="dias" />
+          <span class="ms-1 small text-muted">dias</span>
+        </div>
+      </div>
+    </div>
+
+    <label class="fs-6 fw-semibold modal-label">Descrição</label>
+    <textarea class="form-control mt-1 mb-3" [(ngModel)]="projectDescription"
+      placeholder="Descrição do projeto"></textarea>
+
+    <!-- participantes -->
+    <button class="btn btn-secondary mb-3" (click)="openAddUserModal()">
+      Adicionar participante
+    </button>
+
+    <app-add-user-modal [roles]="roles" [show]="showAddModal" (close)="cancelAdd()"
+      (addUser)="handleAddUser($event)"></app-add-user-modal>
+
+    <!-- Equipe -->
+    <label class="fs-6 fw-semibold modal-label2">Equipe</label>
+    <div class="collaborators-container">
+      <table class="table table-zebra w-full table-auto" *ngIf="users.length > 0; else emptyState">
+        <thead>
+          <tr>
+            <th class="w-1/12">ID</th>
+            <th class="w-5/12">Nome</th>
+            <th class="w-4/12">Função</th>
+            <th class="w-2/12 text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.role | roleTranslate }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-danger" (click)="removeUser(user.id)">
+                Remover
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyState>
+        <div class="empty-state">Nenhum participante adicionado.</div>
+      </ng-template>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="onCancel()">Editar Etapas</button>
+      <button class="btn btn-success" (click)="createProject()">Criar Projeto</button>
+    </div>
+  </div>
+</div>

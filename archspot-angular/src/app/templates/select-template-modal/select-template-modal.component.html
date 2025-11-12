@@ -1,0 +1,96 @@
+<!-- CARD INICIAL COM TEMPLATES -->
+<div class="modal-overlay" *ngIf="show">
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-4 font-logo">Criar Novo Projeto</h1>
+          <button type="button" class="btn-close" (click)="close.emit()"></button>
+        </div>
+
+        <div class="modal-body pb-3">
+          <div class="container-fluid">
+            <h5 class="mb-3">Templates de Projeto:</h5>
+
+            <div class="row g-3 justify-content-center">
+
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card template-card h-100 text-center border-3">
+                  <div class="card-body d-flex align-items-center justify-content-center">
+                    <h6 class="card-title mb-0">+ Novo Projeto</h6>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-grid">
+                    <button class="btn btn-secondary stretched-link" (click)="openNewTemplate()">
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
+                  <div class="card-body d-flex align-items-center justify-content-center">
+                    <h6 class="card-title mb-0">Projeto Arquitetônico</h6>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-grid">
+                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
+                  <div class="card-body d-flex align-items-center justify-content-center">
+                    <h6 class="card-title mb-0">Projeto de Interiores</h6>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-grid">
+                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
+                  <div class="card-body d-flex align-items-center justify-content-center">
+                    <h6 class="card-title mb-0">Projeto Comercial</h6>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-grid">
+                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
+                  <div class="card-body d-flex align-items-center justify-content-center">
+                    <h6 class="card-title mb-0">Reforma</h6>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-grid">
+                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-new-project-template-modal [show]="showNewTemplateModal" [currentUserId]="currentUserId"
+  [currentUserName]="currentUserName" (close)="showNewTemplateModal = false"
+  (goBackToSelect)="showNewTemplateModal = false; show = true">
+</app-new-project-template-modal>
+
+<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" (close)="onCancelConfirm()"
+  (created)="onProjectCreated()" (editPhases)="onEditPhases()">
+</app-confirm-create-new-project-modal>

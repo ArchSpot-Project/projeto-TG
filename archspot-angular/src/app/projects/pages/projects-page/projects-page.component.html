@@ -15,9 +15,9 @@
     {{ errorMessage }}
   </div>
 
-  <app-create-project-modal [show]="showModal" [currentUserId]="currentUserId" [currentUserName]="currentUserName"
+  <app-select-template-modal [show]="showModal" [currentUserId]="currentUserId" [currentUserName]="currentUserName"
     (close)="showModal = false" (projectCreated)="loadUserProjects()">
-  </app-create-project-modal>
+  </app-select-template-modal>
 
   <ng-container *ngIf="!loading && !errorMessage">
     <!-- PROJETOS EM ABERTO -->
