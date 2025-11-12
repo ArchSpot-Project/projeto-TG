@@ -8,9 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectCreateFromTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
+import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
@@ -44,12 +46,15 @@ public class ProjectService {
         .toList();
   }
 
+  // buscar projeto por id
   public ProjectResponseDTO findById(Long id) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
     return toResponseDTO(project);
   }
 
+  // criar projeto (direto, sem ProjectTemplate nem PhaseTemplate)
+  // (provavelmente vai ser descontinuado pois não faz sentido)
   @Transactional
   public ProjectResponseDTO create(ProjectRequestDTO dto) {
     Project project = new Project();
@@ -70,6 +75,7 @@ public class ProjectService {
     return toResponseDTO(project);
   }
 
+  // atualizar projeto
   public ProjectResponseDTO update(Long id, ProjectRequestDTO dto) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
@@ -82,6 +88,7 @@ public class ProjectService {
     return toResponseDTO(projectRepository.save(project));
   }
 
+  // deletar projeto
   public void delete(Long id) {
     if (!projectRepository.existsById(id)) {
       throw new EntityNotFoundException("Projeto não encontrado: " + id);
@@ -89,6 +96,7 @@ public class ProjectService {
     projectRepository.deleteById(id);
   }
 
+  // finalizar projeto
   public ProjectResponseDTO finalizeProject(Long id) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
@@ -97,6 +105,7 @@ public class ProjectService {
     return toResponseDTO(projectRepository.save(project));
   }
 
+  // cancelar projeto
   public ProjectResponseDTO cancelProject(Long id) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
@@ -105,6 +114,7 @@ public class ProjectService {
     return toResponseDTO(projectRepository.save(project));
   }
 
+  // atualizar nome e descriçao
   public ProjectResponseDTO updateTitleAndDescription(Long id, Map<String, String> updates) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
@@ -118,6 +128,50 @@ public class ProjectService {
 
     projectRepository.save(project);
     return toResponseDTO(project);
+  }
+
+  // criar projeto com template
+  @Transactional
+  public ProjectResponseDTO createFromTemplate(ProjectCreateFromTemplateDTO dto) {
+
+    // Criação do projeto base
+    Project project = new Project();
+    project.setName(dto.name());
+    project.setDescription(dto.description());
+    projectRepository.save(project);
+
+    // Criar fases a partir dos templates
+    List<Phase> createdPhases = phaseService.createPhasesFromTemplate(
+        project.getId(),
+        dto.estimatedStartDate(),
+        dto.phaseTemplateIds());
+    project.setPhases(createdPhases);
+    projectRepository.save(project);
+
+    // vincula o criador como ADMIN
+    Long currentUserId = SecurityUtils.getCurrentUser().getId();
+    UserProjectRequestDTO adminUserDto = new UserProjectRequestDTO(
+        currentUserId,
+        project.getId(),
+        UserRole.ADMIN);
+    userProjectService.assignUserToProject(adminUserDto);
+
+    // 2. Vincula os demais usuários vindos do DTO (se houver)
+    if (dto.userProjects() != null && !dto.userProjects().isEmpty()) {
+      for (UserProjectRequestDTO up : dto.userProjects()) {
+        // Evita duplicar o criador
+        if (!up.userId().equals(currentUserId)) {
+          UserProjectRequestDTO userProjectDto = new UserProjectRequestDTO(
+              up.userId(),
+              project.getId(),
+              up.role());
+          userProjectService.assignUserToProject(userProjectDto);
+        }
+      }
+    }
+
+    project.updateDatesAndStatus();
+    return toResponseDTO(projectRepository.save(project));
   }
 
   // mapeamento entidade -> DTO

@@ -1,6 +1,7 @@
 package com.archspot.ArchSpot_BackEnd.controllers;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.diretory.DirectoryDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectCreateFromTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
@@ -111,6 +113,18 @@ public class ProjectController {
       @RequestBody Map<String, String> updates) {
     ProjectResponseDTO updatedProject = projectService.updateTitleAndDescription(id, updates);
     return ResponseEntity.ok(updatedProject);
+  }
+
+  /*
+   * CRIAR PROJETO PELO TEMPLATE
+   */
+  @PostMapping("/from-template")
+  public ResponseEntity<ProjectResponseDTO> createFromTemplate(
+      @RequestBody @Valid ProjectCreateFromTemplateDTO dto) {
+    ProjectResponseDTO created = projectService.createFromTemplate(dto);
+    URI location = URI.create("/projects/" + created.getId());
+    // retorna o location direto no header para redirecionamento da página
+    return ResponseEntity.created(location).body(created);
   }
 
   /*
