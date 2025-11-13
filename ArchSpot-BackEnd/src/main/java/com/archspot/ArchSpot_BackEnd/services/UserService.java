@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.archspot.ArchSpot_BackEnd.dtos.user.PasswordChangeDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
@@ -152,6 +153,21 @@ public class UserService {
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("User not found");
 		}
+	}
+
+	// Para atualizar senha
+	public void changePassword(Long userId, PasswordChangeDTO dto) {
+		User user = repository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		// Valida senha atual
+		if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+			throw new DatabaseException("Senha atual incorreta");
+		}
+
+		// Atualiza nova senha
+		user.setPassword(passwordEncoder.encode(dto.newPassword()));
+		repository.save(user);
 	}
 
 	/*
