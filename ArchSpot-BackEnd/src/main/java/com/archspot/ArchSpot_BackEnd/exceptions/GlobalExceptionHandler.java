@@ -1,37 +1,62 @@
 package com.archspot.ArchSpot_BackEnd.exceptions;
 
+import com.archspot.ArchSpot_BackEnd.dtos.common.ErrorResponseDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+  private ResponseEntity<ErrorResponseDTO> buildErrorResponse(
+      Exception ex, HttpStatus status, HttpServletRequest request) {
+
+    ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+        .status(status.value())
+        .error(status.getReasonPhrase())
+        .message(ex.getMessage())
+        .path(request.getRequestURI())
+        .timestamp(LocalDateTime.now())
+        .build();
+
+    return ResponseEntity.status(status).body(errorResponse);
+  }
+
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(DatabaseException.class)
-  public ResponseEntity<String> handleDatabaseException(DatabaseException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  public ResponseEntity<ErrorResponseDTO> handleDatabaseException(DatabaseException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
   }
 
   @ExceptionHandler(AssociationNotFoundException.class)
-  public ResponseEntity<String> handleAssociationNotFound(AssociationNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  public ResponseEntity<ErrorResponseDTO> handleAssociationNotFound(AssociationNotFoundException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(UnauthorizedException.class)
-  public ResponseEntity<String> handleUnauthorized(UnauthorizedException ex) {
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+  public ResponseEntity<ErrorResponseDTO> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.FORBIDDEN, request);
   }
 
-  // Exceções genéricas
+  @ExceptionHandler(ForbiddenOperationException.class)
+  public ResponseEntity<ErrorResponseDTO> handleForbidden(ForbiddenOperationException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.FORBIDDEN, request);
+  }
+
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<ErrorResponseDTO> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
+  }
+
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleGenericException(Exception ex) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body("Ocorreu um erro inesperado: " + ex.getMessage());
+  public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
   }
 }
