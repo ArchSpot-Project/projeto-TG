@@ -4,16 +4,17 @@ import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
 import com.archspot.ArchSpot_BackEnd.enums.DirectoryType;
+import com.archspot.ArchSpot_BackEnd.exceptions.BadRequestException;
+import com.archspot.ArchSpot_BackEnd.exceptions.ForbiddenOperationException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.*;
 import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.utils.ProjectPermissionUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -29,6 +30,9 @@ public class DocumentService {
 
   @Autowired
   private DirectoryRepository directoryRepository;
+
+  @Autowired
+  private DocumentVersionRepository documentVersionRepository;
 
   private static final String UPLOAD_BASE_PATH = "./uploads";
 
@@ -98,46 +102,27 @@ public class DocumentService {
   }
 
   // excluir um documento
+  @Transactional
   public void delete(Long id) {
     Document document = documentRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
     User currentUser = SecurityUtils.getCurrentUser();
-    Directory directory = document.getDirectory();
-    Project project = directory.getProject();
-    DirectoryType directoryType = directory.getType();
 
-    // Verifica se o usuário é dono do comentário
-    boolean isOwner = document.getUploadedBy().getId().equals(currentUser.getId());
+    // valida permissao do usuário
+    validateDeletePermission(document, currentUser);
 
-    // Verifica se o usuário é ADMIN ou STAFF no projeto
-    boolean isProjectAdminOrStaff = ProjectPermissionUtils.isAdminOrStaff(project, currentUser);
-
-    // Verifica se o usuário é EXTERNAL_COLLABORATOR no projeto
-    boolean isExternalCollaborator = ProjectPermissionUtils.isExternalCollaborator(project, currentUser);
-
-    // Regras por tipo de diretório:
-    if (directoryType == DirectoryType.DRAWINGS) {
-      // Só admin/staff ou externo (se dono)
-      if (!isProjectAdminOrStaff && !(isOwner && isExternalCollaborator)) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-            "User not allowed to delete this file");
-      }
-    } else if (directoryType == DirectoryType.DOCUMENTS) {
-      // Admin/staff ou owner
-      if (!isProjectAdminOrStaff && !isOwner) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-            "User not allowed to delete this file");
-      }
+    // Excluir arquivos físicos das versões antigas
+    List<DocumentVersion> versions = documentVersionRepository.findByDocumentId(id);
+    for (DocumentVersion version : versions) {
+      safeDeleteFile(version.getFileUrl());
     }
 
     // remove o arquivo físico
-    try {
-      Path filePath = Paths.get(document.getFileUrl());
-      Files.deleteIfExists(filePath);
-    } catch (IOException e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error deleting file", e);
-    }
+    safeDeleteFile(document.getFileUrl());
+
+    // Remove versões associadas (garantia adicional ao cascade)
+    documentVersionRepository.deleteAllByDocumentId(id);
 
     // remove do banco
     documentRepository.deleteById(id);
@@ -156,25 +141,19 @@ public class DocumentService {
 
     // Validação: proibir upload em diretórios raiz de DRAWINGS
     if (directory.getType() == DirectoryType.DRAWINGS && directory.getParentDirectory() == null) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+      throw new ForbiddenOperationException(
           "Uploads are not allowed in root DRAWINGS directories.");
     }
 
     // garante que o diretório está vinculado a um projeto
     if (directory.getProject() == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Directory must be linked to a project");
+      throw new BadRequestException("Directory must be linked to a project");
     }
-    Long projectId = directory.getProject().getId();
 
     // caminho local de armazenamento
-    Path uploadDir = Paths.get(UPLOAD_BASE_PATH,
-        "project_" + projectId,
-        directory.getType().name().toLowerCase());
-    Files.createDirectories(uploadDir);
+    Path uploadDir = resolveUploadPath(directory);
 
-    String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-    Path filePath = uploadDir.resolve(filename);
-    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    Path filePath = saveFile(file, uploadDir);
 
     Document document = new Document();
     document.setName(file.getOriginalFilename());
@@ -198,17 +177,30 @@ public class DocumentService {
     Document existing = documentRepository.findById(documentId)
         .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
+    // Salva a versão anterior no histórico
+    DocumentVersion previous = DocumentVersion.builder()
+        .document(existing)
+        .versionNumber(existing.getVersion())
+        .fileUrl(existing.getFileUrl())
+        .size(existing.getSize())
+        .uploadedAt(existing.getModificationDate())
+        .build();
+    documentVersionRepository.save(previous);
+
+    // Remove versões antigas se ultrapassar 3
+    List<DocumentVersion> versions = documentVersionRepository.findByDocumentOrderByVersionNumberDesc(existing);
+    if (versions.size() > 3) {
+      DocumentVersion oldest = versions.get(versions.size() - 1);
+      safeDeleteFile(oldest.getFileUrl());
+      documentVersionRepository.delete(oldest);
+    }
+
+    // Substitui o arquivo principal
     Directory directory = existing.getDirectory();
+    Path uploadDir = resolveUploadPath(directory);
 
-    // substitui arquivo físico
-    Path uploadDir = Paths.get(UPLOAD_BASE_PATH, directory.getType().name().toLowerCase());
-    Files.createDirectories(uploadDir);
+    Path newPath = saveFile(newFile, uploadDir);
 
-    String newFilename = System.currentTimeMillis() + "_" + newFile.getOriginalFilename();
-    Path newPath = uploadDir.resolve(newFilename);
-    Files.copy(newFile.getInputStream(), newPath, StandardCopyOption.REPLACE_EXISTING);
-
-    // atualiza metadados
     existing.setFileUrl(newPath.toString());
     existing.setModificationDate(LocalDateTime.now());
     existing.setSize(newFile.getSize());
@@ -225,6 +217,70 @@ public class DocumentService {
     Document document = documentRepository.findById(documentId)
         .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     return Paths.get(document.getFileUrl());
+  }
+
+  /*
+   * AUXILIARES
+   */
+
+  // montar caminhos de arquivo
+  private Path resolveUploadPath(Directory directory) throws IOException {
+    Long projectId = directory.getProject() != null ? directory.getProject().getId() : null;
+    String dirType = directory.getType().name().toLowerCase();
+
+    Path uploadDir = (projectId != null)
+        ? Paths.get(UPLOAD_BASE_PATH, "project_" + projectId, dirType)
+        : Paths.get(UPLOAD_BASE_PATH, dirType);
+
+    Files.createDirectories(uploadDir);
+    return uploadDir;
+  }
+
+  // salvar arquivo
+  private Path saveFile(MultipartFile file, Path uploadDir) throws IOException {
+    String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+    Path filePath = uploadDir.resolve(filename);
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    return filePath;
+  }
+
+  private void validateDeletePermission(Document document, User currentUser) {
+    Directory directory = document.getDirectory();
+    Project project = directory.getProject();
+    DirectoryType directoryType = directory.getType();
+
+    // Verifica se o usuário é dono do comentário
+    boolean isOwner = document.getUploadedBy().getId().equals(currentUser.getId());
+
+    // Verifica se o usuário é ADMIN ou STAFF no projeto
+    boolean isProjectAdminOrStaff = ProjectPermissionUtils.isAdminOrStaff(project, currentUser);
+
+    // Verifica se o usuário é EXTERNAL_COLLABORATOR no projeto
+    boolean isExternalCollaborator = ProjectPermissionUtils.isExternalCollaborator(project, currentUser);
+
+    // Regras por tipo de diretório:
+    if (directoryType == DirectoryType.DRAWINGS) {
+      // Só admin/staff ou externo (se dono)
+      if (!isProjectAdminOrStaff && !(isOwner && isExternalCollaborator)) {
+        throw new ForbiddenOperationException(
+            "User not allowed to delete this file");
+      }
+    } else if (directoryType == DirectoryType.DOCUMENTS) {
+      // Admin/staff ou owner
+      if (!isProjectAdminOrStaff && !isOwner) {
+        throw new ForbiddenOperationException(
+            "User not allowed to delete this file");
+      }
+    }
+  }
+
+  // deletar arquivo fisico seguramente
+  private void safeDeleteFile(String fileUrl) {
+    try {
+      Files.deleteIfExists(Paths.get(fileUrl));
+    } catch (IOException e) {
+      throw new RuntimeException("Error deleting file", e);
+    }
   }
 
   // mapeamento DTO
