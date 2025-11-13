@@ -107,6 +107,11 @@ public class UserService {
 		try {
 			User user = repository.getReferenceById(id);
 
+			// Verificar senha atual para permitir atualização
+			if (dto.password() == null || !passwordEncoder.matches(dto.password(), user.getPassword())) {
+				throw new DatabaseException("Senha incorreta");
+			}
+
 			// Verificar duplicidade de CPF
 			if (!user.getCpf().equals(dto.cpf()) && repository.existsByCpf(dto.cpf())) {
 				throw new DatabaseException("CPF já está em uso");
@@ -123,11 +128,6 @@ public class UserService {
 			user.setAddress(dto.address());
 			user.setProfession(dto.profession());
 			user.setEmail(dto.email());
-
-			// atualizar senha apenas se infromada
-			if (dto.password() != null && !dto.password().isBlank()) {
-				user.setPassword(passwordEncoder.encode(dto.password()));
-			}
 
 			// Atualizar imagem, se enviada
 			if (profileImage != null && !profileImage.isEmpty()) {
