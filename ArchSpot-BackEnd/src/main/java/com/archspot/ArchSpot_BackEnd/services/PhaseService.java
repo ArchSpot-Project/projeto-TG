@@ -4,20 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.archspot.ArchSpot_BackEnd.enums.*;
+import com.archspot.ArchSpot_BackEnd.exceptions.BusinessRuleException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
-import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateAllDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseCreateDTO;
-import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.phase.*;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
@@ -46,7 +43,7 @@ public class PhaseService {
   // consultar uma fase pelo id
   public PhaseDTO findById(Long id) {
     Phase phase = phaseRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Phase not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
     return toDTO(phase);
   }
 
@@ -58,21 +55,16 @@ public class PhaseService {
   }
 
   // criar fase
-  public PhaseDTO create(PhaseCreateAllDTO dto) {
+  public PhaseDTO create(PhaseCreateDTO dto) {
     Project project = projectRepository.findById(dto.projectId())
-        .orElseThrow(() -> new RuntimeException("Project not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado."));
 
     // validação: data de fim não pode ser menor que data de início
-    if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
-      if (dto.estimatedEndDate().isBefore(dto.estimatedStartDate())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "A data estimada de fim não pode ser anterior à data estimada de início.");
-      }
-    }
+    validateDateOrder(dto.estimatedStartDate(), dto.estimatedEndDate(),
+        "A data estimada de fim não pode ser anterior à data estimada de início.");
 
     /*
-     * TODO: Verificar lógica de negócio:
+     * Verificar lógica de negócio futuramente:
      * O código ainda não implementa a possibilidade de criação de fases com
      * vínculos COMPLEXOS:
      * antes, no meio ou depois das existentes, atualizando a sequencia de
@@ -85,11 +77,10 @@ public class PhaseService {
     Phase previous = null;
     if (dto.previousPhaseId() != null) {
       previous = phaseRepository.findById(dto.previousPhaseId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Etapa predecessora inválida."));
+          .orElseThrow(() -> new BusinessRuleException("Etapa predecessora inválida."));
 
       if (!previous.getProject().getId().equals(project.getId())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "Etapa predecessora deve pertencer ao mesmo projeto.");
+        throw new BusinessRuleException("Etapa predecessora deve pertencer ao mesmo projeto.");
       }
     }
 
@@ -109,8 +100,7 @@ public class PhaseService {
 
     Phase saved = phaseRepository.save(newPhase);
 
-    project.updateDatesAndStatus();
-    projectRepository.save(project);
+    updateProject(project);
 
     return toDTO(saved);
   }
@@ -118,12 +108,12 @@ public class PhaseService {
   // criar fases pelo template
   @Transactional
   public List<Phase> createPhasesFromTemplate(Long projectId, LocalDate estimatedStartDate,
-      List<PhaseCreateDTO> phaseTemplates) {
+      List<PhaseCreateByTemplateDTO> phaseTemplates) {
     Project project = projectRepository.findById(projectId)
         .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado: " + projectId));
 
     if (phaseTemplates == null || phaseTemplates.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nenhum template de etapa foi informado.");
+      throw new BusinessRuleException("Nenhum template de etapa foi informado.");
     }
 
     // início da primeira fase (se não informado, usa hoje)
@@ -132,12 +122,9 @@ public class PhaseService {
     Phase previous = null;
     List<Phase> savedPhases = new ArrayList<>();
 
-    for (int i = 0; i < phaseTemplates.size(); i++) {
-      PhaseCreateDTO dto = phaseTemplates.get(i);
-
+    for (PhaseCreateByTemplateDTO dto : phaseTemplates) {
       if (dto == null || dto.phaseTemplateId() == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "Cada fase deve informar phaseTemplateId.");
+        throw new BusinessRuleException("Cada fase deve informar um phaseTemplateId válido.");
       }
 
       // busca o template correspondente (lança 404 se não existir)
@@ -176,28 +163,44 @@ public class PhaseService {
     }
 
     // Depois de salvar, atualiza as datas/status do projeto
-    project.updateDatesAndStatus();
-    projectRepository.save(project);
+    updateProject(project);
 
     return savedPhases;
   }
 
   // atualizar fase
-  public PhaseDTO update(Long id, PhaseCreateAllDTO dto) {
+  public PhaseDTO update(Long id, PhaseUpdateDTO dto) {
     Phase entity = phaseRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Phase not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
+
+    // validar coerência das datas reais
+    validateDateOrder(dto.realStartDate(), dto.realEndDate(),
+        "A data real de fim não pode ser anterior à data real de início.");
+
+    // validar coerência das datas estimadas
+    validateDateOrder(dto.estimatedStartDate(), dto.estimatedEndDate(),
+        "A data estimada de fim não pode ser anterior à data estimada de início.");
 
     entity.setName(dto.name());
     entity.setDescription(dto.description());
+    entity.setRealStartDate(dto.realStartDate());
+    entity.setRealEndDate(dto.realEndDate());
     entity.setEstimatedStartDate(dto.estimatedStartDate());
     entity.setEstimatedEndDate(dto.estimatedEndDate());
-    entity.setDuration(dto.duration());
+
+    // calcula duração a partir das datas ou seta a recebida pela reuqisição
+    if (dto.estimatedStartDate() != null && dto.estimatedEndDate() != null) {
+      entity.setDuration((int) java.time.temporal.ChronoUnit.DAYS.between(
+          dto.estimatedStartDate(), dto.estimatedEndDate()) + 1);
+    } else {
+      entity.setDuration(dto.duration());
+    }
+
+    entity.setStatus(PhaseService.calculateStatus(entity));
 
     Phase updated = phaseRepository.save(entity);
 
-    Project project = updated.getProject();
-    project.updateDatesAndStatus();
-    projectRepository.save(project);
+    updateProject(updated.getProject());
 
     return toDTO(updated);
   }
@@ -211,8 +214,69 @@ public class PhaseService {
 
     phaseRepository.delete(entity);
 
+    updateProject(project);
+  }
+
+  // iniciar etapa
+  public PhaseDTO startPhase(Long id) {
+    Phase phase = phaseRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
+
+    /*
+     * validações de etapa predecessora suspensas!
+     */
+    // // etapa predecessora e validação - se houver e nao foi finalizada, lançar
+    // erro
+    // // 400
+    // if (phase.getPreviousPhase() != null) {
+    // Phase previous = phase.getPreviousPhase();
+    // if (previous.getRealEndDate() == null) {
+    // throw new BusinessRuleException("Finalize a etapa anterior antes de iniciar
+    // esta.");
+    // }
+    // }
+
+    phase.setRealStartDate(LocalDateTime.now());
+    phase.setStatus(PhaseStatus.IN_PROGRESS);
+    Phase updated = phaseRepository.save(phase);
+
+    // inicia o projeto se for o caso
+    updateProject(updated.getProject());
+
+    return toDTO(updated);
+  }
+
+  // finalizar etapa
+  public PhaseDTO finishPhase(Long id) {
+    Phase phase = phaseRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
+
+    if (phase.getRealStartDate() == null) {
+      throw new BusinessRuleException("Não é possível finalizar uma etapa que ainda não foi iniciada.");
+    }
+    phase.setRealEndDate(LocalDateTime.now());
+    phase.setStatus(PhaseStatus.COMPLETED);
+    Phase updated = phaseRepository.save(phase);
+
+    // finaliza projeto se for o caso
+    updateProject(updated.getProject());
+
+    return toDTO(updated);
+  }
+
+  /*
+   * METODOS AUXILIARES
+   */
+
+  private void updateProject(Project project) {
     project.updateDatesAndStatus();
     projectRepository.save(project);
+  }
+
+  private <T extends Comparable<T>> void validateDateOrder(T start, T end, String message) {
+    if (start != null && end != null && end.compareTo(start) < 0) {
+      throw new BusinessRuleException(message);
+    }
   }
 
   // verificar status da etapa
@@ -239,59 +303,9 @@ public class PhaseService {
     return PhaseStatus.NOT_STARTED;
   }
 
-  // iniciar etapa
-  public PhaseDTO startPhase(Long id) {
-    Phase phase = phaseRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
-
-    // etapa predecessora e validação - se houver e nao foi finalizada, lançar erro
-    // 400
-    if (phase.getPreviousPhase() != null) {
-      Phase previous = phase.getPreviousPhase();
-      if (previous.getRealEndDate() == null) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Finalize a etapa anterior antes de iniciar.");
-      }
-    }
-
-    phase.setRealStartDate(LocalDateTime.now());
-    phase.setStatus(PhaseStatus.IN_PROGRESS);
-    Phase updated = phaseRepository.save(phase);
-
-    // inicia o projeto se for o caso
-    Project project = phase.getProject();
-    project.updateDatesAndStatus();
-    projectRepository.save(project);
-
-    return toDTO(updated);
-  }
-
-  // finalizar etapa
-  public PhaseDTO finishPhase(Long id) {
-    Phase phase = phaseRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Fase não encontrada."));
-
-    if (phase.getRealStartDate() == null) {
-      throw new RuntimeException("Não é possível finalizar uma fase que ainda não foi iniciada.");
-    }
-    phase.setRealEndDate(LocalDateTime.now());
-    phase.setStatus(PhaseStatus.COMPLETED);
-    Phase updated = phaseRepository.save(phase);
-
-    // finaliza projeto se for o caso
-    Project project = phase.getProject();
-    project.updateDatesAndStatus();
-    projectRepository.save(project);
-
-    return toDTO(updated);
-  }
-
   public PhaseDTO toDTO(Phase entity) {
     Long previousId = entity.getPreviousPhase() != null ? entity.getPreviousPhase().getId() : null;
     Long projectId = entity.getProject() != null ? entity.getProject().getId() : null;
-
-    PhaseStatus status = PhaseService.calculateStatus(entity);
 
     return new PhaseDTO(
         entity.getId(),
@@ -304,6 +318,6 @@ public class PhaseService {
         entity.getDuration(),
         previousId,
         projectId,
-        status.name());
+        calculateStatus(entity).name());
   }
 }

@@ -18,6 +18,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
 
+  @ExceptionHandler(BusinessRuleException.class)
+  public ResponseEntity<String> handleBusinessException(BusinessRuleException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+
   @ExceptionHandler(AssociationNotFoundException.class)
   public ResponseEntity<String> handleAssociationNotFound(AssociationNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
