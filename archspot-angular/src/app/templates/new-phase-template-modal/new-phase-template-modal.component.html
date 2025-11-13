@@ -1,0 +1,35 @@
+<!-- CRIAÇÃO DE TEMPLATE DE ETAPA -->
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="show"
+  style="display:block; background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-4 font-logo">Criar Etapa</h1>
+        <button type="button" class="btn-close" (click)="onClose()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <form class="fw-medium">
+            <div class="mb-3">
+              <label for="campoNome" class="form-label">Nome da Etapa:</label>
+              <input type="text" class="form-control" id="campoNome" [(ngModel)]="phaseName" name="phaseName"
+                placeholder="Ex: Estudo Preliminar" />
+            </div>
+
+            <div class="mb-3">
+              <label for="campoDuracao" class="form-label">Duração (em dias):</label>
+              <input type="number" class="form-control" id="campoDuracao" [(ngModel)]="phaseDuration"
+                name="phaseDuration" min="1" placeholder="Ex: 5" />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onClose()">Voltar para Etapas</button>
+        <button type="button" class="btn btn-success" (click)="onSave()">Salvar Etapa</button>
+      </div>
+    </div>
+  </div>
+</div>

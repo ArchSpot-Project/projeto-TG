@@ -1,0 +1,69 @@
+<!-- CRIAÇÃO DE NOVO PROJETO -->
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="show && !showConfirmCreateProjectModal"
+  style="display:block; background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-4 font-logo">Criar Novo Projeto</h1>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row g-3">
+
+            <div class="col-sm-6">
+              <h5>Outras etapas:</h5>
+              <div class="d-grid gap-1">
+                <button type="button" class="btn btn-outline-secondary shadow text-start mb-2">As Built</button>
+                <button type="button" class="btn btn-outline-secondary shadow text-start mb-2">Detalhamento</button>
+                <button type="button" class="btn btn-outline-secondary shadow text-start mb-2">Levantamento</button>
+                <button type="button" class="btn btn-outline-secondary shadow text-start mb-2">Mobiliário</button>
+                <button type="button" class="btn btn-outline-secondary shadow text-start mb-2">Interiores</button>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <h5>Etapas no projeto:</h5>
+              <div class="d-grid gap-1">
+                <button type="button" class="btn mb-2 btn-outline-success shadow text-start">Estudo Preliminar</button>
+                <button type="button" class="btn mb-2 btn-outline-success shadow text-start">Anteprojeto</button>
+                <button type="button" class="btn mb-2 btn-outline-success shadow text-start">Projeto Legal</button>
+                <button type="button" class="btn mb-2 btn-outline-success shadow text-start">Projeto Executivo</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col d-grid">
+              <button type="button" class="btn btn-outline-secondary mt-5 mb-2" (click)="openNewPhaseModal()">
+                + Criar Nova Etapa
+              </button>
+              <button type="button" class="btn btn-outline-success" (click)="saveTemplate()">
+                Salvar Template
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="goBack()">Voltar para Templates</button>
+        <button type="button" class="btn btn-success" (click)="openConfirmCreateProject()">Criar Projeto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" (close)="onCancelConfirm()"
+  (created)="onProjectCreated()"></app-confirm-create-new-project-modal>
+
+<app-new-phase-template-modal [show]="showNewPhaseModal" (close)="onCloseNewPhaseModal()"
+  (save)="onSaveNewPhase($event)"></app-new-phase-template-modal>
+
+<app-confirm-create-new-template-modal [show]="showConfirmCreateTemplateModal" (close)="onCancelConfirmTemplate()"
+  (saved)="onTemplateSaved()"></app-confirm-create-new-template-modal>
+
+<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" (close)="onCancelConfirm()"
+  (created)="onProjectCreated()" (editPhases)="onEditPhases()">
+</app-confirm-create-new-project-modal>

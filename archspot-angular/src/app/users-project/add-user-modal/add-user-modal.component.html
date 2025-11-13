@@ -1,27 +1,41 @@
 <div class="modal-overlay" *ngIf="show" (click)="cancel()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <h4 class="modal-title">Adicionar participante</h4>
+    <!-- título dinâmico -->
+    <h4 class="modal-title">
+      {{ transferMode ? 'Transferir Gerência' : 'Adicionar participante' }}
+    </h4>
 
+    <!-- campo de busca -->
     <label class="fs-5 fw-semibold modal-label">Pesquisar usuário</label>
     <input type="text" placeholder="Digite o nome ou ID" class="modal-input p-2 rounded-3" [(ngModel)]="searchTerm"
       (ngModelChange)="searchUsers($event)" />
 
+    <!-- resultados -->
     <ul class="search-results fw-semibold" *ngIf="searchResults.length > 0">
       <li *ngFor="let user of searchResults" (click)="selectUser(user)" [class.selected]="selectedUser?.id === user.id">
         ID {{ user.id }} - {{ user.name }} ({{ user.email }})
       </li>
     </ul>
 
-    <label class="modal-label mt-2">Função</label>
-    <select class="modal-select p-2" [(ngModel)]="selectedRole">
-      <option [ngValue]="null" disabled>Selecione uma função</option>
-      <option *ngFor="let role of roles" [ngValue]="role">{{ role | roleTranslate }}</option>
-    </select>
+    <!-- se não for transferencia de gerente: -->
+    <div *ngIf="!transferMode">
+      <label class="modal-label mt-2">Função</label>
+      <select class="modal-select p-2" [(ngModel)]="selectedRole">
+        <option [ngValue]="null" disabled>Selecione uma função</option>
+        <option *ngFor="let role of roles" [ngValue]="role">
+          {{ role | roleTranslate }}
+        </option>
+      </select>
+    </div>
 
+    <!-- ações -->
     <div class="modal-actions mt-2 flex justify-end gap-2">
-      <button class="btn btn-outline m-1" className="cancelar" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-outline m-1" (click)="cancel()">Cancelar</button>
+
       <button class="btn btn-success" (click)="confirmAdd()"
-        [disabled]="!selectedUser || !selectedRole">Adicionar</button>
+        [disabled]="!selectedUser || (!transferMode && !selectedRole)">
+        {{ transferMode ? 'Confirmar' : 'Adicionar' }}
+      </button>
     </div>
   </div>
 </div>

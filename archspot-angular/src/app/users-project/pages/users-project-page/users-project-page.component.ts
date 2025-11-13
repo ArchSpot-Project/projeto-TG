@@ -7,6 +7,7 @@ import { UserProjectResponse } from '../../../core/models/user-project.model';
 import { ProjectResponse } from '../../../core/models/project.model';
 import { UserProjectService } from '../../../core/services/user-project.service';
 import { ProjectService } from '../../../core/services/project.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-users-project-page',
@@ -20,18 +21,17 @@ export class UsersProjectPageComponent implements OnInit {
   loading = false;
 
   showAddModal = false;
+  showTransferModal = false;
 
   // roles para mudar no combo box
   roles = ['STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
-
-  // roles ao adicionar um usuario no projeto via modal
-  modalRoles = ['ADMIN', 'STAFF', 'CUSTOMER', 'EXTERNAL_COLLABORATOR'];
 
   constructor(
     private route: ActivatedRoute,
     private userProjectService: UserProjectService,
     private projectService: ProjectService,
-    public authService: AuthService
+    public authService: AuthService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -44,9 +44,66 @@ export class UsersProjectPageComponent implements OnInit {
     } else {
       console.error('ID do projeto não fornecido na rota.');
     }
+
+    const transferredUser = sessionStorage.getItem('transferSuccess');
+    if (transferredUser) {
+      this.toast.showSuccess(`Gerência transferida para ${transferredUser}`);
+      sessionStorage.removeItem('transferSuccess');
+    }
   }
 
-  //verificar se o usuario é adm do projeto para exibição de controles
+  openTransferAdminModal(): void {
+    this.showTransferModal = true;
+  }
+
+  cancelTransfer(): void {
+    this.showTransferModal = false;
+  }
+
+  handleTransferAdmin(event: { user: UserResponse }): void {
+    const newAdmin = event.user;
+    const currentAdmin = this.users.find(u => u.role === 'ADMIN');
+    if (!currentAdmin) {
+      alert('Nenhum gerente atual encontrado.');
+      return;
+    }
+
+    this.loading = true;
+
+    this.userProjectService.addUserToProject({
+      userId: newAdmin.id,
+      projectId: this.projectId,
+      role: 'ADMIN'
+    }).subscribe({
+      next: () => {
+        this.userProjectService.addUserToProject({
+          userId: currentAdmin.userId,
+          projectId: this.projectId,
+          role: 'STAFF'
+        }).subscribe({
+          next: () => {
+            this.loading = false;
+            this.showTransferModal = false;
+
+            sessionStorage.setItem('transferSuccess', newAdmin.name);
+
+            location.reload();
+          },
+          error: (err) => {
+            console.error('Erro ao rebaixar antigo gerente', err);
+            this.loading = false;
+            this.toast.showError('Erro ao rebaixar o gerente antigo');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao definir novo gerente', err);
+        this.loading = false;
+        this.toast.showError('Erro ao definir novo gerente');
+      }
+    });
+  }
+
   private checkIfUserIsAdm(projectId: number): void {
     const user = this.authService.getUser();
     if (!user?.id) {
@@ -85,7 +142,6 @@ export class UsersProjectPageComponent implements OnInit {
     });
   }
 
-  //remoção de usuários com regras de admin
   removeUser(user: UserProjectResponse): void {
     const currentUser = this.authService.getUser();
 
@@ -125,26 +181,22 @@ export class UsersProjectPageComponent implements OnInit {
 
     this.loading = true;
 
-    // caso queira adicionar um gerente para sair do projeto/assumir outra role
     if (event.reassignAdmin) {
-      // localizar o gerente atual
       const currentAdmin = this.users.find(u => u.role === 'ADMIN');
 
       if (currentAdmin) {
-        // atualizar o gerente atual para STAFF
         this.userProjectService.addUserToProject({
           userId: currentAdmin.userId,
           projectId: this.projectId,
           role: 'STAFF'
         }).subscribe({
           next: () => {
-            // adicionar o novo gerente
             this.userProjectService.addUserToProject(payload).subscribe({
               next: () => {
                 this.loading = false;
                 this.showAddModal = false;
-                alert(`Novo gerente definido: ${event.user.name}. O antigo gerente foi rebaixado.`);
-                location.reload(); // recarrega página para refletir mudanças
+                sessionStorage.setItem('transferSuccess', event.user.name);
+                location.reload();
               },
               error: (err) => {
                 console.error('Erro ao adicionar novo gerente', err);
@@ -161,7 +213,6 @@ export class UsersProjectPageComponent implements OnInit {
       return;
     }
 
-    // fluxo normal para adicionar usuario que não é gerente
     this.userProjectService.addUserToProject(payload).subscribe({
       next: () => {
         this.loading = false;
@@ -175,7 +226,6 @@ export class UsersProjectPageComponent implements OnInit {
     });
   }
 
-  //atualizar/adicionar a role do usuario no backend
   changeUserRole(user: UserProjectResponse, oldRole: string): void {
     this.loading = true;
     this.userProjectService.addUserToProject({

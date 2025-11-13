@@ -16,6 +16,8 @@ export class HomePageComponent implements OnInit {
   showModal = false;
   loading = true;
   errorMessage = '';
+  currentUserId!: number;
+  currentUserName!: string;
 
   constructor(
     private projectService: ProjectService,
@@ -35,6 +37,8 @@ export class HomePageComponent implements OnInit {
       return;
     }
 
+    this.currentUserId = user.id;
+    this.currentUserName = user.name;
     this.loading = true;
 
     this.projectService.getProjectsByUser(user.id).subscribe({
@@ -78,7 +82,7 @@ export class HomePageComponent implements OnInit {
     this.router.navigate(['/projects', projectId]);
   }
 
-  openModal(): void {
+  openCreateProjectModal() {
     this.showModal = true;
   }
 }
