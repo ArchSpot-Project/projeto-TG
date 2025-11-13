@@ -51,6 +51,13 @@ public class UserService {
 
 	// Para criar novo usuario
 	public User create(UserCreateDTO dto) {
+		if (repository.existsByEmail(dto.email())) {
+			throw new DatabaseException("E-mail já está em uso");
+		}
+		if (repository.existsByCpf(dto.cpf())) {
+			throw new DatabaseException("CPF já está em uso");
+		}
+
 		User user = new User();
 		user.setCpf(dto.cpf());
 		user.setName(dto.name());
@@ -66,21 +73,24 @@ public class UserService {
 				String imagePath = saveProfileImage(dto.profileImage(), dto.email());
 				user.setFileUrl(imagePath);
 			} catch (IOException e) {
-				throw new RuntimeException("Erro ao salvar imagem de perfil", e);
+				throw new DatabaseException("Erro ao salvar imagem de perfil");
 			}
 		}
 
-		User savedUser = repository.save(user);
+		try {
+			User savedUser = repository.save(user);
 
-		// clonar templates padrão
-		templateService.cloneDefaultTemplatesForUser(savedUser);
+			// Clona templates padrão do sistema para o novo usuário
+			templateService.cloneDefaultTemplatesForUser(savedUser);
 
-		return savedUser;
+			return savedUser;
+		} catch (DataIntegrityViolationException e) {
+			throw new DatabaseException("Violação de integridade ao salvar o usuário");
+		}
 	}
 
 	// Para deletar usuario
 	public void delete(Long id) {
-
 		try {
 			if (repository.existsById(id)) {
 				repository.deleteById(id);
@@ -96,16 +106,22 @@ public class UserService {
 	public User update(Long id, UserUpdateDTO dto, MultipartFile profileImage) {
 		try {
 			User user = repository.getReferenceById(id);
-			user.setCpf(dto.cpf());
-			user.setName(dto.name());
-			user.setPhone(dto.phone());
-			user.setAddress(dto.address());
-			user.setProfession(dto.profession());
+
+			// Verificar duplicidade de CPF
+			if (!user.getCpf().equals(dto.cpf()) && repository.existsByCpf(dto.cpf())) {
+				throw new DatabaseException("CPF já está em uso");
+			}
 
 			// Verificar duplicidade de e-mail
 			if (!user.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())) {
 				throw new DatabaseException("E-mail já está em uso");
 			}
+
+			user.setCpf(dto.cpf());
+			user.setName(dto.name());
+			user.setPhone(dto.phone());
+			user.setAddress(dto.address());
+			user.setProfession(dto.profession());
 			user.setEmail(dto.email());
 
 			// atualizar senha apenas se infromada
@@ -137,6 +153,10 @@ public class UserService {
 			throw new ResourceNotFoundException("User not found");
 		}
 	}
+
+	/*
+	 * MÉTODOS AUXILIARES
+	 */
 
 	private String saveProfileImage(MultipartFile file, String email) throws IOException {
 		Path uploadPath = Paths.get(UPLOAD_DIR);
