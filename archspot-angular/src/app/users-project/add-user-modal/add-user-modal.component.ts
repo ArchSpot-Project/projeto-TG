@@ -12,7 +12,8 @@ export class AddUserModalComponent {
   @Input() roles: string[] = [];
   @Input() existingUsers: UserProjectResponse[] = [];
   @Input() show = false;
-
+  @Input() transferMode = false;
+  @Output() transferUser = new EventEmitter<{ user: UserResponse }>();
   @Output() close = new EventEmitter<void>();
   @Output() addUser = new EventEmitter<{ user: UserResponse; role: string; reassignAdmin?: boolean }>();
 
@@ -67,30 +68,21 @@ export class AddUserModalComponent {
   }
 
   confirmAdd(): void {
-    if (!this.selectedUser || !this.selectedRole) return;
+    if (!this.selectedUser) return;
 
+    if (this.transferMode) {
+      // transferência de role: apenas seleciona o usuário e emite o evento
+      this.transferUser.emit({ user: this.selectedUser });
+      this.cancel();
+      return;
+    }
+
+    if (!this.selectedRole) return;
     const alreadyAdded = this.existingUsers.some(u => Number(u.userId) === Number(this.selectedUser!.id));
     if (alreadyAdded) {
       this.toast.showError('Usuário já está associado ao projeto.');
       this.reset();
       return;
-    }
-
-    // regra de único gerente para um projeto
-    if (this.selectedRole === 'ADMIN') {
-      const currentAdmin = this.existingUsers.find(u => u.role === 'ADMIN');
-      if (currentAdmin) {
-        const confirmed = confirm(
-          `⚠️ ATENÇÃO: você está adicionando o usuário ${this.selectedUser!.name} como GERENTE.\n` +
-          `Sua função será alterada para COLABORADOR INTERNO.\n` +
-          `Deseja continuar?`
-        );
-        if (!confirmed) return;
-
-        this.addUser.emit({ user: this.selectedUser!, role: this.selectedRole!, reassignAdmin: true });
-        this.cancel();
-        return;
-      }
     }
 
     // fluxo normal

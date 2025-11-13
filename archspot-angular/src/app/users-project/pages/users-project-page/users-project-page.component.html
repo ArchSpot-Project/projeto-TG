@@ -37,7 +37,7 @@
                 <ng-template #roleText>{{ user.role | roleTranslate }}</ng-template>
               </td>
               <td *ngIf="isAdmInProject">
-                <button class="btn btn-sm btn-error btn-outline" (click)="removeUser(user)" title="Remover usuário">
+                <button *ngIf="user.role !== 'ADMIN'" class="btn btn-sm btn-error btn-outline" (click)="removeUser(user)" title="Remover usuário">
                   <img src="assets/img/icons/trash3.svg" alt="Remover" class="w-4 h-4" />
                 </button>
               </td>
@@ -46,14 +46,24 @@
         </table>
       </div>
 
-      <button class="btn btn-success mt-4" *ngIf="isAdmInProject" (click)="openAddUserModal()">
-        Adicionar participante
-      </button>
+      <div class="flex gap-3 mt-4 justify-center md:justify-end w-full max-w-5xl">
+        <button class="btn btn-success flex-1 mx-2 md:flex-none" *ngIf="isAdmInProject" (click)="openAddUserModal()">
+          Adicionar participante
+        </button>
+
+        <button class="btn btn-success flex-1 md:flex-none" *ngIf="isAdmInProject" (click)="openTransferAdminModal()">
+          Transferir gerência
+        </button>
+      </div>
     </div>
 
     <!-- modal adicionar usuario -->
-    <app-add-user-modal [roles]="modalRoles" [show]="showAddModal" [existingUsers]="users" (close)="cancelAdd()"
+    <app-add-user-modal [roles]="roles" [show]="showAddModal" [existingUsers]="users" (close)="cancelAdd()"
       (addUser)="handleAddUser($event)">
+    </app-add-user-modal>
+
+    <app-add-user-modal [show]="showTransferModal" [existingUsers]="users" [transferMode]="true"
+      (close)="cancelTransfer()" (transferUser)="handleTransferAdmin($event)">
     </app-add-user-modal>
 
   </div>

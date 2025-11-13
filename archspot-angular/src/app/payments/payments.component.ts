@@ -213,12 +213,16 @@ export class PaymentsComponent implements OnInit {
       return;
     }
 
+    const confirmed = window.confirm('Deseja marcar a parcela como PAGA?');
+    if (!confirmed) return;
+
     this.installmentService.payInstallment(installment.id, installment.paymentMethod).subscribe({
       next: updated => {
         const installmentWithStatus: SelectableInstallment = { ...updated, selected: false, paymentStatus: 'PAID' };
         const idx = this.installments.findIndex(i => i.id === updated.id);
         if (idx >= 0) this.installments[idx] = installmentWithStatus;
         else this.installments.push(installmentWithStatus);
+        this.toast.showSuccess('Parcela paga com sucesso.');
       },
       error: err => {
         console.error('Erro ao pagar parcela', err);
