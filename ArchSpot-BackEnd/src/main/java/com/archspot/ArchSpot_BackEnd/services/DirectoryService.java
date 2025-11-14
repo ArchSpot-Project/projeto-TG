@@ -71,7 +71,22 @@ public class DirectoryService {
         .parentDirectory(parent)
         .build();
 
-    return toDTO(directoryRepository.save(directory));
+    Directory saved = directoryRepository.save(directory);
+
+    // Cria subdiretório genérico se for raiz DRAWINGS
+    if (dto.getType() == DirectoryType.DRAWINGS && dto.getParentDirectoryId() == null) {
+      Directory generic = Directory.builder()
+          .name("Novo subdir. de " + dto.getName())
+          .type(DirectoryType.DRAWINGS)
+          .creationDate(LocalDateTime.now())
+          .project(project)
+          .parentDirectory(saved)
+          .build();
+
+      directoryRepository.save(generic);
+    }
+
+    return toDTO(saved);
   }
 
   // atualizar diretório
