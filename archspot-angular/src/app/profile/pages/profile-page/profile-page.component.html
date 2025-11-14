@@ -2,9 +2,16 @@
 
   <!-- Título e botão de editar -->
   <app-section-title title="Dados da Conta">
-    <button class="btn" type="button" (click)="openEditModal()">
-      <img src="/assets/img/icons/pencil-square.svg" alt="Editar" width="25" height="25" />
-    </button>
+    <div class="d-flex align-items-center gap-2">
+
+      <button class="btn btn-outline-light" (click)="openEditModal()">
+        <img src="/assets/img/icons/pencil-square.svg" alt="Editar" width="25" height="25" />
+      </button>
+
+      <button class="btn btn-outline-primary" (click)="openChangePasswordModal()">
+        Trocar Senha
+      </button>
+    </div>
   </app-section-title>
 
   <!-- Conteúdo da conta -->
@@ -55,3 +62,8 @@
     </div>
   </div>
 </app-page-layout>
+
+<app-change-password-modal
+  [show]="showChangePasswordModal"
+  (close)="showChangePasswordModal = false">
+</app-change-password-modal>

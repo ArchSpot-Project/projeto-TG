@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { User, UserCreateDTO } from '../models/user.model';
+import { User, UserCreateDTO, UserUpdateDTO } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class UserService {
     return this.http.post<User>(`${this.apiUrl}/create`, user);
   }
 
-  updateUser(id: number, user: UserCreateDTO, file?: File): Observable<User> {
+  updateUser(id: number, user: UserUpdateDTO, file?: File): Observable<User> {
     const formData = new FormData();
     formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
 
