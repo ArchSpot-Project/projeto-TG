@@ -35,6 +35,11 @@ public class GlobalExceptionHandler {
     return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
   }
 
+  @ExceptionHandler(BusinessRuleException.class)
+  public ResponseEntity<String> handleBusinessException(BusinessRuleException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+
   @ExceptionHandler(AssociationNotFoundException.class)
   public ResponseEntity<ErrorResponseDTO> handleAssociationNotFound(AssociationNotFoundException ex, HttpServletRequest request) {
     return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);

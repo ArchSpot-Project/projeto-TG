@@ -76,33 +76,33 @@ public class TestConfig implements CommandLineRunner {
         public void run(String... args) throws Exception {
 
                 // ==== USERS ====
-                User user1 = new User(null, "439.779.870-20", "Ana", "9999-9999", "Avenida General Carneiro, 1560",
+                User user1 = new User(null, "439.779.870-20", "Ana", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "ana@email.com", "123");
-                User user2 = new User(null, "847.381.614-58", "Fernando", "9888-9999", "Rua da Penha, 56",
+                User user2 = new User(null, "847.381.614-58", "Fernando", "(15) 99888-9999", "Rua da Penha, 56",
                                 "Arquiteto", "fernando@email.com", "456");
-                User user3 = new User(null, "887.832.723-99", "Beatriz", "9777-9999", "Avenida Barão de Tatuí, 104",
+                User user3 = new User(null, "887.832.723-99", "Beatriz", "(15) 99777-9999", "Avenida Barão de Tatuí, 104",
                                 "Designer Gráfica", "beatriz@email.com", "789");
-                User user4 = new User(null, "397.983.748-35", "Hélio", "9666-8888", "Rua das Palmeiras, 220",
+                User user4 = new User(null, "397.983.748-35", "Hélio", "(15) 99666-8888", "Rua das Palmeiras, 220",
                                 "Engenheiro Civil", "helio@email.com", "101112");
-                User user5 = new User(null, "439.779.870-20", "Diego", "9999-9999", "Avenida General Carneiro, 1560",
+                User user5 = new User(null, "609.697.589-52", "Diego", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "diego@email.com", "123");
-                User user6 = new User(null, "439.779.870-20", "Elisa", "9999-9999", "Avenida General Carneiro, 1560",
+                User user6 = new User(null, "592.757.545-51", "Elisa", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "elisa@email.com", "123");
-                User user7 = new User(null, "439.779.870-20", "Felipe", "9999-9999", "Avenida General Carneiro, 1560",
+                User user7 = new User(null, "999.275.881-35", "Felipe", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "felipe@email.com", "123");
-                User user8 = new User(null, "439.779.870-20", "Gabriela", "9999-9999", "Avenida General Carneiro, 1560",
+                User user8 = new User(null, "588.570.916-51", "Gabriela", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "gabriela@email.com", "123");
-                User user9 = new User(null, "439.779.870-20", "Henrique", "9999-9999", "Avenida General Carneiro, 1560",
+                User user9 = new User(null, "360.992.509-48", "Henrique", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "henrique@email.com", "123");
-                User user10 = new User(null, "439.779.870-20", "Isabela", "9999-9999", "Avenida General Carneiro, 1560",
+                User user10 = new User(null, "431.197.284-97", "Isabela", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "isabela@email.com", "123");
-                User user11 = new User(null, "439.779.870-20", "João", "9999-9999", "Avenida General Carneiro, 1560",
+                User user11 = new User(null, "822.422.132-61", "João", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "joao@email.com", "123");
-                User user12 = new User(null, "439.779.870-20", "Larissa", "9999-9999", "Avenida General Carneiro, 1560",
+                User user12 = new User(null, "311.686.820-45", "Larissa", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "larissa@email.com", "123");
-                User user13 = new User(null, "439.779.870-20", "Marcos", "9999-9999", "Avenida General Carneiro, 1560",
+                User user13 = new User(null, "471.864.785-14", "Marcos", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "marcos@email.com", "123");
-                User user14 = new User(null, "439.779.870-20", "Natália", "9999-9999", "Avenida General Carneiro, 1560",
+                User user14 = new User(null, "050.031.467-52", "Natália", "(15) 99999-9999", "Avenida General Carneiro, 1560",
                                 "Arquiteta", "natalia@email.com", "123");
 
                 userRepository.saveAll(Arrays.asList(user1, user2, user3, user4, user5, user6, user7, user8, user9,

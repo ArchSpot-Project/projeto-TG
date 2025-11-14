@@ -16,7 +16,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "tb_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "cpf"),
+        @UniqueConstraint(columnNames = "email")
+})
 @Data
 public class User {
 
@@ -26,9 +29,11 @@ public class User {
 
     @CPF(message = "O CPF deve ser valido")
     @NotBlank(message = "CPF nao pode ser vazio")
+    @Column(nullable = false, unique = true, length = 14)
     private String cpf;
 
     @NotBlank(message = "Nome nao pode ser vazio")
+    @Column(nullable = false)
     private String name;
 
     private String phone;
@@ -37,6 +42,7 @@ public class User {
 
     @Email(message = "O e-mail deve ser valido")
     @NotBlank(message = "E-mail nao pode ser vazio")
+    @Column(nullable = false, unique = true)
     private String email;
 
     // private UserRole userRole; -> ficou como uma classe de associacao
@@ -52,8 +58,7 @@ public class User {
     @Column(name = "profile_image")
     private String fileUrl;
 
-    // Método para encriptar a senha automaticamente de toda instância que for
-    // persistida ou atualziada
+    // encripta a senha automaticamente ao ser persistida ou atualziada
     @PrePersist
     @PreUpdate
     private void encryptPassword() {
@@ -64,12 +69,12 @@ public class User {
 
     // associacão com projeto
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // evita loop JSON; troque conforme sua estratégia de DTOs
+    @JsonIgnore // evita loop JSON; troque conforme a estratégia de DTOs
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<UserProject> userProjects = new ArrayList<>();
 
-    // 🔹 Associação com Comment (sem cascade)
+    // associação com Comment (sem cascade)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude

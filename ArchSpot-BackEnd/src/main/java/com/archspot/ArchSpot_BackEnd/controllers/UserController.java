@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.archspot.ArchSpot_BackEnd.dtos.user.PasswordChangeDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
@@ -62,13 +63,7 @@ public class UserController {
     }
 
     // Para atualizar um usuario
-    // @PutMapping(value = "/{id}")
-    // public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody
-    // UserUpdateDTO dto) {
-    // User user = service.update(id, dto);
-    // return ResponseEntity.ok().body(user);
-    // }
-    @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<User> update(
             @PathVariable Long id,
             @RequestPart("user") UserUpdateDTO dto,
@@ -77,4 +72,12 @@ public class UserController {
         User user = service.update(id, dto, profileImage);
         return ResponseEntity.ok().body(user);
     }
+
+    // Para atualizar senha
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<Void> changePassword(@PathVariable Long id, @RequestBody PasswordChangeDTO dto) {
+        service.changePassword(id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -51,14 +51,42 @@ export class DirectoryComponent implements OnInit {
   }
 
   loadDirectories() {
+    const currentlyActive = this.activeTabId;
+
     this.directoryService.getDirectoriesByProjectAndType(this.projectId, this.directoryType)
       .subscribe({
         next: (dirs) => {
           this.directories = dirs;
+          if (currentlyActive) {
+            // mantém a aba atual
+            const stillExists = this.directories
+              .flatMap(d => [d, ...(d.subdirectories || [])])
+              .find(d => d.id === currentlyActive);
+
+            if (stillExists) {
+              this.setActiveTab(stillExists);
+              return;
+            }
+          }
+
           if (this.directories.length > 0) {
+
+            // comportamento exclusivo da aba DRAWINGS
+            if (this.directoryType === 'DRAWINGS') {
+              const firstRoot = this.directories[0];
+              const subs = firstRoot.subdirectories ?? [];
+
+              if (subs.length > 0) {
+                this.setActiveTab(subs[0]);
+                return;
+              }
+            }
+
+            // fallback padrão
             this.setActiveTab(this.directories[0]);
           }
         },
+
         error: err => console.error('Erro ao carregar diretórios', err)
       });
   }
@@ -81,6 +109,17 @@ export class DirectoryComponent implements OnInit {
   activeRoot: DirectoryDTO | null = null;
 
   setActiveTab(dir: DirectoryDTO) {
+    // Se for DRAWINGS e clicaram em um root, ativar automaticamente o primeiro subdir
+    if (this.directoryType === 'DRAWINGS') {
+      const subs = dir.subdirectories ?? [];
+      const isRoot = this.directories.some(d => d.id === dir.id);
+
+      if (isRoot && subs.length > 0) {
+        this.setActiveTab(subs[0]);
+        return;
+      }
+    }
+
     this.activeTabId = dir.id;
     this.directoryChanged.emit(dir.id);
 
@@ -99,8 +138,8 @@ export class DirectoryComponent implements OnInit {
     const dto = { name, projectId: this.projectId, type: this.directoryType };
     this.directoryService.createDirectoryInProject(this.projectId, dto).subscribe({
       next: (dir) => {
-        this.directories.push(dir);
         this.setActiveTab(dir);
+        this.loadDirectories();
         this.toast.showSuccess('Diretório criado com sucesso!');
       },
       error: err => { console.error(err); this.toast.showError('Erro ao criar diretório.'); }
@@ -113,7 +152,7 @@ export class DirectoryComponent implements OnInit {
     if (!newName || newName === dir.name) return;
 
     this.directoryService.renameDirectory(dir.id, newName).subscribe({
-      next: (updated) => { dir.name = updated.name; this.toast.showSuccess('Nome atualizado com sucesso!'); location.reload(); },
+      next: (updated) => { dir.name = updated.name; this.toast.showSuccess('Nome atualizado com sucesso!'); this.loadDirectories(); },
       error: err => { console.error(err); this.toast.showError('Erro ao renomear diretório.'); }
     });
   }
@@ -125,6 +164,7 @@ export class DirectoryComponent implements OnInit {
     this.directoryService.deleteDirectory(dir.id).subscribe({
       next: () => {
         this.toast.show('Diretório excluído!');
+        this.loadDirectories();
         this.directories = this.directories.filter(d => d.id !== dir.id);
         if (this.directories.length) this.setActiveTab(this.directories[0]);
       },

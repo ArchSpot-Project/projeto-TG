@@ -1,13 +1,13 @@
 <!-- Linha principal: diretórios raiz + botão upload -->
-<nav class="d-flex justify-content-between align-items-center mb-2">
+<nav>
   <div class="nav nav-tabs fs-5" role="tablist">
-    <button *ngFor="let dir of directories" class="nav-link" [class.active]="dir.id === activeTabId" type="button"
+    <button *ngFor="let dir of directories" class="nav-link" [class.active]="dir.id === activeRoot?.id" type="button"
       (click)="setActiveTab(dir)" (contextmenu)="openContextMenu($event, dir, true)">
       {{ dir.name }}
     </button>
 
     <!-- botão criar diretório raiz -->
-    <a *ngIf="!isCustomerInProject || directoryType === 'DOCUMENTS'" class="btn align-middle ms-1 p-0"
+    <a *ngIf="!isCustomerInProject || directoryType === 'DOCUMENTS'" class="btn d-inline-flex align-items-center"
       (click)="createDirectory()" title="Novo diretório raiz">
       <img src="/assets/img/icons/plus-circle.svg" alt="+" width="20" height="20">
     </a>
@@ -16,7 +16,7 @@
 
 <!-- Subdiretórios (segunda linha de abas) -->
 <nav *ngIf="activeRoot?.subdirectories?.length">
-  <div class="nav nav-tabs ms-3" role="tablist">
+  <div class="nav nav-tabs border border-top-0 px-3 pt-3" role="tablist">
     <button *ngFor="let sub of activeRoot?.subdirectories" class="nav-link" [class.active]="sub.id === activeTabId"
       type="button" (click)="setActiveTab(sub)" (contextmenu)="openContextMenu($event, sub, false)">
       {{ sub.name }}
@@ -24,14 +24,14 @@
 
     <!-- botão criar subdiretório -->
     <a *ngIf="(isAdminInProject() || isCollaboratorOrAssociated()) && activeRoot && directoryType === 'DRAWINGS'"
-      class="btn align-middle ms-1 p-0" (click)="createSubdirectory(activeRoot)" title="Novo subdiretório">
+      class="btn d-inline-flex align-items-center" (click)="createSubdirectory(activeRoot)" title="Novo subdiretório">
       <img src="/assets/img/icons/plus-circle.svg" alt="+" width="18" height="18">
     </a>
   </div>
 </nav>
 
 <!-- Conteúdo -->
-<div class="tab-content border border-top-0 p-2 pt-0 mt-0">
+<div class="tab-content border rounded-bottom border-top-0 p-3">
   <app-table *ngIf="activeTabId" [directoryId]="activeTabId" [directoryType]="directoryType" [projectId]="projectId"
     [activeRootId]="activeRoot?.id">
   </app-table>

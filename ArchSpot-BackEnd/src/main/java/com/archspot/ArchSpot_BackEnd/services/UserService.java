@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.archspot.ArchSpot_BackEnd.dtos.user.PasswordChangeDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.user.UserUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.User;
@@ -51,6 +52,13 @@ public class UserService {
 
 	// Para criar novo usuario
 	public User create(UserCreateDTO dto) {
+		if (repository.existsByEmail(dto.email())) {
+			throw new DatabaseException("E-mail já está em uso");
+		}
+		if (repository.existsByCpf(dto.cpf())) {
+			throw new DatabaseException("CPF já está em uso");
+		}
+
 		User user = new User();
 		user.setCpf(dto.cpf());
 		user.setName(dto.name());
@@ -66,21 +74,24 @@ public class UserService {
 				String imagePath = saveProfileImage(dto.profileImage(), dto.email());
 				user.setFileUrl(imagePath);
 			} catch (IOException e) {
-				throw new RuntimeException("Erro ao salvar imagem de perfil", e);
+				throw new DatabaseException("Erro ao salvar imagem de perfil");
 			}
 		}
 
-		User savedUser = repository.save(user);
+		try {
+			User savedUser = repository.save(user);
 
-		// clonar templates padrão
-		templateService.cloneDefaultTemplatesForUser(savedUser);
+			// Clona templates padrão do sistema para o novo usuário
+			templateService.cloneDefaultTemplatesForUser(savedUser);
 
-		return savedUser;
+			return savedUser;
+		} catch (DataIntegrityViolationException e) {
+			throw new DatabaseException("Violação de integridade ao salvar o usuário");
+		}
 	}
 
 	// Para deletar usuario
 	public void delete(Long id) {
-
 		try {
 			if (repository.existsById(id)) {
 				repository.deleteById(id);
@@ -96,22 +107,28 @@ public class UserService {
 	public User update(Long id, UserUpdateDTO dto, MultipartFile profileImage) {
 		try {
 			User user = repository.getReferenceById(id);
-			user.setCpf(dto.cpf());
-			user.setName(dto.name());
-			user.setPhone(dto.phone());
-			user.setAddress(dto.address());
-			user.setProfession(dto.profession());
+
+			// Verificar senha atual para permitir atualização
+			if (dto.password() == null || !passwordEncoder.matches(dto.password(), user.getPassword())) {
+				throw new DatabaseException("Senha incorreta");
+			}
+
+			// Verificar duplicidade de CPF
+			if (!user.getCpf().equals(dto.cpf()) && repository.existsByCpf(dto.cpf())) {
+				throw new DatabaseException("CPF já está em uso");
+			}
 
 			// Verificar duplicidade de e-mail
 			if (!user.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())) {
 				throw new DatabaseException("E-mail já está em uso");
 			}
-			user.setEmail(dto.email());
 
-			// atualizar senha apenas se infromada
-			if (dto.password() != null && !dto.password().isBlank()) {
-				user.setPassword(passwordEncoder.encode(dto.password()));
-			}
+			user.setCpf(dto.cpf());
+			user.setName(dto.name());
+			user.setPhone(dto.phone());
+			user.setAddress(dto.address());
+			user.setProfession(dto.profession());
+			user.setEmail(dto.email());
 
 			// Atualizar imagem, se enviada
 			if (profileImage != null && !profileImage.isEmpty()) {
@@ -137,6 +154,25 @@ public class UserService {
 			throw new ResourceNotFoundException("User not found");
 		}
 	}
+
+	// Para atualizar senha
+	public void changePassword(Long userId, PasswordChangeDTO dto) {
+		User user = repository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		// Valida senha atual
+		if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+			throw new DatabaseException("Senha atual incorreta");
+		}
+
+		// Atualiza nova senha
+		user.setPassword(passwordEncoder.encode(dto.newPassword()));
+		repository.save(user);
+	}
+
+	/*
+	 * MÉTODOS AUXILIARES
+	 */
 
 	private String saveProfileImage(MultipartFile file, String email) throws IOException {
 		Path uploadPath = Paths.get(UPLOAD_DIR);
