@@ -24,6 +24,9 @@ export class TableComponent implements OnChanges {
   userRole: string | null = null;
   userId: number | null = null;
   projectUsers: any[] = [];
+  showVersioningModal = false;
+  selectedDocumentId: number | null = null;
+  selectedDocumentName: string | null = null;
 
   constructor(
     private documentService: DocumentService,
@@ -116,7 +119,8 @@ export class TableComponent implements OnChanges {
     return false;
   }
 
-  getDisplayName(name: string): string {
+  getDisplayName(name: string | null | undefined): string {
+    if (!name) return 'Sem nome';
     return name.replace(/\.[^/.]+$/, '');
   }
 
@@ -141,11 +145,18 @@ export class TableComponent implements OnChanges {
   }
 
   abrirDoc(doc: DocumentDTO): void {
-    const path =
-      this.directoryType === 'DRAWINGS'
-        ? 'drawings'
-        : 'documents';
+    const path = this.directoryType === 'DRAWINGS' ? 'drawings' : 'documents';
     this.router.navigate([`/projects/${this.projectId}/${path}/${doc.id}/view`]);
+  }
+
+  abrirVersionamento(doc: DocumentDTO) {
+    this.selectedDocumentId = doc.id;
+    this.selectedDocumentName = doc.name;
+    this.showVersioningModal = true;
+  }
+
+  cancelModal(): void {
+    this.showVersioningModal = false;
   }
 
   downloadDoc(doc: DocumentDTO): void {
@@ -168,36 +179,60 @@ export class TableComponent implements OnChanges {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '*/*';
+
     input.onchange = (event: any) => {
       const file: File = event.target.files[0];
       if (!file) return;
 
-      const description = prompt('Descrição da nova versão:', doc.description) ?? '';
+      const description = prompt('Descrição da nova versão:', doc.description || '') ?? '';
 
-      let baseName = doc.name.replace(/\s\(\d+\)(\.[^/.]+)?$/, '');
-      const ext = doc.name.includes('.') ? doc.name.slice(doc.name.lastIndexOf('.')) : '';
+      const ext = doc.name && doc.name.includes('.') ? doc.name.slice(doc.name.lastIndexOf('.')) : '';
+      let baseName = doc.name ?? '';
+      if (ext) baseName = baseName.slice(0, baseName.length - ext.length);
 
-      const sameBase = this.documents
-        .map(d => this.getDisplayName(d.name))
-        .filter(name => name.startsWith(baseName));
+      baseName = baseName.replace(/\s*\(\s*\d+\s*\)\s*$/, '');
 
-      const nextVersion = sameBase.length + 1;
-      const newFileName = `${baseName} (${nextVersion})${ext}`;
+      let currentVersion = 1;
+      const matchCurrent = doc.name?.match(/\((\d+)\)/);
+      if (matchCurrent) currentVersion = Number(matchCurrent[1]);
 
-      this.documentService.uploadNewVersion(doc.id, file, description).subscribe({
-        next: () => {
-          this.documentService.updateDocument(doc.id, { ...doc, name: newFileName }).subscribe({
+      this.documentService.getDocumentVersions(doc.id).subscribe({
+        next: (versions) => {
+          let extracted = [currentVersion];
+
+          versions.forEach(v => {
+            const num = Number((v as any).versionNumber);
+            if (!isNaN(num) && num > 0) extracted.push(num);
+
+            const nameCandidate = (v as any).name || (v as any).fileUrl || '';
+            const m = nameCandidate.match(/\((\d+)\)/);
+            if (m) extracted.push(Number(m[1]));
+          });
+
+          const maxVersion = Math.max(...extracted);
+          const nextVersion = maxVersion + 1;
+
+          const newFileName = `${baseName} (${nextVersion})${ext}`;
+
+          this.documentService.uploadNewVersion(doc.id, file, description).subscribe({
             next: () => {
-              alert(`Nova versão "${newFileName}" enviada com sucesso!`);
-              this.loadDocuments();
+
+              this.documentService.updateDocument(doc.id, {
+                ...doc,
+                name: newFileName,
+                description: description
+              }).subscribe({
+                next: () => {
+                  alert(`Nova versão "${newFileName}" enviada com sucesso!`);
+                  this.loadDocuments();
+                },
+                error: () => this.toast.showError('Erro ao renomear nova versão.')
+              });
             },
-            error: () => this.toast.showError('Erro ao renomear nova versão.')
+            error: () => this.toast.showError('Erro ao enviar nova versão.')
           });
         },
-        error: (err) => {
-          console.error('Erro ao substituir documento:', err);
-          this.toast.showError('Erro ao enviar nova versão.');
-        }
+        error: () => this.toast.showError('Erro ao carregar versões para gerar novo nome.')
       });
     };
     input.click();

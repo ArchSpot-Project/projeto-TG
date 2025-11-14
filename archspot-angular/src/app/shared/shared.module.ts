@@ -20,6 +20,7 @@ import { DirectoryNodeComponent } from './directory/directory-node/directory-nod
 import { SafeUrlPipe } from '../core/pipes/safe-url.pipe';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { DocVersioningModalComponent } from './doc-versioning-modal/doc-versioning-modal.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
     AddUserModalComponent,
     DirectoryComponent,
     DirectoryNodeComponent,
-    ToastContainerComponent
+    ToastContainerComponent,
+    DocVersioningModalComponent
   ],
   imports: [
     CommonModule,

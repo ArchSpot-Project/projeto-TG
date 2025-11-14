@@ -10,3 +10,14 @@ export interface DocumentDTO {
   version: number;
   fileUrl: string;
 }
+
+export interface DocumentVersionDTO {
+  id: number;
+  name: string;
+  documentId: number;
+  versionNumber: number;
+  size: number;
+  uploadedAt: string;
+  fileUrl: string;
+  description?: string;
+}
