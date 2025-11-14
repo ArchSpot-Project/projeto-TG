@@ -36,7 +36,6 @@ export class ProjectDetailsPageComponent {
     this.currentUser = this.authService.getUser();
     this.loadProject();
     const projectId = Number(this.route.snapshot.paramMap.get('id'));
-    if (projectId) this.checkIfUserIsAdmin(projectId);
     if (projectId) this.loadCurrentUserRole(projectId);
   }
 
@@ -47,7 +46,7 @@ export class ProjectDetailsPageComponent {
       next: (users) => {
         const user = users.find(u => u.userId === this.currentUser?.id);
         this.currentUserRole = user ? user.role : '';
-        this.isAdminInProject = this.currentUserRole === '';
+        this.isAdminInProject = ['ADMIN'].includes(this.currentUserRole);
       },
       error: () => {
         this.currentUserRole = '';
@@ -55,7 +54,6 @@ export class ProjectDetailsPageComponent {
       }
     });
   }
-
 
   loadProject(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -77,22 +75,6 @@ export class ProjectDetailsPageComponent {
         this.errorMessage = 'Erro ao carregar o projeto.';
         this.loading = false;
       }
-    });
-  }
-
-  //verificar se usuario é admin para edição
-  private checkIfUserIsAdmin(projectId: number): void {
-    if (!this.currentUser?.id) {
-      this.isAdminInProject = false;
-      return;
-    }
-
-    this.userProjectService.getUsersByProject(projectId).subscribe({
-      next: (users) => {
-        const match = users.find(u => u.userId === this.currentUser?.id && u.role === 'ADMIN');
-        this.isAdminInProject = !!match;
-      },
-      error: () => this.isAdminInProject = false
     });
   }
 
@@ -187,5 +169,4 @@ export class ProjectDetailsPageComponent {
     const parsedDate = new Date(dateValue);
     return parsedDate.toLocaleDateString('pt-BR');
   }
-
 }

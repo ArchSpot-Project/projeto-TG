@@ -1,0 +1,48 @@
+<!-- MODAL PARA CRIAR NOVO TEMPLATE, SEM CRIAR UM PROJETO -->
+<div class="modal fade show" *ngIf="show" tabindex="-1" style="display:block; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-4 font-logo">Criar Novo Template</h1>
+                <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row g-3 fw-medium">
+                        <form class="col">
+                            <div class="mb-3">
+                                <label for="campoNome" class="form-label">Nome do template:</label>
+                                <input type="text" class="form-control" id="campoNome" [(ngModel)]="templateName"
+                                    name="templateName" placeholder="Digite o nome do template" />
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-3">
+                                    <label class="form-label">Etapas:</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="d-grid gap-1">
+                                        <button type="button" class="btn btn-outline-success text-start">Estudo
+                                            Preliminar</button>
+                                        <button type="button"
+                                            class="btn btn-outline-success text-start">Anteprojeto</button>
+                                        <button type="button" class="btn btn-outline-success text-start">Projeto
+                                            Legal</button>
+                                        <button type="button" class="btn btn-outline-success text-start">Projeto
+                                            Executivo</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="onCancel()">Voltar para Etapas</button>
+                <button type="button" class="btn btn-success" (click)="onSave()">Salvar Template</button>
+            </div>
+        </div>
+    </div>
+</div>

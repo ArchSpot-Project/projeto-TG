@@ -1,0 +1,120 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 80%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.modal-title {
+  margin-bottom: 10px;
+}
+
+.etapas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.etapa-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.etapa-btn {
+  min-width: 200px;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.etapa-btn:hover {
+  transform: translateY(-1px);
+}
+
+.etapa-duracao {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.etapa-duracao input {
+  width: 70px;
+  /* 🔹 menor e mais discreto */
+  padding: 3px 6px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.etapa-item.selected .form-control {
+  border-color: #28a745;
+}
+
+/* 🔹 Colaboradores */
+.collaborators-container {
+  max-height: 400px;
+  min-height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 0;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
+  padding-top: 10px;
+}
+
+textarea {
+  resize: none;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+  }
+
+  .etapa-btn {
+    min-width: 160px;
+    font-size: 0.85rem;
+  }
+
+  .etapa-duracao input {
+    width: 20px;
+  }
+}
