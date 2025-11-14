@@ -7,6 +7,7 @@
 </div>
 
 <h5>{{ title }}</h5>
+
 <table class="table table-hover align-middle">
   <thead class="table-light">
     <tr>
@@ -22,6 +23,7 @@
   <tbody>
     <tr *ngFor="let doc of documents; let i = index">
       <td>{{ i + 1 }}</td>
+
       <td>
         <span class="document-name" [attr.data-title]="doc.description || 'Sem descrição'" (click)="abrirDoc(doc)">
           {{ getDisplayName(doc.name) }}
@@ -29,17 +31,20 @@
       </td>
 
       <td>{{ getUploaderName(doc.uploadedById) }}</td>
-      <td>{{ doc.modificationDate | date: 'dd-MM-yyyy HH:mm' }}</td>
-      <td>{{ (doc.size / (1024 * 1024)) | number: '1.2-2' }} MB</td>
+      <td>{{ doc.modificationDate | date :'dd-MM-yyyy HH:mm' }}</td>
+      <td>{{ (doc.size / (1024*1024)) | number:'1.2-2' }} MB</td>
 
-      <!-- Dropdown de ações -->
       <td>
         <div class="dropdown">
-          <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle" role="button"
-            id="dropdownMenuButton{{ i }}" data-bs-toggle="dropdown" aria-expanded="false" width="20" height="20" />
+          <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle"
+            id="dropdownMenuButton{{ i }}" data-bs-toggle="dropdown" width="20" height="20" />
 
-          <ul class="dropdown-menu align-middle me-2">
-            <!-- Abrir sempre disponível -->
+          <ul class="dropdown-menu">
+
+            <li>
+              <a class="dropdown-item" (click)="abrirVersionamento(doc)">Últimas versões</a>
+            </li>
+
             <li>
               <a class="dropdown-item" (click)="abrirDoc(doc)">
                 <img src="assets/img/icons/envelope-open.svg" width="15" height="15" />
@@ -47,7 +52,6 @@
               </a>
             </li>
 
-            <!-- Baixar sempre disponível -->
             <li>
               <a class="dropdown-item" (click)="downloadDoc(doc)">
                 <img src="assets/img/icons/download.svg" width="15" height="15" />
@@ -55,7 +59,6 @@
               </a>
             </li>
 
-            <!-- Substituir versão -->
             <li *ngIf="canEdit(doc)">
               <a class="dropdown-item" (click)="substituirDoc(doc)">
                 <img src="assets/img/icons/upload.svg" width="15" height="15" />
@@ -63,7 +66,6 @@
               </a>
             </li>
 
-            <!-- Renomear -->
             <li *ngIf="canEdit(doc)">
               <a class="dropdown-item" (click)="renomearDoc(doc)">
                 <img src="assets/img/icons/pencil.svg" width="15" height="15" />
@@ -71,7 +73,6 @@
               </a>
             </li>
 
-            <!-- Deletar -->
             <li *ngIf="canDelete(doc)">
               <a class="dropdown-item" (click)="deletarDoc(doc)">
                 <img src="assets/img/icons/trash3.svg" width="15" height="15" />
@@ -84,3 +85,7 @@
     </tr>
   </tbody>
 </table>
+
+<app-doc-versioning-modal [documentId]="selectedDocumentId" [documentName]="selectedDocumentName"
+  [visible]="showVersioningModal" (close)="cancelModal()">
+</app-doc-versioning-modal>

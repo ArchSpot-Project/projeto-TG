@@ -54,11 +54,11 @@
 
             <div class="col-md-6 mb-3">
                 <label for="password" class="form-label">Senha:</label>
-                <input type="password" class="form-control" id="password" name="password" required
+                <input type="password" class="form-control" id="password" name="password" [required]="!isEditMode"
                     [(ngModel)]="password" />
             </div>
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-3" *ngIf="!isEditMode">
                 <label for="confirmPassword" class="form-label">Confirme sua senha:</label>
                 <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
                     [(ngModel)]="confirmPassword" #confirmPassField="ngModel" />

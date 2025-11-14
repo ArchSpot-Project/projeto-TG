@@ -5,11 +5,13 @@ import { ProfileRoutingModule } from './profile-routing.module';
 import { ProfilePageComponent } from './pages/profile-page/profile-page.component';
 import { LayoutModule } from '../layout/layout.module';
 import { SharedModule } from '../shared/shared.module';
+import { ChangePasswordModalComponent } from './change-password-modal/change-password-modal.component';
 
 
 @NgModule({
   declarations: [
-    ProfilePageComponent
+    ProfilePageComponent,
+    ChangePasswordModalComponent
   ],
   imports: [
     CommonModule,

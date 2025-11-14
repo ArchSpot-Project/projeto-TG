@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DocumentDTO } from '../models/document.model';
+import { DocumentDTO, DocumentVersionDTO } from '../models/document.model';
 
 @Injectable({
   providedIn: 'root'
@@ -53,5 +53,25 @@ export class DocumentService {
 
   viewDocument(id: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/documents/${id}/view`, { responseType: 'blob' });
+  }
+
+  getDocumentVersions(documentId: number): Observable<DocumentVersionDTO[]> {
+    return this.http.get<DocumentVersionDTO[]>(
+      `${this.baseUrl}/documents/${documentId}/versions`
+    );
+  }
+
+  viewDocumentVersion(versionId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.baseUrl}/documents/versions/${versionId}/view`,
+      { responseType: 'blob' }
+    );
+  }
+
+  downloadDocumentVersion(versionId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.baseUrl}/documents/versions/${versionId}/download`,
+      { responseType: 'blob' }
+    );
   }
 }

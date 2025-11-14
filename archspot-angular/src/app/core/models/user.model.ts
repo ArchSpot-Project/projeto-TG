@@ -38,6 +38,17 @@ export interface UserCreateDTO {
   fileUrl: string;
 }
 
+export interface UserUpdateDTO {
+  cpf: string;
+  name: string;
+  phone: string;
+  address: string;
+  profession: string;
+  email: string;
+  fileUrl: string;
+  password?: string;
+}
+
 // Interface opcional só para criação/login (sugestao GPT):
 // TODO: Tirar essa senha daqui logo logo...
 export interface UserCredentials {

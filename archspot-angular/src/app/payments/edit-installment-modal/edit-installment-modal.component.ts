@@ -14,6 +14,7 @@ export class EditInstallmentModalComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<InstallmentResponse | null>();
 
+  amount: number | null = null;
   paymentMethod: PaymentMethod | null = null;
   paymentStatus: PaymentStatus | null = null;
 
@@ -35,9 +36,20 @@ export class EditInstallmentModalComponent implements OnChanges {
     }
   }
 
-  onAmountChange(value: string) {
-    const numeric = Number(value.replace(/\D/g, '')) / 100;
-    this.cloned.amount = numeric;
+  onAmountChange(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+
+    const value = input.value;
+
+    const onlyNumbers = value.replace(/\D/g, '');
+    const numeric = Number(onlyNumbers) / 100;
+    this.amount = numeric;
+
+    input.value = numeric.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
 
   cancel(): void {

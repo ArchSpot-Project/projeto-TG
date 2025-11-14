@@ -4,9 +4,12 @@ import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentUpdateDTO;
+import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentVersionDTO;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.services.CommentService;
 import com.archspot.ArchSpot_BackEnd.services.DocumentService;
+import com.archspot.ArchSpot_BackEnd.services.DocumentVersionService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -32,6 +35,9 @@ public class DocumentController {
   @Autowired
   private CommentService commentService;
 
+  @Autowired
+  private DocumentVersionService documentVersionService;
+
   /*
    * CRUD DE DOCUMENTO
    */
@@ -55,15 +61,6 @@ public class DocumentController {
   @PutMapping("/{id}")
   public ResponseEntity<DocumentDTO> update(@PathVariable Long id, @RequestBody DocumentUpdateDTO dto) {
     return ResponseEntity.ok(documentService.update(id, dto));
-  }
-
-  // Subir nova versão do arquivo (sobrescreve fisicamente e incrementa version)
-  @PostMapping("/{id}/update")
-  public ResponseEntity<DocumentDTO> uploadNewVersion(
-      @PathVariable Long id,
-      @RequestParam MultipartFile file) throws IOException {
-    DocumentDTO updated = documentService.updateDocumentVersion(id, file);
-    return ResponseEntity.ok(updated);
   }
 
   // Deletar documento
@@ -114,6 +111,71 @@ public class DocumentController {
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(contentType))
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filePath.getFileName() + "\"")
+        .body(resource);
+  }
+
+  /*
+   * ENDPOINT DE VERSÕES DE UM DOCUMENTO
+   */
+
+  // Subir nova versão do arquivo
+  // (guarda versão atual em DocumentVersion e atualiza a nova como principal)
+  @PostMapping("/{id}/update")
+  public ResponseEntity<DocumentDTO> uploadNewVersion(
+      @PathVariable Long id,
+      @RequestParam MultipartFile file) throws IOException {
+    DocumentDTO updated = documentService.updateDocumentVersion(id, file);
+    return ResponseEntity.ok(updated);
+  }
+
+  // Listar versões anteriores de um documento
+  @GetMapping("/{id}/versions")
+  public ResponseEntity<List<DocumentVersionDTO>> getVersions(@PathVariable Long id) {
+    List<DocumentVersionDTO> versions = documentVersionService.getVersionsByDocument(id);
+    return ResponseEntity.ok(versions);
+  }
+
+  // Visualizar uma versão específica de um documento
+  @GetMapping("/versions/{versionId}/view")
+  public ResponseEntity<Resource> viewVersionFile(@PathVariable Long versionId) throws IOException {
+    Path filePath = documentVersionService.getFilePath(versionId);
+
+    if (!Files.exists(filePath)) {
+      throw new ResourceNotFoundException("File not found on server");
+    }
+
+    Resource resource = new UrlResource(filePath.toUri());
+
+    String contentType = Files.probeContentType(filePath);
+    if (contentType == null) {
+      contentType = "application/octet-stream";
+    }
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filePath.getFileName() + "\"")
+        .body(resource);
+  }
+
+  // Download de uma versão específica de um documento
+  @GetMapping("/versions/{versionId}/download")
+  public ResponseEntity<Resource> downloadVersionFile(@PathVariable Long versionId) throws IOException {
+    Path filePath = documentVersionService.getFilePath(versionId);
+
+    if (!Files.exists(filePath)) {
+      throw new ResourceNotFoundException("File not found on server");
+    }
+
+    Resource resource = new UrlResource(filePath.toUri());
+
+    String contentType = Files.probeContentType(filePath);
+    if (contentType == null) {
+      contentType = "application/octet-stream";
+    }
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName() + "\"")
         .body(resource);
   }
 

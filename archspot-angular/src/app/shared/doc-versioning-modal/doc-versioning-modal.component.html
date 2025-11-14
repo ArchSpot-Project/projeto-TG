@@ -1,0 +1,45 @@
+<div class="modal-overlay" *ngIf="visible" (click)="closeModal()">
+
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h4 class="modal-title">Histórico de Versões</h4>
+    <span>3 últimas versões do documento</span>
+    <hr />
+
+    <div *ngIf="versions.length === 0" class="empty-state">
+      Nenhuma versão anterior encontrada.
+    </div>
+
+    <table class="table table-sm table-hover" *ngIf="versions.length > 0">
+      <thead>
+        <tr>
+          <th>Versão</th>
+          <th>Data</th>
+          <th>Tamanho</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let v of versions">
+          <td>{{ v.versionNumber }}</td>
+
+          <td>{{ v.uploadedAt | date : 'dd/MM/yyyy HH:mm' }}</td>
+
+          <td>{{ (v.size / (1024*1024)) | number : '1.2-2' }} MB</td>
+
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1" (click)="viewVersion(v)">Ver</button>
+
+            <button class="btn btn-sm btn-outline-success" (click)="downloadVersion(v)">Baixar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="closeModal()">Fechar</button>
+    </div>
+
+  </div>
+
+</div>
