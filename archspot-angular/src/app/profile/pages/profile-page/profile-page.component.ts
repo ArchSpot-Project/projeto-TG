@@ -12,12 +12,13 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class ProfilePageComponent implements OnInit {
   user: User | null = null;
+  showChangePasswordModal = false;
 
   constructor(
     private modalService: NgbModal,
     private authService: AuthService,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const currentUser = this.authService.getUser();
@@ -33,6 +34,10 @@ export class ProfilePageComponent implements OnInit {
     } else {
       console.warn('Nenhum usuário logado encontrado');
     }
+  }
+
+  openChangePasswordModal(): void {
+    this.showChangePasswordModal = true;
   }
 
   openEditModal(): void {

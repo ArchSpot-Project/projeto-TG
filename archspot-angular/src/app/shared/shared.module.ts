@@ -25,6 +25,7 @@ import { NewProjectTemplateModalComponent } from '../templates/new-project-templ
 import { SelectTemplateModalComponent } from '../templates/select-template-modal/select-template-modal.component';
 import { ConfirmCreateNewProjectModalComponent } from '../templates/confirm-create-new-project/confirm-create-new-project.component';
 import { ConfirmCreateNewTemplateModalComponent } from '../templates/confirm-create-new-template-modal/confirm-create-new-template-modal.component';
+import { DocVersioningModalComponent } from './doc-versioning-modal/doc-versioning-modal.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { ConfirmCreateNewTemplateModalComponent } from '../templates/confirm-cre
     AddUserModalComponent,
     DirectoryComponent,
     DirectoryNodeComponent,
-    ToastContainerComponent
+    ToastContainerComponent,
+    DocVersioningModalComponent
   ],
   imports: [
     CommonModule,
