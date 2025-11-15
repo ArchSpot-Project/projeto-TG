@@ -27,52 +27,14 @@
                 </div>
               </div>
 
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+              <!-- Templates existentes -->
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let template of projectTemplates">
                 <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
                   <div class="card-body d-flex align-items-center justify-content-center">
-                    <h6 class="card-title mb-0">Projeto Arquitetônico</h6>
+                    <h6 class="card-title mb-0">{{ template.name }}</h6>
                   </div>
                   <div class="card-footer bg-transparent border-0 d-grid">
-                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
-                      Criar
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
-                  <div class="card-body d-flex align-items-center justify-content-center">
-                    <h6 class="card-title mb-0">Projeto de Interiores</h6>
-                  </div>
-                  <div class="card-footer bg-transparent border-0 d-grid">
-                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
-                      Criar
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
-                  <div class="card-body d-flex align-items-center justify-content-center">
-                    <h6 class="card-title mb-0">Projeto Comercial</h6>
-                  </div>
-                  <div class="card-footer bg-transparent border-0 d-grid">
-                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
-                      Criar
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card template-card h-100 text-center border-3 bc-archspot-samambaia">
-                  <div class="card-body d-flex align-items-center justify-content-center">
-                    <h6 class="card-title mb-0">Reforma</h6>
-                  </div>
-                  <div class="card-footer bg-transparent border-0 d-grid">
-                    <button class="btn btn-success stretched-link" (click)="openConfirmCreateProject()">
+                    <button class="btn btn-success stretched-link" (click)="selectTemplate(template)">
                       Criar
                     </button>
                   </div>
@@ -86,11 +48,13 @@
   </div>
 </div>
 
-<app-new-project-template-modal [show]="showNewTemplateModal" [currentUserId]="currentUserId"
-  [currentUserName]="currentUserName" (close)="showNewTemplateModal = false"
-  (goBackToSelect)="showNewTemplateModal = false; show = true">
+<!-- Modais secundárias -->
+<app-new-project-template-modal [show]="showNewTemplateModal" [editing]="editing" [projectPhases]="projectPhases"
+  [returnToProjectConfirm]="returnToProjectConfirm" (goBack)="handleGoBack()" (close)="showNewTemplateModal = false"
+  (goBackToSelect)="onNewTemplateSaved($event)" (projectCreated)="projectCreated.emit()">
 </app-new-project-template-modal>
 
-<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" (close)="onCancelConfirm()"
-  (created)="onProjectCreated()" (editPhases)="onEditPhases()">
+<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" [templatePhases]="selectedTemplatePhases"
+  [templateName]="selectedTemplate?.name || ''" (goBack)="showConfirmCreateProjectModal = false"
+  (editPhases)="editPhases($event)" (created)="onProjectCreated()" (close)="showConfirmCreateProjectModal = false">
 </app-confirm-create-new-project-modal>

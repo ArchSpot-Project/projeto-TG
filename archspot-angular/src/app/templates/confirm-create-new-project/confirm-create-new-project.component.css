@@ -52,6 +52,7 @@
 
 .etapa-btn:hover {
   transform: translateY(-1px);
+  cursor: default;
 }
 
 .etapa-duracao {
@@ -62,7 +63,6 @@
 
 .etapa-duracao input {
   width: 70px;
-  /* 🔹 menor e mais discreto */
   padding: 3px 6px;
   font-size: 0.85rem;
   text-align: center;
@@ -72,7 +72,6 @@
   border-color: #28a745;
 }
 
-/* 🔹 Colaboradores */
 .collaborators-container {
   max-height: 400px;
   min-height: 150px;

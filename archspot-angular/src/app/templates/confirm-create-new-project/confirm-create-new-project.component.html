@@ -1,7 +1,11 @@
 <!-- CRIANDO UM NOVO PROJETO -->
 <div class="modal-overlay" *ngIf="show" (click)="onCancel()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <h4 class="modal-title font-logo">Criar Novo Projeto</h4>
+    <div class="modal-header">
+      <h4 class="modal-title font-logo">Criar Novo Projeto - {{ templateName }} </h4>
+      <button type="button" class="btn-close" (click)="close.emit()"></button>
+    </div>
+
     <hr />
 
     <label class="fs-6 fw-semibold modal-label2">Nome</label>
@@ -17,10 +21,7 @@
 
     <div class="etapas-container mb-4">
       <div class="etapa-item" *ngFor="let etapa of etapas" [ngClass]="{ selected: isSelected(etapa.nome) }">
-        <button type="button" class="btn btn-sm etapa-btn" [ngClass]="{
-            'btn-success': isSelected(etapa.nome),
-            'btn-outline-success': !isSelected(etapa.nome)
-          }" (click)="toggleEtapa(etapa.nome)">
+        <button type="button" class="btn btn-success etapa-btn p-2">
           {{ etapa.nome }}
         </button>
 
@@ -76,8 +77,11 @@
       </ng-template>
     </div>
 
-    <div class="modal-actions">
-      <button class="btn btn-secondary" (click)="onCancel()">Editar Etapas</button>
+    <div class="modal-actions d-flex justify-content-end">
+      <button class="btn btn-secondary" (click)="onGoBack()">
+        Voltar
+      </button>
+      <button class="btn btn-secondary me-2" (click)="editPhases.emit(etapas)">Editar Etapas</button>
       <button class="btn btn-success" (click)="createProject()">Criar Projeto</button>
     </div>
   </div>

@@ -37,14 +37,13 @@ export class EditInstallmentModalComponent implements OnChanges {
   }
 
   onAmountChange(event: Event) {
-    const input = event.target as HTMLInputElement | null;
+    const input = event.target as HTMLInputElement;
     if (!input) return;
 
-    const value = input.value;
+    const value = input.value.replace(/\D/g, '');
+    const numeric = Number(value) / 100;
 
-    const onlyNumbers = value.replace(/\D/g, '');
-    const numeric = Number(onlyNumbers) / 100;
-    this.amount = numeric;
+    this.cloned.amount = numeric;
 
     input.value = numeric.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,

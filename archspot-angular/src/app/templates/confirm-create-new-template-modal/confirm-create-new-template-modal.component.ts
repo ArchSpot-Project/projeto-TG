@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { TemplateService } from '../../core/services/template.service';
+import { PhaseTemplateDTO, ProjectTemplateDTO } from '../../core/models/project-template.model';
 
 @Component({
   selector: 'app-confirm-create-new-template-modal',
@@ -7,10 +9,14 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 })
 export class ConfirmCreateNewTemplateModalComponent {
   @Input() show = false;
+  @Input() selectedPhases: PhaseTemplateDTO[] = [];
   @Output() close = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<ProjectTemplateDTO>();
 
   templateName = '';
+  saving = false;
+
+  constructor(private templateService: TemplateService) { }
 
   onCancel() {
     this.close.emit();
@@ -21,7 +27,22 @@ export class ConfirmCreateNewTemplateModalComponent {
       alert('Por favor, insira um nome para o template.');
       return;
     }
-    console.log('Template salvo:', this.templateName);
-    this.saved.emit();
+
+    this.saving = true;
+
+    const template: ProjectTemplateDTO = {
+      name: this.templateName.trim(),
+      description: undefined,
+      phases: this.selectedPhases,
+      createdBy: undefined,
+      isDefault: false,
+      id: undefined
+    };
+
+    this.templateService.createProjectTemplate(template).subscribe({
+      next: savedTemplate => this.saved.emit(savedTemplate),
+      error: err => console.error('Erro ao salvar template', err)
+    });
+
   }
 }

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TemplateService {
@@ -34,11 +35,15 @@ public class TemplateService {
    */
 
   public List<ProjectTemplateDTO> findAllProjectTemplates() {
+    //mostrar tambem os templates de projeto default
     User currentUser = SecurityUtils.getCurrentUser();
-    return projectTemplateRepository.findAllByUserId(currentUser.getId())
-        .stream()
+    List<ProjectTemplate> userProjects = projectTemplateRepository.findAllByUserId(currentUser.getId());
+    List<ProjectTemplate> defaultProjects = projectTemplateRepository.findByIsDefaultTrue();
+
+    return Stream.concat(userProjects.stream(), defaultProjects.stream())
+        .distinct()
         .map(this::toProjectTemplateDTO)
-        .toList();
+        .collect(Collectors.toList());
   }
 
   public ProjectTemplateDTO findProjectTemplateById(Long id) {
@@ -96,10 +101,14 @@ public class TemplateService {
 
   public List<PhaseTemplateDTO> findAllPhaseTemplates() {
     User currentUser = SecurityUtils.getCurrentUser();
-    return phaseTemplateRepository.findAllByUserId(currentUser.getId())
-        .stream()
+    //mostrar tambem os templates de etapa default
+    List<PhaseTemplate> userPhases = phaseTemplateRepository.findAllByUserId(currentUser.getId());
+    List<PhaseTemplate> defaultPhases = phaseTemplateRepository.findByIsDefaultTrue();
+
+    return Stream.concat(userPhases.stream(), defaultPhases.stream())
+        .distinct()
         .map(this::toPhaseTemplateDTO)
-        .toList();
+        .collect(Collectors.toList());
   }
 
   public PhaseTemplateDTO findPhaseTemplateById(Long id) {
