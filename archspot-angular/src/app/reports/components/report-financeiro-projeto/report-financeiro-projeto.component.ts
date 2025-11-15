@@ -1,138 +1,122 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReportService } from '../../../core/services/report.service';
+import { FinancialProjectRowDTO } from '../../../core/models/reports.model';
 import { ProjectService } from '../../../core/services/project.service';
-import { InstallmentService } from '../../../core/services/installment.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-
-interface Parcela {
-  name: string;
-  description: string;
-  amount: number;
-  status: string;
-  paymentMethod: string;
-  estimatedPaymentDate: string;
-  realPaymentDate: string | null;
-}
+import { Subscription } from 'rxjs';
+import { ReportColumn } from '../../reports-table/reports-table.component';
 
 @Component({
   selector: 'app-report-financeiro-projeto',
   templateUrl: './report-financeiro-projeto.component.html',
   styleUrls: ['./report-financeiro-projeto.component.css']
 })
-export class ReportFinanceiroProjetoComponent implements OnInit {
-  isGenerated = false;
+
+export class ReportFinanceiroProjetoComponent {
+  form: FormGroup;
+  rows: FinancialProjectRowDTO[] = [];
   loading = false;
   error = '';
+  isGenerated = false;
+  projetoSelecionadoNome: string | null = null;
 
-  projetos: any[] = [];
-  formData = {
-    projeto: ''
-  };
+  projects: { projectId: number; projectName: string }[] = [];
 
-  parcelas: Parcela[] = [];
-  projetoSelecionado: any = null;
+  private subs: Subscription = new Subscription();
+
+  // colunas fixas do relatório
+  colunas: ReportColumn[] = [
+    { campo: 'description', label: 'Descrição' },
+    { campo: 'status', label: 'Status', pipe: 'paymentStatus' },
+    { campo: 'value', label: 'Valor', pipe: 'currency' },
+    { campo: 'paymentMethod', label: 'Forma de Pagamento', pipe: 'paymentMethod' },
+    { campo: 'estimatedPaymentDate', label: 'Previsto', pipe: 'date' },
+    { campo: 'realPaymentDate', label: 'Pago em', pipe: 'date' },
+  ];
 
   constructor(
+    private fb: FormBuilder,
+    private reportService: ReportService,
     private projectService: ProjectService,
-    private installmentService: InstallmentService,
     private authService: AuthService
-  ) { }
-
-  ngOnInit(): void {
-    const currentUser = this.authService.getUser();
-    if (!currentUser) return;
-
-    this.projectService.getProjectsByUser(currentUser.id).subscribe(projects => {
-      this.projetos = projects;
+  ) {
+    this.form = this.fb.group({
+      projectId: [null, Validators.required]
     });
   }
 
+  ngOnInit(): void {
+    this.loadProjects();
+  }
+
+  private loadProjects(): void {
+    this.loading = true;
+    this.error = '';
+    const currentUser = this.authService.getUser();
+    if (!currentUser) return;
+    this.subs.add(
+      this.projectService.getProjectsByUser(currentUser.id).subscribe({
+        next: (projects: any[]) => {
+          // adaptações caso o shape seja diferente
+          this.projects = projects.map(p => ({
+            projectId: p.projectId ?? p.id ?? p.projectId,
+            projectName: p.projectName ?? p.name ?? p.projectName
+          }));
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erro ao carregar projetos', err);
+          this.error = 'Erro ao carregar projetos.';
+          this.loading = false;
+        }
+      })
+    );
+  }
+
   gerarRelatorio(): void {
-    if (!this.formData.projeto) {
-      alert('Selecione um projeto.');
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
+
+    const projectId = Number(this.form.value.projectId);
+
+    const projeto = this.projects.find(p => p.projectId === projectId);
+    this.projetoSelecionadoNome = projeto ? projeto.projectName : null;
+
+    const payload = {
+      reportType: 'FINANCIAL_PROJECT',
+      projectId: projectId
+    };
 
     this.loading = true;
-    this.isGenerated = true;
-
-    const projetoId = Number(this.formData.projeto);
-    this.projetoSelecionado = this.projetos.find(p => p.projectId === projetoId) || null;
-
-    if (!this.projetoSelecionado) {
-      this.error = 'Projeto não encontrado.';
-      this.loading = false;
-      return;
-    }
-
-    this.installmentService.getInstallmentsByProject(projetoId).subscribe({
-      next: (parcelas) => {
-        this.parcelas = parcelas.map(p => ({
-          projeto: this.projetoSelecionado.projectName,
-          name: `Parcela ${p.id}`,
-          description: p.description ?? '-',
-          amount: p.amount,
-          status: this.mapStatus(p.paymentStatus),
-          paymentMethod: p.paymentMethod ?? '-',
-          estimatedPaymentDate: p.estimatedPaymentDate,
-          realPaymentDate: p.realPaymentDate
-        }));
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = 'Erro ao buscar parcelas do projeto.';
-        this.loading = false;
-      }
-    });
+    this.error = '';
+    this.subs.add(
+      this.reportService.generateReport<FinancialProjectRowDTO>(payload).subscribe({
+        next: (res) => {
+          this.rows = res.rows ?? [];
+          this.isGenerated = true;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erro ao gerar relatório financeiro por projeto', err);
+          this.error = 'Erro ao gerar relatório.';
+          this.loading = false;
+        }
+      })
+    );
   }
 
   voltarEdicao(): void {
     this.isGenerated = false;
-    this.parcelas = [];
-    this.formData.projeto = '';
-    this.projetoSelecionado = null;
+    this.rows = [];
+    this.form.reset();
+    this.projetoSelecionadoNome = null;
   }
 
-  mapStatus(status?: string): string {
-    switch (status) {
-      case 'PENDING': return 'Pendente';
-      case 'PAID': return 'Pago';
-      case 'OVERDUE': return 'Em atraso';
-      case 'CANCELED': return 'Cancelado';
-      default: return status ?? '-';
-    }
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
-  baixarPDF(): void {
-    const tabela = document.getElementById('relatorioTabela');
-    if (!tabela) return;
-
-    const container = document.createElement('div');
-    container.style.padding = '15px';
-    container.style.backgroundColor = 'white';
-    container.style.position = 'absolute';
-    container.style.top = '-9999px';
-    container.appendChild(tabela.cloneNode(true));
-    document.body.appendChild(container);
-
-    html2canvas(container, { scale: 2 }).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(`ArchSpot - Relatório de Pagamentos por Projeto`, pdf.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
-
-      pdf.addImage(imgData, 'PNG', 10, 25, pdfWidth, pdfHeight);
-      pdf.save('relatorio_pagamentos_projeto.pdf');
-
-      document.body.removeChild(container);
-    });
-  }
 }

@@ -1,12 +1,50 @@
-<div class="row" *ngIf="!isGenerated; else relatorioGerado">
+<form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
+  <div class="row g-3">
+    <div class="col-md-3"><input type="date" class="form-control" formControlName="startDate"
+        placeholder="Data inicial"></div>
+    <div class="col-md-3"><input type="date" class="form-control" formControlName="endDate" placeholder="Data final">
+    </div>
+    <div class="col-md-3"><input type="text" class="form-control" formControlName="paymentMethod"
+        placeholder="Método de pagamento"></div>
+    <div class="col-md-3"><input type="text" class="form-control" formControlName="projectStatus"
+        placeholder="Status do projeto"></div>
+  </div>
+  <button class="btn btn-primary mt-3" type="submit">Gerar relatório</button>
+</form>
+
+<div *ngIf="isGenerated">
+  <table class="table mt-4 table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Projeto</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Pago</th>
+        <th>Restante</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td>{{ r.projectName }}</td>
+        <td>{{ r.status }}</td>
+        <td>{{ r.totalValue }}</td>
+        <td>{{ r.totalPaid }}</td>
+        <td>{{ r.totalRemaining }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- <div class="row" *ngIf="!isGenerated; else relatorioGerado">
   <div class="col fs-5 fw-medium">Gerar relatório - Pagamentos Gerais</div>
   <hr class="mt-0">
 </div>
 
-<div *ngIf="!isGenerated">
+<div *ngIf="!isGenerated"> -->
 
-  <!-- datas -->
-  <div class="row mb-3">
+<!-- datas -->
+<!-- <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">De:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
@@ -16,10 +54,10 @@
       <label class="form-label">Até:</label>
       <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
     </div>
-  </div>
+  </div> -->
 
-  <!-- filtros -->
-  <div class="row mb-3">
+<!-- filtros -->
+<!-- <div class="row mb-3">
     <div class="col-md-6">
       <label class="form-label">Status da parcela:</label>
       <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
@@ -43,20 +81,21 @@
         <option value="dinheiro">Dinheiro em espécie</option>
       </select>
     </div>
-  </div>
+  </div> -->
 
-  <!-- Botões -->
-  <div class="row">
+<!-- Botões -->
+<!-- <div class="row">
     <div class="col-12 text-end">
       <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
       <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- relatório gerado -->
-<ng-template #relatorioGerado>
-  <app-reports-table [titulo]="'ArchSpot - Relatório de Pagamentos Gerais'" [pdfNomeArquivo]="'relatorio_pagamentos_gerais.pdf'" [colunas]="[
+<!-- <ng-template #relatorioGerado>
+  <app-reports-table [titulo]="'ArchSpot - Relatório de Pagamentos Gerais'"
+    [pdfNomeArquivo]="'relatorio_pagamentos_gerais.pdf'" [colunas]="[
   { campo: 'projectName', label: 'Projeto' },
   { campo: 'projectStatus', label: 'Status do Projeto', pipe:'statusTranslate' },
   { campo: 'name', label: 'Nome da Parcela' },
@@ -67,4 +106,4 @@
   { campo: 'realPaymentDate', label: 'Data de Pagamento', pipe:'date' }
 ]" [registros]="parcelas" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
-</ng-template>
+</ng-template> -->

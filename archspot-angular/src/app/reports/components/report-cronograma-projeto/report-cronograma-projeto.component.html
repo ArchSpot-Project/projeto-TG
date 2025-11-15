@@ -4,12 +4,12 @@
 </div>
 
 <div *ngIf="!isGenerated" class="row">
-  <form class="col">
+  <form [formGroup]="form" class="col">
     <div class="mb-0">
       <label class="form-label">Projeto:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.projeto" name="projeto">
-        <option value="">Selecione</option>
-        <option *ngFor="let p of projetos" [value]="p.projectId">{{ p.projectName }}</option>
+      <select class="form-select shadow-sm" formControlName="projectId">
+        <option [ngValue]="null">Selecione</option>
+        <!-- <option *ngFor="let p of projetos" [value]="p.projectId">{{ p.projectName }}</option> -->
       </select>
     </div>
   </form>
@@ -30,6 +30,6 @@
       { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
       { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
       { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
-    ]" [registros]="phases" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
+    ]" [registros]="rows" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>

@@ -5,21 +5,21 @@
 
 <!-- formulário de filtros -->
 <div *ngIf="!isGenerated">
-  <form class="row">
+  <form [formGroup]="form" class="row">
     <div class="col mb-3">
       <label class="form-label">De:</label>
-      <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
+      <input type="date" class="form-control shadow-sm" formControlName="startDate">
     </div>
 
     <div class="col mb-3">
       <label class="form-label">Até:</label>
-      <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
+      <input type="date" class="form-control shadow-sm" formControlName="endDate">
     </div>
 
     <div class="col mb-3">
       <label class="form-label">Status:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
-        <option value="todos">Todos</option>
+      <select class="form-select shadow-sm" formControlName="projectStatus">
+        <option value="">Todos</option>
         <option value="IN_PROGRESS">Em andamento</option>
         <option value="COMPLETED">Concluído</option>
         <option value="OVERDUE">Atrasado</option>
@@ -35,10 +35,7 @@
 
 <!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <app-reports-table
-    [titulo]="'Cronograma Geral'"
-    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'"
-    [colunas]="[
+  <app-reports-table [titulo]="'Cronograma Geral'" [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'" [colunas]="[
       { campo: 'projectName', label: 'Projeto' },
       { campo: 'name', label: 'Etapa' },
       { campo: 'status', label: 'Status', pipe:'phaseStatus' },
@@ -46,10 +43,6 @@
       { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
       { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
       { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
-    ]"
-    [registros]="phases"
-    [loading]="loading"
-    [error]="error"
-    (voltar)="voltarEdicao()">
+    ]" [registros]="rows" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>
