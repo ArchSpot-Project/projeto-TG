@@ -26,8 +26,14 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+  public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex,
+      HttpServletRequest request) {
     return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
   }
 
   @ExceptionHandler(DatabaseException.class)
@@ -36,7 +42,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(AssociationNotFoundException.class)
-  public ResponseEntity<ErrorResponseDTO> handleAssociationNotFound(AssociationNotFoundException ex, HttpServletRequest request) {
+  public ResponseEntity<ErrorResponseDTO> handleAssociationNotFound(AssociationNotFoundException ex,
+      HttpServletRequest request) {
     return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
   }
 
