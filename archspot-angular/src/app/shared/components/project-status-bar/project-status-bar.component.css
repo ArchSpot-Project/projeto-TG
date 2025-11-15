@@ -74,6 +74,10 @@
   background-color: #ccc;
 }
 
+.timeline-dot.overdue {
+  background-color: #dc3545;
+}
+
 .timeline-label-top {
   font-size: 0.75rem;
   text-align: center;

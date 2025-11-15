@@ -157,27 +157,27 @@ export class PaymentsComponent implements OnInit {
 
   onInstallmentUpdated(updated: InstallmentResponse | null): void {
     if (!updated) {
-      if (this.selectedInstallment) {
-        this.installments = this.installments.filter(i => i.id !== this.selectedInstallment?.id);
+      if (this.selectedInstallment !== null && this.selectedInstallment.id != null) {
+        this.installments = this.installments.filter(i => i.id !== this.selectedInstallment!.id);
       }
+
     } else {
-      const today = new Date();
-      const todayNum = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-
-      const est = new Date(updated.estimatedPaymentDate);
-      const estNum = est.getFullYear() * 10000 + (est.getMonth() + 1) * 100 + est.getDate();
-
-      let status: PaymentStatus = 'PENDING';
-      if (updated.realPaymentDate) {
-        status = 'PAID';
-      } else if (estNum < todayNum) {
-        status = 'OVERDUE';
-      }
-
-      const installmentWithStatus: SelectableInstallment = { ...updated, selected: false, paymentStatus: status };
       const idx = this.installments.findIndex(i => i.id === updated.id);
+
+      const installmentWithStatus: SelectableInstallment = {
+        ...updated,
+        selected: false,
+        paymentStatus: updated.realPaymentDate ? 'PAID'
+          : this.isOverdue(updated.estimatedPaymentDate) ? 'OVERDUE'
+            : 'PENDING'
+      };
+
       if (idx >= 0) this.installments[idx] = installmentWithStatus;
       else this.installments.push(installmentWithStatus);
+
+      this.installments.sort((a, b) =>
+        new Date(a.estimatedPaymentDate).getTime() - new Date(b.estimatedPaymentDate).getTime()
+      );
     }
     this.closeEditModal();
     this.recalculateProjectTotal();

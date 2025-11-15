@@ -12,14 +12,14 @@ export class CreatePhaseModalComponent {
   @Output() phaseCreated = new EventEmitter<Phase>();
   @Input() show: boolean = false;
   @Input() projectId!: number;
-  @Input() lastPhaseId?: number; 
+  @Input() lastPhaseId?: number;
 
   phaseName: string = '';
   phaseDescription: string = '';
   phaseEstimatedStartDate: string = '';
   phaseEstimatedEndDate: string = '';
 
-  constructor(private phaseService: PhaseService) {}
+  constructor(private phaseService: PhaseService) { }
 
   cancel(): void {
     this.resetForm();
@@ -38,7 +38,7 @@ export class CreatePhaseModalComponent {
       estimatedStartDate: this.phaseEstimatedStartDate,
       estimatedEndDate: this.phaseEstimatedEndDate,
       projectId: this.projectId,
-      predecessorId: this.lastPhaseId || null
+      previousPhaseId: this.lastPhaseId || null
     };
 
     this.phaseService.createPhase(this.projectId, phaseData).subscribe({

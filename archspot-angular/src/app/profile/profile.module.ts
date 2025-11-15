@@ -6,6 +6,7 @@ import { ProfilePageComponent } from './pages/profile-page/profile-page.componen
 import { LayoutModule } from '../layout/layout.module';
 import { SharedModule } from '../shared/shared.module';
 import { ChangePasswordModalComponent } from './change-password-modal/change-password-modal.component';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ChangePasswordModalComponent } from './change-password-modal/change-pas
     CommonModule,
     ProfileRoutingModule,
     LayoutModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ]
 })
 export class ProfileModule { }

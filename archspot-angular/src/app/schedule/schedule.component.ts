@@ -23,9 +23,8 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   selectedPhaseIndex?: number;
   ganttViewMode: 'Day' | 'Month' | 'Year' = 'Month';
 
-  userRole: string | null = null;       // role global do usuário
-  userId: number | null = null;         // id do usuário
-  projectUsers: any[] = [];             // lista de usuários no projeto
+  userId: number | null = null;
+  projectUsers: any[] = [];
 
   @ViewChild('ganttContainer', { static: false }) ganttContainer!: ElementRef;
 
@@ -46,107 +45,112 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     this.userId = currentUser?.id || null;
 
     this.loadProject();
-    this.loadProjectUsers();
     this.loadPhases();
+    this.loadProjectUsers();
   }
 
-  ngAfterViewInit(): void {
-    if (this.phases.length > 0) this.renderGantt();
+  ngAfterViewInit(): void { }
+
+  get isCustomerInProject(): boolean {
+    if (!this.userId) return true;
+    return this.projectUsers.find(u => u.userId === this.userId)?.role === 'CUSTOMER';
   }
 
   changeGanttView(view: 'Day' | 'Month' | 'Year') {
     this.ganttViewMode = view;
-    if (this.gantt) {
-      this.gantt.change_view_mode(view);
-    }
+    if (this.gantt) this.gantt.change_view_mode(view);
   }
 
-  /** Verifica se o usuário logado é CUSTOMER neste projeto */
-  get isCustomerInProject(): boolean {
-    if (!this.userId) return true;
-    const user = this.projectUsers.find(u => u.userId === this.userId);
-    return user?.role === 'CUSTOMER';
-  }
-
-  /** Abre modal de criação */
   openCreatePhaseModal(): void {
-    if (this.isCustomerInProject) return;
-    this.showCreateModal = true;
+    if (!this.isCustomerInProject) this.showCreateModal = true;
   }
 
-  /** Abre modal de edição */
   openEditPhaseModal(phase: any, index: number): void {
     if (this.isCustomerInProject) return;
-
     this.selectedPhase = {
       ...phase,
-      estimatedStartDate: this.formatDateForInput(phase.estimatedStartDate),
-      estimatedEndDate: this.formatDateForInput(phase.estimatedEndDate),
-      realStartDate: this.formatDateForInput(phase.realStartDate),
-      realEndDate: this.formatDateForInput(phase.realEndDate)
+      estimatedStartDate: this.formatDate(phase.estimatedStartDate),
+      estimatedEndDate: this.formatDate(phase.estimatedEndDate),
+      realStartDate: this.formatDate(phase.realStartDate),
+      realEndDate: this.formatDate(phase.realEndDate)
     };
     this.selectedPhaseIndex = index + 1;
     this.showEditModal = true;
-  }
-
-  private formatDateForInput(date: any): string | null {
-    if (!date) return null;
-    return new Date(date).toISOString().slice(0, 10);
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
   }
 
-  //adicionar nova fase
-  onPhaseCreated(newPhase: any) {
-    this.phases.push(newPhase);
-    this.updatePhaseStatus();
-    setTimeout(() => this.renderGantt(), 200);
-    location.reload();
+  private formatDate(date: any): string | null {
+    return date ? new Date(date).toISOString().slice(0, 10) : null;
   }
 
-  //permitir iniciar fase
+  onPhaseCreated() {
+    this.loadPhases();
+  }
+
   canStartPhase(index: number): boolean {
     if (this.isCustomerInProject) return false;
+
     const phase = this.phases[index];
-    return !phase.realStartDate && phase.status !== 'IN_PROGRESS' && phase.status !== 'COMPLETED';
+    if (phase.realStartDate || phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED') return false;
+
+    const start = new Date(phase.estimatedStartDate);
+    let prevId = phase.previousPhaseId || null;
+
+    while (prevId) {
+      const prev = this.phases.find(p => p.id === prevId);
+      if (!prev) return false;
+
+      if (prev.realEndDate) {
+        prevId = prev.previousPhaseId || null;
+        continue;
+      }
+
+      const prevStart = new Date(prev.estimatedStartDate);
+      const prevEnd = new Date(prev.estimatedEndDate);
+
+      if (start > prevStart && start <= prevEnd) return true;
+      return false;
+    }
+
+    return true;
   }
 
-  //permitir finalizar fase
   canFinishPhase(index: number): boolean {
     if (this.isCustomerInProject) return false;
     const phase = this.phases[index];
-    return phase.status === 'IN_PROGRESS' || (!!phase.realStartDate && phase.status !== 'COMPLETED');
+    return phase.status === 'IN_PROGRESS';
   }
 
   startPhase(phase: any) {
     if (this.isCustomerInProject) return;
+
     this.phaseService.startPhase(phase.id).subscribe({
-      next: updated => {
-        phase.realStartDate = updated.realStartDate;
-        phase.status = 'IN_PROGRESS';
-        this.updatePhaseStatus();
-        this.updateProjectRealDates();
-      },
-      error: err => alert(err.error?.message || 'Finalize a etapa anterior antes de iniciar esta fase.')
+      next: () => {
+        this.loadPhases();
+        setTimeout(() => this.updateProjectRealDates(), 200);
+      }
     });
   }
 
   finishPhase(phase: any) {
     if (this.isCustomerInProject) return;
+
     this.phaseService.finishPhase(phase.id).subscribe({
-      next: updated => {
-        phase.realEndDate = updated.realEndDate;
-        phase.status = 'COMPLETED';
-        this.updatePhaseStatus();
-        this.updateProjectRealDates();
-      },
-      error: err => console.error(err)
+      next: () => {
+        this.loadPhases();
+        setTimeout(() => this.updateProjectRealDates(), 200);
+      }
     });
   }
 
   updateProjectRealDates(): void {
+    if (this.project?.status?.toUpperCase() === 'CANCELLED') {
+      console.warn("Projeto cancelado — updateProjectRealDates() ignorado.");
+      return;
+    }
     this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
       next: phases => {
         const realStartDates = phases
@@ -181,40 +185,88 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
 
   loadProject(): void {
     this.projectService.getProjectById(this.projectId).subscribe({
-      next: project => this.project = project,
-      error: err => console.error('Erro ao carregar projeto', err)
+      next: project => (this.project = project)
     });
   }
 
   loadProjectUsers(): void {
     this.userProjectService.getUsersByProject(this.projectId).subscribe({
-      next: users => this.projectUsers = users,
-      error: err => console.error('Erro ao carregar usuários do projeto', err)
+      next: users => (this.projectUsers = users)
     });
   }
 
   loadPhases(): void {
     this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
       next: phases => {
-        this.phases = phases;
+        this.phases = phases
+          .map((p: any) => ({
+            ...p,
+            previousPhaseId: p.previousPhaseId ?? p.predecessorId ?? null
+          }))
+          .sort((a, b) => new Date(a.estimatedStartDate).getTime() - new Date(b.estimatedStartDate).getTime());
+
         this.updatePhaseStatus();
-        setTimeout(() => this.renderGantt(), 200);
-      },
-      error: err => console.error(err)
+        setTimeout(() => this.renderGantt(), 150);
+      }
     });
   }
 
   updatePhaseStatus(): void {
     const today = new Date();
-    this.phases.forEach(p => {
-      if (p.realEndDate) p.status = 'COMPLETED';
-      else if (p.realStartDate) p.status = 'IN_PROGRESS';
-      else if (new Date(p.estimatedEndDate) < today) p.status = 'OVERDUE';
+
+    this.phases = this.phases.map(p => {
+      const realStart = p.realStartDate ? new Date(p.realStartDate) : null;
+      const realEnd = p.realEndDate ? new Date(p.realEndDate) : null;
+      const estEnd = new Date(p.estimatedEndDate);
+
+      if (realEnd) p.status = 'COMPLETED';
+      else if (realStart) p.status = 'IN_PROGRESS';
+      else if (estEnd < today) p.status = 'OVERDUE';
       else p.status = 'NOT_STARTED';
+
+      return p;
     });
   }
 
-  //gantt
+  undoPhase(phase: any) {
+    if (this.isCustomerInProject) return;
+
+    const idx = this.phases.findIndex(p => p.id === phase.id);
+    if (idx === -1) return;
+
+    const reset = (p: any) => ({
+      name: p.name,
+      description: p.description,
+      estimatedStartDate: p.estimatedStartDate,
+      estimatedEndDate: p.estimatedEndDate,
+      realStartDate: null,
+      realEndDate: null
+    });
+
+    this.phaseService.updatePhase(phase.id, reset(phase)).subscribe({
+      next: () => this.resetSubsequentPhases(idx + 1, reset)
+    });
+  }
+
+  private resetSubsequentPhases(startIdx: number, resetFn: (p: any) => any) {
+    const next = (i: number) => {
+      if (i >= this.phases.length) {
+        this.loadPhases();
+        setTimeout(() => this.updateProjectRealDates(), 200);
+        return;
+      }
+
+      const p = this.phases[i];
+      if (!p.realStartDate && !p.realEndDate) return next(i + 1);
+
+      this.phaseService.updatePhase(p.id, resetFn(p)).subscribe({
+        next: () => next(i + 1)
+      });
+    };
+
+    next(startIdx);
+  }
+
   renderGantt(): void {
     if (!this.ganttContainer) return;
 

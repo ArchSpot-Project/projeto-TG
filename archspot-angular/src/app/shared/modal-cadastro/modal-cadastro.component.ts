@@ -67,35 +67,27 @@ export class ModalCadastroComponent implements OnInit {
         return;
       }
 
-      if (this.userData?.email) {
-        //TODO: está confirmando a senha por meio do login para fazer update das infos do usuario; sujeito a mudanças
-        this.authService.login({ email: this.userData.email, password: this.password }).subscribe({
-          next: () => {
-            const updatedUser: UserUpdateDTO = {
-              cpf: this.cpf,
-              name: this.name,
-              phone: this.phone,
-              address: this.address,
-              profession: this.profession,
-              email: this.email,
-              fileUrl: this.fileUrl
-            };
+      const updatedUser: UserUpdateDTO = {
+        cpf: this.cpf,
+        name: this.name,
+        phone: this.phone,
+        address: this.address,
+        profession: this.profession,
+        email: this.email,
+        password: this.password,
+        fileUrl: this.fileUrl
+      };
 
-            this.userService.updateUser(this.userData.id!, updatedUser, this.selectedFile!).subscribe({
-              next: updated => {
-                this.authService.setCurrentUser(updated);
-                this.activeModal.close();
-                this.toast.showSuccess('Perfil atualizado com sucesso!');
-                setTimeout(() => location.reload(), 1000);
-              },
-              error: err => this.toast.showError('Erro ao atualizar perfil.')
-            });
-          },
-          error: () => {
-            this.toast.showWarning('Senha incorreta. Não foi possível salvar alterações.');
-          }
-        });
-      }
+      this.userService.updateUser(this.userData.id!, updatedUser, this.selectedFile!).subscribe({
+        next: updated => {
+          this.authService.setCurrentUser(updated);
+          this.activeModal.close();
+          this.toast.showSuccess('Perfil atualizado com sucesso!');
+          setTimeout(() => location.reload(), 500);
+        },
+        error: err => this.toast.showError('Senha incorreta ou dados inválidos.')
+      });
+
       return;
     }
 
