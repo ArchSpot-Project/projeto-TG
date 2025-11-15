@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export interface ReportColumn {
   campo: string;
   label: string;
-  pipe?: 'date' | 'currency' | 'statusTranslate' | 'paymentMethod' | 'paymentStatus' | 'phaseStatus';
+  pipe?: 'date' | 'currency' | 'statusTranslate' | 'paymentMethod' | 'paymentStatus' | 'phaseStatus' | 'financialStatus';
 }
 
 @Component({

@@ -33,6 +33,7 @@
                     <span *ngSwitchCase="'phaseStatus'">{{ r[c.campo] | phaseStatus }}</span>
                     <span *ngSwitchCase="'paymentMethod'">{{ r[c.campo] | paymentMethod }}</span>
                     <span *ngSwitchCase="'paymentStatus'">{{ r[c.campo] | paymentStatus }}</span>
+                    <span *ngSwitchCase="'financialStatus'">{{ r[c.campo] | financialStatus }}</span>
                     <span *ngSwitchDefault>{{ r[c.campo] ?? '-' }}</span>
                 </ng-container>
             </td>
