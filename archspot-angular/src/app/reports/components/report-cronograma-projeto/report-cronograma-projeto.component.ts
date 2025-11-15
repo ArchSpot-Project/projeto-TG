@@ -1,137 +1,123 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ReportService } from '../../../core/services/report.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ScheduleProjectRowDTO } from '../../../core/models/reports.model';
 import { ProjectService } from '../../../core/services/project.service';
-import { PhaseService } from '../../../core/services/phase.service';
+import { ReportService } from '../../../core/services/report.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { PhaseWithProject } from '../../../core/models/phase.model';
+import { Subscription } from 'rxjs';
+import { ReportColumn } from '../../reports-table/reports-table.component';
 
 @Component({
   selector: 'app-report-cronograma-projeto',
   templateUrl: './report-cronograma-projeto.component.html',
   styleUrls: ['./report-cronograma-projeto.component.css']
 })
+export class ReportCronogramaProjetoComponent implements OnInit, OnDestroy {
 
-export class ReportCronogramaProjetoComponent {
   form: FormGroup;
   rows: ScheduleProjectRowDTO[] = [];
   loading = false;
   error = '';
   isGenerated = false;
 
+  projetoSelecionadoNome: string | null = null;
+  projects: { projectId: number; projectName: string }[] = [];
 
-  constructor(private fb: FormBuilder, private reportService: ReportService) {
-    this.form = this.fb.group({ projectId: [null] });
+  private subs = new Subscription();
+
+  colunas: ReportColumn[] = [
+    { campo: 'phaseName', label: 'Etapa' },
+    { campo: 'status', label: 'Status', pipe: 'phaseStatus' },
+    { campo: 'percentComplete', label: '% Concluído' },
+    { campo: 'estimatedStartDate', label: 'Início Previsto', pipe: 'date' },
+    { campo: 'estimatedEndDate', label: 'Término Previsto', pipe: 'date' },
+    { campo: 'realStartDate', label: 'Início Real', pipe: 'date' },
+    { campo: 'realEndDate', label: 'Término Real', pipe: 'date' },
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    private projectService: ProjectService,
+    private reportService: ReportService,
+    private authService: AuthService
+  ) {
+    this.form = this.fb.group({
+      projectId: [null, Validators.required]
+    });
   }
 
+  ngOnInit(): void {
+    this.loadProjects();
+  }
 
-  gerarRelatorio() {
-    const filtros = {
+  private loadProjects(): void {
+    this.loading = true;
+    this.error = '';
+
+    const currentUser = this.authService.getUser();
+    if (!currentUser) return;
+
+    this.subs.add(
+      this.projectService.getProjectsByUser(currentUser.id).subscribe({
+        next: (projects: any[]) => {
+          this.projects = projects.map(p => ({
+            projectId: p.projectId ?? p.id,
+            projectName: p.projectName ?? p.name
+          }));
+          this.loading = false;
+        },
+        error: err => {
+          console.error('Erro ao carregar projetos', err);
+          this.error = 'Erro ao carregar projetos.';
+          this.loading = false;
+        }
+      })
+    );
+  }
+
+  gerarRelatorio(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const projectId = Number(this.form.value.projectId);
+
+    const projeto = this.projects.find(p => p.projectId === projectId);
+    this.projetoSelecionadoNome = projeto ? projeto.projectName : null;
+
+    const payload = {
       reportType: 'SCHEDULE_PROJECT',
-      projectId: this.form.value.projectId
+      projectId: projectId
     };
 
-
     this.loading = true;
-    this.reportService.generateReport<ScheduleProjectRowDTO>(filtros).subscribe({
-      next: res => {
-        this.rows = res.rows;
-        this.isGenerated = true;
-        this.loading = false;
-      },
-      error: () => {
-        this.error = 'Erro ao gerar relatório.';
-        this.loading = false;
-      }
-    });
+    this.error = '';
+
+    this.subs.add(
+      this.reportService.generateReport<ScheduleProjectRowDTO>(payload).subscribe({
+        next: res => {
+          this.rows = res.rows ?? [];
+          this.isGenerated = true;
+          this.loading = false;
+        },
+        error: err => {
+          console.error('Erro ao gerar relatório', err);
+          this.error = 'Erro ao gerar relatório.';
+          this.loading = false;
+        }
+      })
+    );
   }
 
   voltarEdicao(): void {
     this.isGenerated = false;
     this.rows = [];
+    this.form.reset();
+    this.projetoSelecionadoNome = null;
   }
 
-  /* TRECHO ANTIGO COMENTADO */
-
-
-  // export class ReportCronogramaProjetoComponent implements OnInit {
-  //   isGenerated = false;
-  //   loading = false;
-  //   error = '';
-  //   phases: PhaseWithProject[] = [];
-  //   projetos: any[] = [];
-  //   projetoSelecionado: any = null;
-
-  //   formData = {
-  //     projeto: ''
-  //   };
-
-  //   constructor(
-  //     private projectService: ProjectService,
-  //     private phaseService: PhaseService,
-  //     private authService: AuthService
-  //   ) {}
-
-  //   ngOnInit(): void {
-  //     const currentUser = this.authService.getUser();
-  //     if (!currentUser) return;
-
-  //     this.projectService.getProjectsByUser(currentUser.id).subscribe(projects => {
-  //       this.projetos = projects;
-  //     });
-  //   }
-
-  //   gerarRelatorio(): void {
-  //     this.error = '';
-  //     if (!this.formData.projeto) {
-  //       alert('Selecione um projeto.');
-  //       return;
-  //     }
-
-  //     this.loading = true;
-  //     this.isGenerated = true;
-
-  //     const projetoIdSelecionado = Number(this.formData.projeto);
-  //     this.projetoSelecionado = this.projetos.find(p => p.projectId === projetoIdSelecionado) || null;
-
-  //     if (!this.projetoSelecionado) {
-  //       this.error = 'Projeto não encontrado.';
-  //       this.loading = false;
-  //       return;
-  //     }
-
-  //     this.phaseService.getPhasesByProjectId(this.projetoSelecionado.projectId).subscribe({
-  //       next: (phases) => {
-  //         this.phases = phases.map(p => ({
-  //           ...p,
-  //           projectName: this.projetoSelecionado.projectName,
-  //           status: this.mapStatus(p.status)
-  //         }));
-  //         this.loading = false;
-  //       },
-  //       error: (err) => {
-  //         console.error(err);
-  //         this.error = 'Erro ao buscar fases do projeto.';
-  //         this.loading = false;
-  //       }
-  //     });
-  //   }
-
-  //   voltarEdicao(): void {
-  //     this.isGenerated = false;
-  //     this.phases = [];
-  //     this.projetoSelecionado = null;
-  //     this.formData.projeto = '';
-  //   }
-
-  //   mapStatus(status?: string): string {
-  //     switch (status) {
-  //       case 'OVERDUE': return 'Atrasado';
-  //       case 'IN_PROGRESS': return 'Em andamento';
-  //       case 'COMPLETED': return 'Concluído';
-  //       case 'NOT_STARTED': return 'Não iniciada';
-  //       default: return status ?? '-';
-  //     }
-  //   }
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
 }

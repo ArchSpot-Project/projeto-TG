@@ -30,6 +30,7 @@
                     <span *ngSwitchCase="'date'">{{ r[c.campo] | date:'dd/MM/yyyy' }}</span>
                     <span *ngSwitchCase="'currency'">{{ r[c.campo] | currency:'BRL' }}</span>
                     <span *ngSwitchCase="'statusTranslate'">{{ r[c.campo] | statusTranslate }}</span>
+                    <span *ngSwitchCase="'phaseStatus'">{{ r[c.campo] | phaseStatus }}</span>
                     <span *ngSwitchCase="'paymentMethod'">{{ r[c.campo] | paymentMethod }}</span>
                     <span *ngSwitchCase="'paymentStatus'">{{ r[c.campo] | paymentStatus }}</span>
                     <span *ngSwitchDefault>{{ r[c.campo] ?? '-' }}</span>
