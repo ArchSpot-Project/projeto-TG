@@ -56,6 +56,11 @@ export class ReportFinanceiroGeralComponent {
     });
   }
 
+  limparFiltros(): void {
+    this.form.reset();
+    this.error = '';
+  }
+
   voltarEdicao(): void {
     this.isGenerated = false;
     this.rows = [];

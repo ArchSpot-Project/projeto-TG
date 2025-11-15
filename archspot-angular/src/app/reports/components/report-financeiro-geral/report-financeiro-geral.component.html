@@ -8,17 +8,17 @@
 
         <div class="row g-3">
 
-            <div class="col-md-3">
+            <div class="col">
                 <label class="form-label">Data inicial</label>
                 <input type="date" class="form-control" formControlName="startDate">
             </div>
 
-            <div class="col-md-3">
+            <div class="col">
                 <label class="form-label">Data final</label>
                 <input type="date" class="form-control" formControlName="endDate">
             </div>
 
-            <div class="col-md-3">
+            <div class="col">
                 <label class="form-label">Método de pagamento</label>
                 <select class="form-select" formControlName="paymentMethod">
                     <option [ngValue]="null">Todos</option>
@@ -32,7 +32,7 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col">
                 <label class="form-label">Status do Projeto</label>
                 <select class="form-select" formControlName="projectStatus">
                     <option [ngValue]="null">Todos</option>
@@ -43,12 +43,10 @@
                 </select>
             </div>
         </div>
-
-        <button class="btn btn-primary mt-3" type="submit" [disabled]="loading">
-            {{ loading ? "Gerando..." : "Gerar relatório" }}
-        </button>
-
-        <div *ngIf="error" class="text-danger mt-2">{{ error }}</div>
+        <div class="col-12 text-end mt-3">
+            <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
+            <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
+        </div>
     </form>
 </div>
 
