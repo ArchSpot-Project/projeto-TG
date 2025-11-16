@@ -113,7 +113,8 @@ export class SelectTemplateModalComponent implements OnInit {
       name: p.name,
       duration: p.defaultDurationDays ?? 1
     })) || [];
-    this.showConfirmCreateProjectModal = true;
+
+    this.show = true;
   }
 
   private resetModal() {

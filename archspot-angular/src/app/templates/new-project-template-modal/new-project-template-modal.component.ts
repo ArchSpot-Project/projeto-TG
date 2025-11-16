@@ -25,6 +25,7 @@ export class NewProjectTemplateModalComponent implements OnInit {
   showConfirmCreateTemplateModal = false;
 
   otherPhases: PhaseTemplateDTO[] = [];
+  confirmProjectPhases: { name: string; duration: number }[] = [];
 
   constructor(private templateService: TemplateService) { }
 
@@ -81,11 +82,22 @@ export class NewProjectTemplateModalComponent implements OnInit {
   get templatePhasesForConfirm(): { name: string; duration: number }[] {
     return this.projectPhases.map(p => ({
       name: p.name,
-      duration: p.defaultDurationDays ?? 1 
+      duration: p.defaultDurationDays ?? 1
     }));
   }
 
   openConfirmCreateProject() {
+    if (!this.editing && this.projectPhases.length === 0) {
+      alert("Escolha pelo menos uma etapa antes de criar o projeto.");
+      return;
+    }
+
+    // se nao tem template, cria array temporário com as etapas selecionadas pelo usuário
+    this.confirmProjectPhases = this.projectPhases.map(p => ({
+      name: p.name,
+      duration: p.defaultDurationDays ?? 1
+    }));
+
     this.showConfirmCreateProjectModal = true;
     this.show = false;
   }

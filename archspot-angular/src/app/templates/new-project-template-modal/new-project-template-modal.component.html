@@ -68,7 +68,7 @@
   (save)="onSaveNewPhase($event)">
 </app-new-phase-template-modal>
 
-<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" [templatePhases]="templatePhasesForConfirm"
+<app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" [templatePhases]="confirmProjectPhases"
   (created)="onProjectCreated()" (editPhases)="editPhasesForProject()" (goBack)="onCancelConfirm()">
 </app-confirm-create-new-project-modal>
 
