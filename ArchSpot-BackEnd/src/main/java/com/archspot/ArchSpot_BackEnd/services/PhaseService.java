@@ -14,10 +14,12 @@ import com.archspot.ArchSpot_BackEnd.enums.*;
 import com.archspot.ArchSpot_BackEnd.exceptions.BusinessRuleException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.activities.services.ActivityService;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.*;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.templates.dtos.PhaseTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.templates.services.TemplateService;
 
@@ -32,6 +34,9 @@ public class PhaseService {
 
   @Autowired
   private TemplateService templateService;
+
+  @Autowired
+  ActivityService activityService;
 
   // consultar todas as fases
   public List<PhaseDTO> findAll() {
@@ -223,7 +228,7 @@ public class PhaseService {
         .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
 
     /*
-     * validações de etapa predecessora suspensas!
+     * validações de etapa predecessora SUSPENSAS!
      */
     // // etapa predecessora e validação - se houver e nao foi finalizada, lançar
     // erro
@@ -242,7 +247,7 @@ public class PhaseService {
 
     // inicia o projeto se for o caso
     updateProject(updated.getProject());
-
+    activityService.logPhaseStarted(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 

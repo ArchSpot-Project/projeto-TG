@@ -1,0 +1,7 @@
+<div *ngIf="loading" class="text-center p-3">
+  <div class="spinner-border"></div>
+</div>
+
+<div *ngFor="let activity of activities" class="mb-3">
+  <app-activity-card [activity]="activity"></app-activity-card>
+</div>

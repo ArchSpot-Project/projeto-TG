@@ -21,6 +21,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { AboutModule } from './about/about.module';
 import { AlbunsModule } from './albuns/albuns.module';
 import { AuthInterceptor } from './core/services/auth.interceptor';
+import { ActivityModule } from './activity/activity.module';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { AuthInterceptor } from './core/services/auth.interceptor';
     PublicModule,
     LayoutModule,
     SharedModule,
-    HttpClientModule
+    HttpClientModule,
+    ActivityModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

@@ -1,0 +1,22 @@
+package com.archspot.ArchSpot_BackEnd.activities.enums;
+
+public enum ActivityType {
+    PHASE_CREATED,
+    PHASE_STARTED,
+    PHASE_FINISHED,
+
+    PROJECT_FINALIZED,
+    PROJECT_CANCELLED,
+
+    DOCUMENT_UPLOADED,
+    DOCUMENT_DELETED,
+
+    PHOTO_UPLOADED,
+    PHOTO_DELETED,
+
+    INSTALLMENT_CREATED,
+    INSTALLMENT_PAID,
+
+    COMMENT_ADDED,
+    COMMENT_DELETED
+}
