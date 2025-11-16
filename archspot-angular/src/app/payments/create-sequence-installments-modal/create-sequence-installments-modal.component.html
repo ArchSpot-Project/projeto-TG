@@ -1,14 +1,13 @@
 <div class="modal-overlay" *ngIf="show" (click)="cancel()">
     <div class="modal-content" (click)="$event.stopPropagation()">
         <h4 class="modal-title">Criar sequência de parcelas</h4>
-        
+
         <hr>
 
         <div class="mb-3">
-            <label class="form-label">Valor total</label>
-            <input type="text" class="form-control" mask="separator.2" placeholder="Valor cheio" thousandSeparator="."
-                decimalMarker="," [ngModel]="totalAmount | currency:'BRL':'symbol':'1.2-2'"
-                (ngModelChange)="onAmountChange($event)" />
+            <label class="form-label">Valor</label>
+            <input type="text" placeholder="Valor da parcela" class="form-control" [(ngModel)]="totalAmount"
+                (input)="onAmountChange($event)" />
         </div>
 
         <div class="mb-3">

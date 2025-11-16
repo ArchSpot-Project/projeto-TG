@@ -46,11 +46,19 @@
                 <td>{{ phase.realEndDate ? (phase.realEndDate | date:'dd/MM/yyyy') : '-' }}</td>
                 <td>{{ phase.status | phaseStatus }}</td>
                 <td>
-                  <button *ngIf="canStartPhase(i)" class="btn btn-sm btn-primary"
-                    (click)="startPhase(phase)">Iniciar</button>
-                  <button *ngIf="canFinishPhase(i)" class="btn btn-sm btn-success"
-                    (click)="finishPhase(phase)">Finalizar</button>
-                  <span *ngIf="!canStartPhase(i) && !canFinishPhase(i)">-</span>
+                  <div *ngIf="canStartPhase(i)">
+                    <button class="btn btn-sm btn-primary" (click)="startPhase(phase)">Iniciar</button>
+                  </div>
+                  <div *ngIf="canFinishPhase(i)">
+                    <button class="btn btn-sm btn-success" (click)="finishPhase(phase)">Finalizar</button>
+                  </div>
+                  <div *ngIf="phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED'">
+                    <button class="btn btn-sm btn-warning mt-1" (click)="undoPhase(phase)">Desfazer</button>
+                  </div>
+                  <div
+                    *ngIf="!canStartPhase(i) && !canFinishPhase(i) && phase.status !== 'IN_PROGRESS' && phase.status !== 'COMPLETED'">
+                    -
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -74,7 +82,7 @@
 
       <app-create-phase-modal [show]="showCreateModal" [projectId]="projectId"
         [lastPhaseId]="phases.length ? phases[phases.length - 1].id : null" (close)="showCreateModal = false"
-        (phaseCreated)="onPhaseCreated($event)">
+        (phaseCreated)="onPhaseCreated()">
       </app-create-phase-modal>
 
       <div class="mt-5" *ngIf="phases.length > 0">

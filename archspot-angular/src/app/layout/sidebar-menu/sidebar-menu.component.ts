@@ -30,7 +30,6 @@ export class SidebarMenuComponent implements OnInit {
 
   generalMenuItems = [
     { icon: 'assets/img/icons/file-richtext.svg', label: 'Relatórios', action: () => this.goToReports() },
-    { icon: 'assets/img/icons/02-contact.png', label: 'Contatos', action: () => this.goToContacts() },
   ];
 
   profileMenuItems = [

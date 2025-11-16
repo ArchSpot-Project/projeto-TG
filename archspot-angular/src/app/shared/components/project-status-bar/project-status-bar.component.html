@@ -9,10 +9,11 @@
     <div class="timeline-item" *ngFor="let phase of phases; let i = index">
       <div class="timeline-label-top">
         <div class="timeline-dot" [ngClass]="{
-             'completed': i <= lastCompletedIndex,
-             'in-progress': phase.status === 'IN_PROGRESS',
-             'not-started': phase.status === 'NOT_STARTED'
-           }">
+                                  'completed': i <= lastCompletedIndex,
+                                  'in-progress': phase.status === 'IN_PROGRESS',
+                                  'overdue': phase.status === 'OVERDUE',
+                                  'not-started': phase.status === 'NOT_STARTED'
+        }">
         </div>
         <span class="phase-name">{{ phase.name }}</span><br>
         <span class="phase-date">{{ phase.estimatedStartDate | date:'dd/MM' }}</span>

@@ -49,6 +49,12 @@ export interface UserUpdateDTO {
   password?: string;
 }
 
+export interface PasswordChangeDTO {
+  currentPassword: string;
+  newPassword: string;
+}
+
+
 // Interface opcional só para criação/login (sugestao GPT):
 // TODO: Tirar essa senha daqui logo logo...
 export interface UserCredentials {

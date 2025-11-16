@@ -8,7 +8,7 @@ export interface Phase {
   realEndDate?: string;
   status?: string;
   projectId: number;
-  predecessorId?: number | null;
+  previousPhaseId?: number | null;
 }
 
 export interface PhaseWithProject extends Phase {

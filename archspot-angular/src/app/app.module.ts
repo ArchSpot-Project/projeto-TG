@@ -18,7 +18,6 @@ import { DrawingsModule } from './drawings/drawings.module';
 import { DocumentsModule } from './documents/documents.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ScheduleModule } from './schedule/schedule.module';
-import { ContactsModule } from './contacts/contacts.module';
 import { AboutModule } from './about/about.module';
 import { AlbunsModule } from './albuns/albuns.module';
 import { AuthInterceptor } from './core/services/auth.interceptor';
@@ -47,8 +46,7 @@ import { AuthInterceptor } from './core/services/auth.interceptor';
     PublicModule,
     LayoutModule,
     SharedModule,
-    HttpClientModule,
-    ContactsModule
+    HttpClientModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

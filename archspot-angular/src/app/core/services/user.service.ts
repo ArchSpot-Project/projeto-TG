@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { User, UserCreateDTO, UserUpdateDTO } from '../models/user.model';
+import { PasswordChangeDTO, User, UserCreateDTO, UserUpdateDTO } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +32,9 @@ export class UserService {
     }
 
     return this.http.put<User>(`${this.apiUrl}/${id}`, formData);
+  }
+
+  changePassword(userId: number, dto: PasswordChangeDTO): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${userId}/change-password`, dto);
   }
 }

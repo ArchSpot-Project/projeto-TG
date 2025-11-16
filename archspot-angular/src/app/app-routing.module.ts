@@ -6,7 +6,6 @@ import { ProjectDetailsPageComponent } from './projects/pages/project-details-pa
 import { LoginPageComponent } from './auth/pages/login-page/login-page.component';
 import { projectAccessGuard } from './core/guards/project-access.guard';
 import { authGuard } from './core/guards/auth.guard';
-import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { ProfilePageComponent } from './profile/pages/profile-page/profile-page.component';
 import { ReportsPageComponent } from './reports/pages/reports-page/reports-page.component';
@@ -26,7 +25,6 @@ const routes: Routes = [
 
   // rotas globais protegidas
   { path: 'home', component: HomePageComponent, canActivate: [authGuard] },
-  { path: 'contacts', component: ContactsComponent, canActivate: [authGuard] },
   { path: 'about', component: AboutComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsPageComponent, canActivate: [authGuard] },
