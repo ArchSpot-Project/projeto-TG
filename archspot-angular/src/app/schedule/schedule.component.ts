@@ -94,28 +94,21 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     if (this.isCustomerInProject) return false;
 
     const phase = this.phases[index];
-    if (phase.realStartDate || phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED') return false;
 
-    const start = new Date(phase.estimatedStartDate);
-    let prevId = phase.previousPhaseId || null;
-
-    while (prevId) {
-      const prev = this.phases.find(p => p.id === prevId);
-      if (!prev) return false;
-
-      if (prev.realEndDate) {
-        prevId = prev.previousPhaseId || null;
-        continue;
-      }
-
-      const prevStart = new Date(prev.estimatedStartDate);
-      const prevEnd = new Date(prev.estimatedEndDate);
-
-      if (start > prevStart && start <= prevEnd) return true;
+    // Não permitir iniciar fases já iniciadas ou concluídas
+    if (phase.realStartDate || phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED')
       return false;
-    }
 
-    return true;
+    const prevId = phase.previousPhaseId;
+
+    // Sem predecessora → pode iniciar
+    if (!prevId) return true;
+
+    // Com predecessora → precisa que a predecessora tenha iniciado
+    const prev = this.phases.find(p => p.id === prevId);
+    if (!prev) return true; // fallback seguro caso dados venham inconsistentes
+
+    return !!prev.realStartDate;
   }
 
   canFinishPhase(index: number): boolean {

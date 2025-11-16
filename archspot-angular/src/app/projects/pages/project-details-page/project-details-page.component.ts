@@ -5,6 +5,7 @@ import { AuthService } from "../../../core/services/auth.service";
 import { Component, Inject } from "@angular/core";
 import { User } from "../../../core/models/user.model";
 import { ProjectResponse } from "../../../core/models/project.model";
+import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: 'app-project-details-page',
@@ -29,7 +30,8 @@ export class ProjectDetailsPageComponent {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private userProjectService: UserProjectService
+    private userProjectService: UserProjectService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -71,7 +73,7 @@ export class ProjectDetailsPageComponent {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erro ao carregar projeto:', err);
+        this.toast.showError('Erro ao carregar projeto.');
         this.errorMessage = 'Erro ao carregar o projeto.';
         this.loading = false;
       }
@@ -98,7 +100,7 @@ export class ProjectDetailsPageComponent {
         this.project = updatedProject;
         this.editing = false;
       },
-      error: (err) => console.error('Erro ao atualizar projeto:', err)
+      error: (err) => this.toast.showError('Erro ao atualizar projeto.')
     });
   }
 
@@ -113,9 +115,9 @@ export class ProjectDetailsPageComponent {
     this.projectService.finalizeProject(this.project.id).subscribe({
       next: (updatedProject) => {
         this.project = updatedProject;
-        alert('Projeto finalizado com sucesso.');
+        this.toast.showSuccess('Projeto finalizado com sucesso.');
       },
-      error: (err) => console.error('Erro ao finalizar projeto:', err)
+      error: (err) => this.toast.showError('Erro ao finalizar projeto. ' + err.error)
     });
   }
 
@@ -125,9 +127,9 @@ export class ProjectDetailsPageComponent {
     this.projectService.cancelProject(this.project.id).subscribe({
       next: (updatedProject) => {
         this.project = updatedProject;
-        alert('Projeto cancelado com sucesso.');
+        this.toast.showSuccess('Projeto cancelado com sucesso.');
       },
-      error: (err) => console.error('Erro ao cancelar projeto:', err)
+      error: (err) => this.toast.showError('Erro ao cancelar projeto.')
     });
   }
 
@@ -139,10 +141,10 @@ export class ProjectDetailsPageComponent {
 
     this.projectService.deleteProject(this.project.id).subscribe({
       next: () => {
-        alert('Projeto excluído com sucesso.');
+        this.toast.showSuccess('Projeto excluído com sucesso.');
         this.router.navigate(['/projects']);
       },
-      error: (err) => console.error('Erro ao excluir projeto:', err)
+      error: (err) => this.toast.showError('Erro ao excluir projeto.')
     });
   }
 

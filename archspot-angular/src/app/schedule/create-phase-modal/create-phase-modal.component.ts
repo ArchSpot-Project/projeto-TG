@@ -38,7 +38,7 @@ export class CreatePhaseModalComponent {
       estimatedStartDate: this.phaseEstimatedStartDate,
       estimatedEndDate: this.phaseEstimatedEndDate,
       projectId: this.projectId,
-      previousPhaseId: this.lastPhaseId || null
+      previousPhaseId: null // será melhor implementado no futuro
     };
 
     this.phaseService.createPhase(this.projectId, phaseData).subscribe({
