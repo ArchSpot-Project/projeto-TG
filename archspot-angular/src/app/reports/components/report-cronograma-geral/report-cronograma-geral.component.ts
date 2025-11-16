@@ -16,16 +16,17 @@ export class ReportCronogramaGeralComponent {
   loading = false;
   error = '';
   isGenerated = false;
+  today: string;
 
   colunas: ReportColumn[] = [
     { campo: 'projectName', label: 'Projeto' },
     { campo: 'status', label: 'Status', pipe: 'statusTranslate' },
-    { campo: 'percentComplete', label: '% Concluído', pipe: 'percent' },
-    { campo: 'percentPaid', label: '% Pago', pipe: 'percent' },
-    { campo: 'estimatedStartDate', label: 'Previsão Início', pipe: 'date' },
-    { campo: 'estimatedEndDate', label: 'Previsão Término', pipe: 'date' },
-    { campo: 'realStartDate', label: 'Real Início', pipe: 'date' },
-    { campo: 'realEndDate', label: 'Real Término', pipe: 'date' }
+    { campo: 'percentComplete', label: '% Concluído', pipe: 'percent', class: 'text-center' },
+    { campo: 'percentPaid', label: '% Pago', pipe: 'percent', class: 'text-center' },
+    { campo: 'estimatedStartDate', label: 'Previsão Início', pipe: 'date', class: 'text-center' },
+    { campo: 'estimatedEndDate', label: 'Previsão Término', pipe: 'date', class: 'text-center' },
+    { campo: 'realStartDate', label: 'Real Início', pipe: 'date', class: 'text-center' },
+    { campo: 'realEndDate', label: 'Real Término', pipe: 'date', class: 'text-center' }
   ];
 
   constructor(private fb: FormBuilder, private reportService: ReportService) {
@@ -33,7 +34,9 @@ export class ReportCronogramaGeralComponent {
       startDate: [null],
       endDate: [null],
       projectStatus: [null]
+      
     });
+    this.today = new Date().toLocaleDateString('pt-BR');
   }
 
   gerarRelatorio(): void {

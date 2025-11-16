@@ -19,6 +19,7 @@ export class ReportCronogramaProjetoComponent implements OnInit, OnDestroy {
   loading = false;
   error = '';
   isGenerated = false;
+  today: string;
 
   projetoSelecionadoNome: string | null = null;
   projects: { projectId: number; projectName: string }[] = [];
@@ -28,11 +29,11 @@ export class ReportCronogramaProjetoComponent implements OnInit, OnDestroy {
   colunas: ReportColumn[] = [
     { campo: 'phaseName', label: 'Etapa' },
     { campo: 'status', label: 'Status', pipe: 'phaseStatus' },
-    { campo: 'percentComplete', label: '% Concluído' },
-    { campo: 'estimatedStartDate', label: 'Início Previsto', pipe: 'date' },
-    { campo: 'estimatedEndDate', label: 'Término Previsto', pipe: 'date' },
-    { campo: 'realStartDate', label: 'Início Real', pipe: 'date' },
-    { campo: 'realEndDate', label: 'Término Real', pipe: 'date' },
+    { campo: 'percentComplete', label: '% Concluído', class: 'text-center' },
+    { campo: 'estimatedStartDate', label: 'Início Previsto', pipe: 'date', class: 'text-center' },
+    { campo: 'estimatedEndDate', label: 'Término Previsto', pipe: 'date', class: 'text-center' },
+    { campo: 'realStartDate', label: 'Início Real', pipe: 'date', class: 'text-center' },
+    { campo: 'realEndDate', label: 'Término Real', pipe: 'date', class: 'text-center' },
   ];
 
   constructor(
@@ -44,6 +45,7 @@ export class ReportCronogramaProjetoComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       projectId: [null, Validators.required]
     });
+    this.today = new Date().toLocaleDateString('pt-BR');
   }
 
   ngOnInit(): void {

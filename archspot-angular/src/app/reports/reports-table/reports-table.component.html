@@ -20,12 +20,12 @@
 <table class="table mt-4 align-middle" id="relatorioTabela" *ngIf="registros.length > 0">
     <thead class="table-light">
         <tr>
-            <th *ngFor="let c of colunas">{{ c.label }}</th>
+            <th *ngFor="let c of colunas" [ngClass]="c.class">{{ c.label }}</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let r of registros">
-            <td *ngFor="let c of colunas">
+            <td *ngFor="let c of colunas" [ngClass]="c.class">
                 <ng-container [ngSwitch]="c.pipe">
                     <span *ngSwitchCase="'date'">{{ r[c.campo] | date:'dd/MM/yyyy' }}</span>
                     <span *ngSwitchCase="'currency'">{{ r[c.campo] | currency:'BRL' }}</span>

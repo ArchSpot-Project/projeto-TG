@@ -2,6 +2,9 @@ package com.archspot.ArchSpot_BackEnd.reports.dtos;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +14,7 @@ public class FinancialProjectRowDTO {
   private Long installmentId;
   private String description;
 
-  private String status; // pago / pendente
+  private PaymentStatus status;
   private BigDecimal value;
   private String paymentMethod;
 

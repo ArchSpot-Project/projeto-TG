@@ -20,6 +20,7 @@ export class ReportFinanceiroProjetoComponent {
   error = '';
   isGenerated = false;
   projetoSelecionadoNome: string | null = null;
+  today: string;
 
   projects: { projectId: number; projectName: string }[] = [];
 
@@ -28,11 +29,11 @@ export class ReportFinanceiroProjetoComponent {
   // colunas fixas do relatório
   colunas: ReportColumn[] = [
     { campo: 'description', label: 'Descrição' },
+    { campo: 'value', label: 'Valor', pipe: 'currency', class: 'text-end' },
     { campo: 'status', label: 'Status', pipe: 'paymentStatus' },
-    { campo: 'value', label: 'Valor', pipe: 'currency' },
+    { campo: 'estimatedPaymentDate', label: 'Previsto', pipe: 'date', class: 'text-center' },
+    { campo: 'realPaymentDate', label: 'Pago em', pipe: 'date', class: 'text-center' },
     { campo: 'paymentMethod', label: 'Forma de Pagamento', pipe: 'paymentMethod' },
-    { campo: 'estimatedPaymentDate', label: 'Previsto', pipe: 'date' },
-    { campo: 'realPaymentDate', label: 'Pago em', pipe: 'date' },
   ];
 
   constructor(
@@ -44,6 +45,7 @@ export class ReportFinanceiroProjetoComponent {
     this.form = this.fb.group({
       projectId: [null, Validators.required]
     });
+    this.today = new Date().toLocaleDateString('pt-BR');
   }
 
   ngOnInit(): void {

@@ -1,26 +1,22 @@
-<div *ngIf="!isGenerated; else relatorioGerado">
-    <div class="row">
-        <div class="col fs-5 fw-medium">Gerar relatório - Pagamentos Gerais</div>
-        <hr class="mt-0">
-    </div>
+<app-section-title [title]="'Gerar relatório - Pagamentos Gerais'"></app-section-title>
 
+<div *ngIf="!isGenerated; else relatorioGerado">
     <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
 
-        <div class="row g-3">
-
+        <div class="row g-2">
             <div class="col">
                 <label class="form-label">Data inicial</label>
-                <input type="date" class="form-control" formControlName="startDate">
+                <input type="date" class="form-control shadow-sm" formControlName="startDate">
             </div>
 
             <div class="col">
                 <label class="form-label">Data final</label>
-                <input type="date" class="form-control" formControlName="endDate">
+                <input type="date" class="form-control shadow-sm" formControlName="endDate">
             </div>
 
             <div class="col">
                 <label class="form-label">Método de pagamento</label>
-                <select class="form-select" formControlName="paymentMethod">
+                <select class="form-select shadow-sm" formControlName="paymentMethod">
                     <option [ngValue]="null">Todos</option>
                     <option value="PIX">PIX</option>
                     <option value="BOLETO">Boleto</option>
@@ -34,7 +30,7 @@
 
             <div class="col">
                 <label class="form-label">Status do Projeto</label>
-                <select class="form-select" formControlName="projectStatus">
+                <select class="form-select shadow-sm" formControlName="projectStatus">
                     <option [ngValue]="null">Todos</option>
                     <option value="PLANNED">Não iniciado</option>
                     <option value="IN_PROGRESS">Em andamento</option>
@@ -53,7 +49,7 @@
 <!-- relatório -->
 <ng-template #relatorioGerado>
     <app-reports-table
-        [titulo]="'ArchSpot - Relatório de Pagamentos Gerais'"
+        [titulo]="'ArchSpot - Relatório de Pagamentos Gerais' + ' - ' + today"
         [pdfNomeArquivo]="'relatorio_pagamentos_gerais.pdf'"
         [colunas]="colunas"
         [registros]="rows"

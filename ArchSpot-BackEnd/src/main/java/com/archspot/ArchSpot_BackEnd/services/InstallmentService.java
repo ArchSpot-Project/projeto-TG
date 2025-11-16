@@ -210,7 +210,8 @@ public class InstallmentService {
     }
   }
 
-  // Atualiza valor total em um Projeto (poderia ser private -> está public para ser acessado em testConfig)
+  // Atualiza valor total em um Projeto (poderia ser private -> está public para
+  // ser acessado em testConfig)
   public void updateProjectTotal(Long projectId) {
     BigDecimal total = installmentRepository
         .findByProjectId(projectId)
@@ -223,6 +224,12 @@ public class InstallmentService {
 
     project.setTotalValue(total);
     projectRepository.save(project);
+  }
+
+  // retorna atualizadas as parcelas de um projeto (usado no reportService)
+  public List<Installment> findAllUpdatedByProject(Long projectId) {
+    refreshOverdueStatuses(projectId);
+    return installmentRepository.findAllByProjectIdOrderByEstimatedPaymentDateAsc(projectId);
   }
 
   // mapeamente entidade para DTO

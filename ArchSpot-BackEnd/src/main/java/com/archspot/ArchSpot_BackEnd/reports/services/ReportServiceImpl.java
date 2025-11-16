@@ -2,6 +2,7 @@ package com.archspot.ArchSpot_BackEnd.reports.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.UserProjectRepository;
 import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
+import com.archspot.ArchSpot_BackEnd.services.InstallmentService;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -37,6 +39,9 @@ public class ReportServiceImpl implements ReportService {
 
   @Autowired
   private InstallmentRepository installmentRepository;
+
+  @Autowired
+  private InstallmentService installmentService;
 
   @Override
   public ReportResponseDTO<?> generateReport(ReportFilterDTO filters) {
@@ -206,7 +211,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     // Buscamos as parcelas
-    List<Installment> installments = installmentRepository.findAllByProjectIdOrderByEstimatedPaymentDateAsc(projectId);
+    List<Installment> installments = installmentService.findAllUpdatedByProject(projectId);
 
     return installments.stream()
         .filter(i -> filterInstallmentByDate(i, filters))
@@ -221,8 +226,7 @@ public class ReportServiceImpl implements ReportService {
           dto.setEstimatedPaymentDate(i.getEstimatedPaymentDate());
           dto.setRealPaymentDate(i.getRealPaymentDate());
 
-          // Status simples (não criamos enum por enquanto)
-          dto.setStatus(i.getRealPaymentDate() != null ? "PAGO" : "PENDENTE");
+          dto.setStatus(i.getPaymentStatus());
 
           return dto;
         })
@@ -237,14 +241,48 @@ public class ReportServiceImpl implements ReportService {
 
   // calcular progresso do projeto
   private int computeProjectProgress(List<Phase> phases) {
-    if (phases.isEmpty())
-      return 0;
 
-    int sum = phases.stream()
-        .mapToInt(this::calculatePhaseProgress)
+    if (phases == null || phases.isEmpty()) {
+      return 0;
+    }
+
+    // Somatório dos pesos (duração estimada)
+    long totalDuration = phases.stream()
+        .mapToLong(p -> {
+          LocalDate start = p.getEstimatedStartDate();
+          LocalDate end = p.getEstimatedEndDate();
+          if (start == null || end == null)
+            return 0;
+          long d = ChronoUnit.DAYS.between(start, end);
+          return Math.max(d, 1); // evitar peso zero
+        })
         .sum();
 
-    return sum / phases.size(); // média simples
+    if (totalDuration <= 0) {
+      // fallback: média simples
+      return (int) phases.stream()
+          .mapToInt(this::calculatePhaseProgress)
+          .average()
+          .orElse(0);
+    }
+
+    // Média ponderada
+    double weighted = phases.stream()
+        .mapToDouble(p -> {
+          int phaseProgress = calculatePhaseProgress(p);
+
+          LocalDate start = p.getEstimatedStartDate();
+          LocalDate end = p.getEstimatedEndDate();
+
+          long duration = (start != null && end != null)
+              ? Math.max(ChronoUnit.DAYS.between(start, end), 1)
+              : 1;
+
+          return phaseProgress * (duration / (double) totalDuration);
+        })
+        .sum();
+
+    return (int) weighted;
   }
 
   // calcular porcentagem paga do projeto
@@ -298,18 +336,50 @@ public class ReportServiceImpl implements ReportService {
 
   // calcular progresso da etapa
   private int calculatePhaseProgress(Phase phase) {
-    // concluído
+
+    LocalDate today = LocalDate.now();
+
+    // Se já finalizou → 100%
     if (phase.getRealEndDate() != null) {
       return 100;
     }
 
-    // em andamento
-    if (phase.getRealStartDate() != null) {
-      return 50;
+    LocalDate start = phase.getEstimatedStartDate();
+    LocalDate end = phase.getEstimatedEndDate();
+
+    // Se não há estimativas, fallback para o método anterior
+    if (start == null || end == null) {
+      if (phase.getRealStartDate() != null)
+        return 50;
+      return 0;
     }
 
-    // não começou
-    return 0;
+    // Se não iniciou e já passou o prazo → progresso 0% (fase atrasada)
+    if (phase.getRealStartDate() == null && today.isAfter(end)) {
+        return 2;
+    }
+
+    // Se hoje é antes do começo → 0%
+    if (today.isBefore(start)) {
+      return 0;
+    }
+
+    // Se hoje é depois do fim estimado → 99% (fase atrasada)
+    if (today.isAfter(end) && phase.getRealStartDate() != null) {
+        return 98;
+    }
+
+    // Caso normal
+    long totalDays = ChronoUnit.DAYS.between(start, end);
+    long doneDays = ChronoUnit.DAYS.between(start, today);
+
+    if (totalDays <= 0)
+      return 0;
+
+    int progress = (int) ((doneDays * 100) / totalDays);
+
+    // Garantir limites
+    return Math.min(100, Math.max(0, progress));
   }
 
   // filtra projeto por status

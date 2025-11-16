@@ -16,13 +16,14 @@ export class ReportFinanceiroGeralComponent {
   loading = false;
   error = '';
   isGenerated = false;
+  today: string;
 
   colunas: ReportColumn[] = [
     { campo: 'projectName', label: 'Projeto' },
     { campo: 'status', label: 'Status financeiro', pipe: 'financialStatus' },
-    { campo: 'totalValue', label: 'Total do Projeto', pipe: 'currency' },
-    { campo: 'totalPaid', label: 'Total Pago', pipe: 'currency' },
-    { campo: 'totalRemaining', label: 'Restante', pipe: 'currency' }
+    { campo: 'totalValue', label: 'Total do Projeto', pipe: 'currency', class: 'text-end' },
+    { campo: 'totalPaid', label: 'Total Pago', pipe: 'currency', class: 'text-end' },
+    { campo: 'totalRemaining', label: 'Restante', pipe: 'currency', class: 'text-end' }
   ];
 
   constructor(private fb: FormBuilder, private reportService: ReportService) {
@@ -32,6 +33,7 @@ export class ReportFinanceiroGeralComponent {
       paymentMethod: [null],
       projectStatus: [null]
     });
+    this.today = new Date().toLocaleDateString('pt-BR');
   }
 
   gerarRelatorio(): void {

@@ -1,20 +1,24 @@
 <app-section-title [title]="'Gerar relatório - Cronograma por Projeto'"></app-section-title>
 
 <div *ngIf="!isGenerated; else relatorioGerado" class="row">
-  <form class="col" [formGroup]="form" (ngSubmit)="gerarRelatorio()">
-    <div class="mb-3">
-      <label class="form-label">Projeto:</label>
-      <select class="form-select shadow-sm" formControlName="projectId">
-        <option [ngValue]="null">Selecione</option>
-        <option *ngFor="let p of projects" [ngValue]="p.projectId">{{ p.projectName }}</option>
-      </select>
-      <div *ngIf="form.controls['projectId'].touched && form.controls['projectId'].invalid"
-        class="text-danger small mt-1">
-        Selecione um projeto.
+  <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
+    
+    <div class="row g-3">
+      <div class="col">
+        <label class="form-label">Projeto:</label>
+        <select class="form-select shadow-sm" formControlName="projectId">
+          <option [ngValue]="null">Selecione</option>
+          <option *ngFor="let p of projects" [ngValue]="p.projectId">{{ p.projectName }}</option>
+        </select>
+        <div *ngIf="form.controls['projectId'].touched && form.controls['projectId'].invalid"
+          class="text-danger small mt-1">
+          Selecione um projeto.
+        </div>
       </div>
     </div>
+    
 
-    <div class="col-12 text-end">
+    <div class="col-12 text-end mt-3">
       <button class="btn btn-success" type="submit" [disabled]="form.invalid || loading">
         <span *ngIf="!loading">Gerar Relatório</span>
         <span *ngIf="loading">Carregando...</span>
@@ -25,7 +29,7 @@
 
 <ng-template #relatorioGerado>
   <app-reports-table
-    [titulo]="'Cronograma por Projeto - ' + projetoSelecionadoNome"
+    [titulo]="'ArchSpot - Cronograma por Projeto - ' + projetoSelecionadoNome + ' - ' + today"
     [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
     [colunas]="colunas"
     [registros]="rows"
