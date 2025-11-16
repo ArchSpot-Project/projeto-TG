@@ -1,35 +1,40 @@
-<div class="row" *ngIf="!isGenerated; else relatorioGerado">
-  <div class="col fs-5 fw-medium">Gerar relatório - Cronograma por Projeto</div>
-  <hr class="mt-0">
-</div>
+<app-section-title [title]="'Gerar relatório - Cronograma por Projeto'"></app-section-title>
 
-<div *ngIf="!isGenerated" class="row">
-  <form class="col">
-    <div class="mb-0">
-      <label class="form-label">Projeto:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.projeto" name="projeto">
-        <option value="">Selecione</option>
-        <option *ngFor="let p of projetos" [value]="p.projectId">{{ p.projectName }}</option>
-      </select>
+<div *ngIf="!isGenerated; else relatorioGerado" class="row">
+  <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
+    
+    <div class="row g-3">
+      <div class="col">
+        <label class="form-label">Projeto:</label>
+        <select class="form-select shadow-sm" formControlName="projectId">
+          <option [ngValue]="null">Selecione</option>
+          <option *ngFor="let p of projects" [ngValue]="p.projectId">{{ p.projectName }}</option>
+        </select>
+        <div *ngIf="form.controls['projectId'].touched && form.controls['projectId'].invalid"
+          class="text-danger small mt-1">
+          Selecione um projeto.
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="col-12 text-end mt-3">
+      <button class="btn btn-success" type="submit" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Gerar Relatório</span>
+        <span *ngIf="loading">Carregando...</span>
+      </button>
     </div>
   </form>
-
-  <div class="col text-end align-self-end">
-    <button type="button" class="btn btn-success" (click)="gerarRelatorio()">Gerar Relatório</button>
-  </div>
 </div>
 
-<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <app-reports-table [titulo]="'Cronograma Por Projeto'" [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
-    [colunas]="[
-      { campo: 'projectName', label: 'Projeto' },
-      { campo: 'name', label: 'Etapa' },
-      { campo: 'status', label: 'Status', pipe:'phaseStatus' },
-      { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
-      { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
-      { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
-      { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
-    ]" [registros]="phases" [loading]="loading" [error]="error" (voltar)="voltarEdicao()">
+  <app-reports-table
+    [titulo]="'ArchSpot - Cronograma por Projeto - ' + projetoSelecionadoNome + ' - ' + today"
+    [pdfNomeArquivo]="'relatorio_cronograma_projeto.pdf'"
+    [colunas]="colunas"
+    [registros]="rows"
+    [loading]="loading"
+    [error]="error"
+    (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>

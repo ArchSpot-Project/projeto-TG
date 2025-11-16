@@ -9,7 +9,7 @@ import { ReportCronogramaProjetoComponent } from './components/report-cronograma
 import { ReportFinanceiroGeralComponent } from './components/report-financeiro-geral/report-financeiro-geral.component';
 import { ReportFinanceiroProjetoComponent } from './components/report-financeiro-projeto/report-financeiro-projeto.component';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../shared/shared.module';
 import { ReportsTableComponent } from './reports-table/reports-table.component';
 
@@ -29,7 +29,8 @@ import { ReportsTableComponent } from './reports-table/reports-table.component';
     LayoutModule,
     NgbNavModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule
   ]
 })
 export class ReportsModule { }

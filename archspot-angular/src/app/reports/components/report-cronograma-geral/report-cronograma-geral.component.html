@@ -1,31 +1,42 @@
-<div class="row" *ngIf="!isGenerated; else relatorioGerado">
-  <div class="col fs-5 fw-medium">Gerar relatório - Cronograma Geral</div>
-  <hr class="mt-0">
-</div>
+<app-section-title [title]="'Gerar relatório - Cronograma Geral'"></app-section-title>
 
-<!-- formulário de filtros -->
-<div *ngIf="!isGenerated">
-  <form class="row">
-    <div class="col mb-3">
-      <label class="form-label">De:</label>
-      <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoInicio" name="inicio">
+<div *ngIf="!isGenerated; else relatorioGerado">
+  <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
+
+    <div class="row g-3">
+      <div class="col">
+        <label class="form-label">De:</label>
+        <input type="date" formControlName="startDate" class="form-control shadow-sm">
+      </div>
+
+      <div class="col">
+        <label class="form-label">Até:</label>
+        <input type="date" formControlName="endDate" class="form-control shadow-sm">
+      </div>
+
+      <div class="col">
+        <label class="form-label">Usuário / Função</label>
+        <select class="form-select shadow-sm" formControlName="userRole">
+          <option [ngValue]="null">Todos</option>
+          <option value="ADMIN">Gerente</option>
+          <option value="STAFF">Colaborador Interno</option>
+          <option value="CUSTOMER">Cliente</option>
+          <option value="EXTERNAL_COLLABORATOR">Colaborador Externo</option>
+        </select>
+      </div>
+
+      <div class="col">
+        <label class="form-label">Status do Projeto</label>
+        <select class="form-select shadow-sm" formControlName="projectStatus">
+          <option [ngValue]="null">Todos</option>
+          <option value="PLANNED">Não iniciado</option>
+          <option value="IN_PROGRESS">Em andamento</option>
+          <option value="COMPLETED">Concluído</option>
+          <option value="CANCELLED">Cancelado</option>
+        </select>
+      </div>
     </div>
-
-    <div class="col mb-3">
-      <label class="form-label">Até:</label>
-      <input type="date" class="form-control shadow-sm" [(ngModel)]="formData.periodoFim" name="fim">
-    </div>
-
-    <div class="col mb-3">
-      <label class="form-label">Status:</label>
-      <select class="form-select shadow-sm" [(ngModel)]="formData.status" name="status">
-        <option value="todos">Todos</option>
-        <option value="IN_PROGRESS">Em andamento</option>
-        <option value="COMPLETED">Concluído</option>
-        <option value="OVERDUE">Atrasado</option>
-      </select>
-    </div>
-
+    
     <div class="col-12 text-end mt-3">
       <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
       <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
@@ -33,23 +44,9 @@
   </form>
 </div>
 
-<!-- relatório gerado -->
 <ng-template #relatorioGerado>
-  <app-reports-table
-    [titulo]="'Cronograma Geral'"
-    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'"
-    [colunas]="[
-      { campo: 'projectName', label: 'Projeto' },
-      { campo: 'name', label: 'Etapa' },
-      { campo: 'status', label: 'Status', pipe:'phaseStatus' },
-      { campo: 'estimatedStartDate', label: 'Previsão Início', pipe:'date' },
-      { campo: 'estimatedEndDate', label: 'Previsão Término', pipe:'date' },
-      { campo: 'realStartDate', label: 'Data Real Início', pipe:'date' },
-      { campo: 'realEndDate', label: 'Data Real Término', pipe:'date' }
-    ]"
-    [registros]="phases"
-    [loading]="loading"
-    [error]="error"
-    (voltar)="voltarEdicao()">
+  <app-reports-table [titulo]="'ArchSpot - Cronograma Geral' + ' - ' + today"
+    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'" [colunas]="colunas" [registros]="rows" [loading]="loading"
+    [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>

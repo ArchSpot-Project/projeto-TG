@@ -16,4 +16,9 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
 
     // buscar todas parcelas de um projeto com um status
     List<Installment> findByProjectIdAndPaymentStatus(Long projectId, PaymentStatus paymentStatus);
+
+    // busca todas as parcelas de um projeto ordenadas por data estimada ascendente
+    List<Installment> findAllByProjectIdOrderByEstimatedPaymentDateAsc(Long projectId);
+
+    List<Installment> findByProjectIdIn(List<Long> projectId);
 }

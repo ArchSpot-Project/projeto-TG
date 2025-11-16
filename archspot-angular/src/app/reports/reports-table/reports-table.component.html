@@ -1,5 +1,5 @@
 <!-- componente de tabela do relatorio gerado -->
-<div class="row d-flex justify-content-between align-items-end mb-2">
+<div class="row d-flex justify-content-between align-items-end">
     <div class="col-auto pe-0">
         <button class="btn p-1" (click)="voltar.emit()">
             <img src="/assets/img/icons/chevron-left.svg" alt="Voltar" width="20" height="20">
@@ -20,18 +20,21 @@
 <table class="table mt-4 align-middle" id="relatorioTabela" *ngIf="registros.length > 0">
     <thead class="table-light">
         <tr>
-            <th *ngFor="let c of colunas">{{ c.label }}</th>
+            <th *ngFor="let c of colunas" [ngClass]="c.class">{{ c.label }}</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let r of registros">
-            <td *ngFor="let c of colunas">
+            <td *ngFor="let c of colunas" [ngClass]="c.class">
                 <ng-container [ngSwitch]="c.pipe">
                     <span *ngSwitchCase="'date'">{{ r[c.campo] | date:'dd/MM/yyyy' }}</span>
                     <span *ngSwitchCase="'currency'">{{ r[c.campo] | currency:'BRL' }}</span>
                     <span *ngSwitchCase="'statusTranslate'">{{ r[c.campo] | statusTranslate }}</span>
+                    <span *ngSwitchCase="'phaseStatus'">{{ r[c.campo] | phaseStatus }}</span>
                     <span *ngSwitchCase="'paymentMethod'">{{ r[c.campo] | paymentMethod }}</span>
                     <span *ngSwitchCase="'paymentStatus'">{{ r[c.campo] | paymentStatus }}</span>
+                    <span *ngSwitchCase="'financialStatus'">{{ r[c.campo] | financialStatus }}</span>
+                    <span *ngSwitchCase="'percent'">{{ r[c.campo] | percent }}</span>
                     <span *ngSwitchDefault>{{ r[c.campo] ?? '-' }}</span>
                 </ng-container>
             </td>
