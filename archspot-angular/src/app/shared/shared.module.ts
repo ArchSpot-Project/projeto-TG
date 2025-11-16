@@ -26,6 +26,8 @@ import { SelectTemplateModalComponent } from '../templates/select-template-modal
 import { ConfirmCreateNewProjectModalComponent } from '../templates/confirm-create-new-project/confirm-create-new-project.component';
 import { ConfirmCreateNewTemplateModalComponent } from '../templates/confirm-create-new-template-modal/confirm-create-new-template-modal.component';
 import { DocVersioningModalComponent } from './doc-versioning-modal/doc-versioning-modal.component';
+import { FinancialStatusPipe } from '../core/pipes/financial-status.pipe';
+import { PercentPipe } from '../core/pipes/percent.pipe';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,9 @@ import { DocVersioningModalComponent } from './doc-versioning-modal/doc-versioni
     DirectoryComponent,
     DirectoryNodeComponent,
     ToastContainerComponent,
-    DocVersioningModalComponent
+    DocVersioningModalComponent,
+    FinancialStatusPipe,
+    PercentPipe
   ],
   imports: [
     CommonModule,
@@ -81,7 +85,9 @@ import { DocVersioningModalComponent } from './doc-versioning-modal/doc-versioni
     DateDashPipe,
     RoleTranslatePipe,
     DirectoryComponent,
-    AddUserModalComponent
+    AddUserModalComponent,
+    FinancialStatusPipe,
+    PercentPipe
   ],
   providers: [
     provideNgxMask()

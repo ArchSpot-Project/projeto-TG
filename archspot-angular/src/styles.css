@@ -101,6 +101,12 @@ body {
     left: 90%;
   }
 
+  app-page-layout .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+
   /* tirar o contorno preto ao clicar em alguns botoes/links */
   a.btn:focus,
   a.btn:active,
