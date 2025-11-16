@@ -2,19 +2,30 @@
 
 <div *ngIf="!isGenerated; else relatorioGerado">
   <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
-    
-    <div class="row g-2">
+
+    <div class="row g-3">
       <div class="col">
         <label class="form-label">De:</label>
         <input type="date" formControlName="startDate" class="form-control shadow-sm">
       </div>
-      
+
       <div class="col">
         <label class="form-label">Até:</label>
         <input type="date" formControlName="endDate" class="form-control shadow-sm">
       </div>
-      
-      <div class="col">  
+
+      <div class="col">
+        <label class="form-label">Usuário / Função</label>
+        <select class="form-select shadow-sm" formControlName="userRole">
+          <option [ngValue]="null">Todos</option>
+          <option value="ADMIN">Gerente</option>
+          <option value="STAFF">Colaborador Interno</option>
+          <option value="CUSTOMER">Cliente</option>
+          <option value="EXTERNAL_COLLABORATOR">Colaborador Externo</option>
+        </select>
+      </div>
+
+      <div class="col">
         <label class="form-label">Status do Projeto</label>
         <select class="form-select shadow-sm" formControlName="projectStatus">
           <option [ngValue]="null">Todos</option>
@@ -26,7 +37,6 @@
       </div>
     </div>
     
-
     <div class="col-12 text-end mt-3">
       <button type="button" class="btn btn-success me-2" (click)="gerarRelatorio()">Gerar Relatório</button>
       <button type="button" class="btn btn-outline-secondary" (click)="limparFiltros()">Limpar</button>
@@ -35,13 +45,8 @@
 </div>
 
 <ng-template #relatorioGerado>
-  <app-reports-table
-    [titulo]="'ArchSpot - Cronograma Geral' + ' - ' + today"
-    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'"
-    [colunas]="colunas"
-    [registros]="rows"
-    [loading]="loading"
-    [error]="error"
-    (voltar)="voltarEdicao()">
+  <app-reports-table [titulo]="'ArchSpot - Cronograma Geral' + ' - ' + today"
+    [pdfNomeArquivo]="'relatorio_cronograma_geral.pdf'" [colunas]="colunas" [registros]="rows" [loading]="loading"
+    [error]="error" (voltar)="voltarEdicao()">
   </app-reports-table>
 </ng-template>

@@ -33,7 +33,8 @@ export class ReportCronogramaGeralComponent {
     this.form = this.fb.group({
       startDate: [null],
       endDate: [null],
-      projectStatus: [null]
+      projectStatus: [null],
+      userRole: [null]
       
     });
     this.today = new Date().toLocaleDateString('pt-BR');

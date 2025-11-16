@@ -3,7 +3,7 @@
 <div *ngIf="!isGenerated; else relatorioGerado">
     <form [formGroup]="form" (ngSubmit)="gerarRelatorio()" class="p-3">
 
-        <div class="row g-2">
+        <div class="row g-3">
             <div class="col">
                 <label class="form-label">Data inicial</label>
                 <input type="date" class="form-control shadow-sm" formControlName="startDate">
