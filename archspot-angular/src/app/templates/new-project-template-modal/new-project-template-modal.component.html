@@ -1,5 +1,4 @@
-<!-- MODAL DE CRIAR NOVO PROJETO / EDITAR TEMPLATE -->
-<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="show || showConfirmCreateProjectModal"
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="show"
   style="display:block; background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -8,7 +7,7 @@
         <h1 class="modal-title fs-4 font-logo">
           {{ editing ? 'Editar Etapas do Projeto' : 'Criar Novo Projeto' }}
         </h1>
-        <button type="button" class="btn-close" (click)="close.emit()"></button>
+        <button type="button" class="btn-close" (click)="goBackModal()"></button>
       </div>
 
       <div class="modal-body">
@@ -40,13 +39,16 @@
             <button type="button" class="btn btn-outline-secondary" (click)="openNewPhaseModal()">
               + Criar Nova Etapa
             </button>
+            <button *ngIf="!editing" type="button" class="btn btn-success mt-2" (click)="openConfirmCreateTemplate()">
+              Salvar template
+            </button>
           </div>
         </div>
 
       </div>
 
       <div class="modal-footer">
-        <button *ngIf="returnToProjectConfirm" type="button" class="btn btn-secondary" (click)="goBackModal()">
+        <button type="button" class="btn btn-secondary" (click)="goBackModal()">
           Voltar
         </button>
 
@@ -62,14 +64,12 @@
   </div>
 </div>
 
-<!-- MODAIS INTERNAS -->
 <app-new-phase-template-modal [show]="showNewPhaseModal" (close)="onCloseNewPhaseModal()"
   (save)="onSaveNewPhase($event)">
 </app-new-phase-template-modal>
 
 <app-confirm-create-new-project-modal [show]="showConfirmCreateProjectModal" [templatePhases]="templatePhasesForConfirm"
-  (close)="onCancelConfirm()" (created)="onProjectCreated()" (goBack)="showConfirmCreateProjectModal = true"
-  (editPhases)="editPhasesForProject()">
+  (created)="onProjectCreated()" (editPhases)="editPhasesForProject()" (goBack)="onCancelConfirm()">
 </app-confirm-create-new-project-modal>
 
 <app-confirm-create-new-template-modal [show]="showConfirmCreateTemplateModal" [selectedPhases]="projectPhases"

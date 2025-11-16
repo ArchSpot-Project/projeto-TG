@@ -16,9 +16,9 @@ export class NewProjectTemplateModalComponent implements OnInit {
   @Input() returnToProjectConfirm = false;
 
   @Output() close = new EventEmitter<void>();
-  @Output() goBack = new EventEmitter<void>(); // Volta para a modal anterior
+  @Output() goBack = new EventEmitter<void>();
   @Output() projectCreated = new EventEmitter<void>();
-  @Output() goBackToSelect = new EventEmitter<ProjectTemplateDTO>(); // Emite template atualizado
+  @Output() goBackToSelect = new EventEmitter<ProjectTemplateDTO>();
 
   showNewPhaseModal = false;
   showConfirmCreateProjectModal = false;
@@ -81,12 +81,18 @@ export class NewProjectTemplateModalComponent implements OnInit {
   get templatePhasesForConfirm(): { name: string; duration: number }[] {
     return this.projectPhases.map(p => ({
       name: p.name,
-      duration: p.defaultDurationDays ?? 1
+      duration: p.defaultDurationDays ?? 1 
     }));
   }
 
   openConfirmCreateProject() {
     this.showConfirmCreateProjectModal = true;
+    this.show = false;
+  }
+
+  openConfirmCreateTemplate() {
+    this.showConfirmCreateTemplateModal = true;
+    this.show = false;
   }
 
   onCancelConfirm() {
@@ -101,29 +107,29 @@ export class NewProjectTemplateModalComponent implements OnInit {
   }
 
   editPhasesForProject() {
-    this.returnToProjectConfirm = true;
-    this.editing = true;
     this.show = true;
     this.showConfirmCreateProjectModal = false;
   }
 
   saveTemplate() {
-    const updatedTemplate: ProjectTemplateDTO = {
-      name: 'Template Temporário',
-      phases: this.projectPhases,
-      id: undefined,
-      description: undefined,
-      createdBy: undefined,
-      isDefault: false
-    };
-
-    this.goBackToSelect.emit(updatedTemplate);
-
     this.showNewPhaseModal = false;
     this.showConfirmCreateTemplateModal = false;
     this.show = false;
     this.editing = false;
+
+    if (this.projectPhases.length > 0) {
+      const tempTemplate: ProjectTemplateDTO = {
+        name: 'Template Temporário',
+        phases: this.projectPhases,
+        id: undefined,
+        createdBy: this.currentUserId,
+        isDefault: false,
+        description: ''
+      };
+      this.goBackToSelect.emit(tempTemplate);
+    }
   }
+
 
   onTemplateSaved(template: ProjectTemplateDTO) {
     this.showConfirmCreateTemplateModal = false;
@@ -135,6 +141,5 @@ export class NewProjectTemplateModalComponent implements OnInit {
   onCancelConfirmTemplate() {
     this.showConfirmCreateTemplateModal = false;
     this.show = true;
-    this.editing = false;
   }
 }

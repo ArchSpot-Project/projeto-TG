@@ -35,15 +35,20 @@ public class TemplateService {
    */
 
   public List<ProjectTemplateDTO> findAllProjectTemplates() {
-    //mostrar tambem os templates de projeto default
     User currentUser = SecurityUtils.getCurrentUser();
+
     List<ProjectTemplate> userProjects = projectTemplateRepository.findAllByUserId(currentUser.getId());
     List<ProjectTemplate> defaultProjects = projectTemplateRepository.findByIsDefaultTrue();
 
-    return Stream.concat(userProjects.stream(), defaultProjects.stream())
-        .distinct()
-        .map(this::toProjectTemplateDTO)
-        .collect(Collectors.toList());
+    // filtra templates default que já foram clonados para o usuário (sugestao porque nao aparecia nenhum template)
+    List<ProjectTemplate> filteredDefaults = defaultProjects.stream()
+        .filter(dp -> userProjects.stream().noneMatch(up -> up.getName().equals(dp.getName())))
+        .toList();
+
+    List<ProjectTemplate> combined = Stream.concat(userProjects.stream(), filteredDefaults.stream())
+        .toList();
+
+    return combined.stream().map(this::toProjectTemplateDTO).toList();
   }
 
   public ProjectTemplateDTO findProjectTemplateById(Long id) {
@@ -101,14 +106,17 @@ public class TemplateService {
 
   public List<PhaseTemplateDTO> findAllPhaseTemplates() {
     User currentUser = SecurityUtils.getCurrentUser();
-    //mostrar tambem os templates de etapa default
     List<PhaseTemplate> userPhases = phaseTemplateRepository.findAllByUserId(currentUser.getId());
     List<PhaseTemplate> defaultPhases = phaseTemplateRepository.findByIsDefaultTrue();
 
-    return Stream.concat(userPhases.stream(), defaultPhases.stream())
-        .distinct()
+    // filtra templates default que já foram clonados para o usuário (sugestao porque nao aparecia nenhum template)
+    List<PhaseTemplate> filteredDefaults = defaultPhases.stream()
+        .filter(df -> userPhases.stream().noneMatch(up -> up.getName().equals(df.getName())))
+        .toList();
+
+    return Stream.concat(userPhases.stream(), filteredDefaults.stream())
         .map(this::toPhaseTemplateDTO)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public PhaseTemplateDTO findPhaseTemplateById(Long id) {

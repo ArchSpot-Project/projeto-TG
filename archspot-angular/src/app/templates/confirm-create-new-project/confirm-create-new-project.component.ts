@@ -47,7 +47,6 @@ export class ConfirmCreateNewProjectModalComponent implements OnChanges {
         nome: p.name,
         duracao: p.duration
       }));
-
       this.etapasSelecionadas = this.etapas.map(e => e.nome);
     }
   }
@@ -165,6 +164,6 @@ export class ConfirmCreateNewProjectModalComponent implements OnChanges {
   }
 
   onCancel() {
-    this.editPhases.emit(this.etapas);
+    this.goBack.emit();
   }
 }

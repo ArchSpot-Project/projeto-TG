@@ -40,9 +40,13 @@ export class ConfirmCreateNewTemplateModalComponent {
     };
 
     this.templateService.createProjectTemplate(template).subscribe({
-      next: savedTemplate => this.saved.emit(savedTemplate),
-      error: err => console.error('Erro ao salvar template', err)
+      next: savedTemplate => {
+        this.saved.emit(savedTemplate); // Retorna o template salvo para o NewProjectTemplateModal
+      },
+      error: err => {
+        console.error('Erro ao salvar template', err);
+        this.saving = false;
+      }
     });
-
   }
 }

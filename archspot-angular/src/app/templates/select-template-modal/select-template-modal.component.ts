@@ -37,7 +37,17 @@ export class SelectTemplateModalComponent implements OnInit {
 
   private loadProjectTemplates() {
     this.templateService.getProjectTemplates().subscribe({
-      next: templates => this.projectTemplates = templates,
+      next: templates => {
+        const userId = this.currentUserId;
+
+        const filtered = templates.filter((t, index, self) => {
+          if (!t.isDefault) return true;
+          const cloneExists = self.some(other => !other.isDefault && other.name === t.name && other.createdBy === userId);
+          return !cloneExists;
+        });
+
+        this.projectTemplates = filtered;
+      },
       error: err => console.error('Erro ao carregar templates:', err)
     });
   }
@@ -78,16 +88,11 @@ export class SelectTemplateModalComponent implements OnInit {
     this.returnToProjectConfirm = true;
   }
 
-  /** Chamado pelo filho ao clicar em "Voltar" */
   handleGoBack() {
-    if (this.returnToProjectConfirm) {
-      // Volta para a confirmação de projeto
-      this.showConfirmCreateProjectModal = true;
-    } else {
-      // Volta para a tela de seleção
-      this.show = true;
-    }
+    this.showConfirmCreateProjectModal = false;
+    this.show = true;
     this.showNewTemplateModal = false;
+    this.returnToProjectConfirm = false;
   }
 
   onCancelConfirm() {
@@ -102,14 +107,13 @@ export class SelectTemplateModalComponent implements OnInit {
 
   onNewTemplateSaved(savedTemplate: ProjectTemplateDTO) {
     this.showNewTemplateModal = false;
-
+    this.projectTemplates.push(savedTemplate);
+    this.selectedTemplate = savedTemplate;
     this.selectedTemplatePhases = savedTemplate.phases?.map(p => ({
       name: p.name,
       duration: p.defaultDurationDays ?? 1
     })) || [];
-
     this.showConfirmCreateProjectModal = true;
-    this.editing = false;
   }
 
   private resetModal() {

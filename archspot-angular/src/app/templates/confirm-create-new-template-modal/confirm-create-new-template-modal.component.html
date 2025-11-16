@@ -1,8 +1,7 @@
-<!-- MODAL PARA CRIAR NOVO TEMPLATE, SEM CRIAR UM PROJETO -->
 <div class="modal fade show" *ngIf="show" tabindex="-1" style="display:block; background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog">
     <div class="modal-content">
-      
+
       <div class="modal-header">
         <h1 class="modal-title fs-4 font-logo">Criar Novo Template</h1>
         <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close"></button>
@@ -14,8 +13,8 @@
             <form class="col">
               <div class="mb-3">
                 <label for="campoNome" class="form-label">Nome do template:</label>
-                <input type="text" class="form-control" id="campoNome" [(ngModel)]="templateName"
-                  name="templateName" placeholder="Digite o nome do template" />
+                <input type="text" class="form-control" id="campoNome" [(ngModel)]="templateName" name="templateName"
+                  placeholder="Digite o nome do template" />
               </div>
 
               <div class="row mb-3">

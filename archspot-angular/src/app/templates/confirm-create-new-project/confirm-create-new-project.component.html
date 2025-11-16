@@ -1,9 +1,8 @@
-<!-- CRIANDO UM NOVO PROJETO -->
 <div class="modal-overlay" *ngIf="show" (click)="onCancel()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h4 class="modal-title font-logo">Criar Novo Projeto - {{ templateName }} </h4>
-      <button type="button" class="btn-close" (click)="close.emit()"></button>
+      <button type="button" class="btn-close" (click)="onGoBack()"></button>
     </div>
 
     <hr />
