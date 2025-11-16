@@ -14,7 +14,9 @@ import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.enums.PhaseStatus;
 import com.archspot.ArchSpot_BackEnd.enums.UserRole;
+import com.archspot.ArchSpot_BackEnd.exceptions.BusinessRuleException;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
 import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 
@@ -97,11 +99,32 @@ public class ProjectService {
   }
 
   // finalizar projeto
+  @Transactional
   public ProjectResponseDTO finalizeProject(Long id) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
+
+    List<Phase> phases = project.getPhases();
+
+    boolean temFasesNaoIniciadas = phases.stream()
+        .anyMatch(phase -> phase.getRealStartDate() == null);
+
+    if (temFasesNaoIniciadas) {
+      throw new BusinessRuleException(
+          "Não é possível finalizar um projeto com etapas não iniciadas.");
+    }
+
+    List<Long> fasesAEncerrar = phases.stream()
+        .filter(phase -> phase.getStatus() == PhaseStatus.IN_PROGRESS)
+        .map(Phase::getId)
+        .toList();
+
+    for (Long phaseId : fasesAEncerrar) {
+      phaseService.finishPhase(phaseId);
+    }
+    
+    project.updateDatesAndStatus();
     project.finalizeProject();
-    project.updateDatesAndStatus(); // redundante, melhorar no futuro
     return toResponseDTO(projectRepository.save(project));
   }
 
@@ -109,8 +132,8 @@ public class ProjectService {
   public ProjectResponseDTO cancelProject(Long id) {
     Project project = projectRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
+    project.updateDatesAndStatus();
     project.cancelProject();
-    project.updateDatesAndStatus(); // redundante, melhorar no futuro
     return toResponseDTO(projectRepository.save(project));
   }
 
