@@ -1,75 +1,80 @@
-<div class="modal-header p-4">
-    <h4 class="modal-title">{{ isEditMode ? 'Editar Perfil' : 'Cadastro' }}</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Fechar')"></button>
-</div>
 <div class="modal-body p-4">
     <form #form="ngForm" (ngSubmit)="onSubmit(form)" [attr.novalidate]="null">
-        <div class="mb-3">
-            <label for="profileImage" class="form-label">Foto de perfil:</label><br>
-            <label class="btn btn-outline-secondary">
-                Escolher imagem
-                <input type="file" id="profileImage" hidden (change)="onFileSelected($event)" accept="image/*" />
-            </label>
-            <span *ngIf="selectedFile" class="ms-2">{{ selectedFile.name }}</span>
-        </div>
-
-        <div class="mb-3" *ngIf="preview">
-            <label class="form-label">Pré-visualização:</label><br />
-            <img [src]="preview" alt="Preview" class="img-thumbnail" style="max-width: 200px;" />
-        </div>
-
         <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="cpf" class="form-label">CPF:</label>
-                <input type="text" mask="000.000.000-00" class="form-control" name="cpf" id="cpf" [(ngModel)]="cpf"
-                    required />
+            <!-- FORMULÁRIO -->
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label for="cpf" class="form-label">CPF:</label>
+                    <input type="text" mask="000.000.000-00" class="form-control" name="cpf" id="cpf" [(ngModel)]="cpf"
+                        required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome Completo:</label>
+                    <input type="text" class="form-control" name="name" id="name" [(ngModel)]="name" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail:</label>
+                    <input type="email" class="form-control" name="email" id="email" [(ngModel)]="email" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Telefone:</label>
+                    <input type="text" mask="(00) 00000-0000" class="form-control" name="phone" id="phone"
+                        [(ngModel)]="phone" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Endereço:</label>
+                    <input type="text" class="form-control" name="address" id="address" [(ngModel)]="address"
+                        required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="profession" class="form-label">Profissão:</label>
+                    <input type="text" class="form-control" name="profession" id="profession" [(ngModel)]="profession"
+                        required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Senha:</label>
+                    <input type="password" class="form-control" id="password" name="password" [required]="!isEditMode"
+                        [(ngModel)]="password" />
+                </div>
+
+                <div class="mb-3" *ngIf="!isEditMode">
+                    <label for="confirmPassword" class="form-label">Confirme sua senha:</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
+                        [(ngModel)]="confirmPassword" #confirmPassField="ngModel" />
+                    <div class="text-danger mt-2" *ngIf="passwordsDoNotMatch && confirmPassField.touched">
+                        A confirmação de senha não confere.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar' }}
+                </button>
             </div>
 
-            <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">Nome Completo:</label>
-                <input type="text" class="form-control" name="name" id="name" [(ngModel)]="name" required />
-            </div>
+            <!-- FOTO À DIREITA -->
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <div class="mb-3 text-center">
+                    <label class="form-label">Foto de perfil:</label><br>
+                    <label class="btn btn-outline-secondary">
+                        Escolher imagem
+                        <input type="file" id="profileImage" hidden (change)="onFileSelected($event)"
+                            accept="image/*" />
+                    </label>
+                </div>
 
-            <div class="col-md-6 mb-3">
-                <label for="email">E-mail:</label>
-                <input type="email" class="form-control" name="email" id="email" [(ngModel)]="email" required />
-            </div>
+                <div *ngIf="selectedFile" class="mb-3 text-center">{{ selectedFile.name }}</div>
 
-            <div class="col-md-6 mb-3">
-                <label for="phone" class="form-label">Telefone:</label>
-                <input type="text" mask="(00) 00000-0000" class="form-control" name="phone" id="phone"
-                    [(ngModel)]="phone" required />
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="address" class="form-label">Endereço:</label>
-                <input type="text" class="form-control" name="address" id="address" [(ngModel)]="address" required />
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="profession" class="form-label">Profissão:</label>
-                <input type="text" class="form-control" name="profession" id="profession" [(ngModel)]="profession"
-                    required />
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="password" class="form-label">Senha:</label>
-                <input type="password" class="form-control" id="password" name="password" [required]="!isEditMode"
-                    [(ngModel)]="password" />
-            </div>
-
-            <div class="col-md-6 mb-3" *ngIf="!isEditMode">
-                <label for="confirmPassword" class="form-label">Confirme sua senha:</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
-                    [(ngModel)]="confirmPassword" #confirmPassField="ngModel" />
-                <div class="text-danger mt-2" *ngIf="passwordsDoNotMatch && confirmPassField.touched">
-                    A confirmação de senha não confere.
+                <div *ngIf="preview" class="mb-3 text-center">
+                    <label class="form-label">Pré-visualização:</label><br />
+                    <img [src]="preview" alt="Preview" class="img-thumbnail" style="max-width: 200px;" />
                 </div>
             </div>
         </div>
-
-        <button type="submit" class="btn btn-success">
-            {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar' }}
-        </button>
     </form>
 </div>
