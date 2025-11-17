@@ -297,23 +297,25 @@ public class PhaseService {
   public static PhaseStatus calculateStatus(Phase phase) {
     LocalDate today = LocalDate.now();
 
+        // fase concluída
     if (phase.getRealEndDate() != null) {
-      return PhaseStatus.COMPLETED;
+        return PhaseStatus.COMPLETED;
     }
 
+    // fase em andamento
     if (phase.getRealStartDate() != null) {
-      if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
+        if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
+            return PhaseStatus.OVERDUE;
+        }
+        return PhaseStatus.IN_PROGRESS;
+    }
+
+    // fase não iniciada: atrasada se data de início estimada já passou
+    if (phase.getEstimatedStartDate() != null && today.isAfter(phase.getEstimatedStartDate())) {
         return PhaseStatus.OVERDUE;
-      }
-      return PhaseStatus.IN_PROGRESS;
     }
 
-    // etapa ainda não COMPLETED = em atraso se a data atual está após a data de
-    // término estimada
-    if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
-      return PhaseStatus.OVERDUE;
-    }
-
+    // fase não iniciada e dentro do prazo
     return PhaseStatus.NOT_STARTED;
   }
 
