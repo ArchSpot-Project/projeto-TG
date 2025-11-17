@@ -1,55 +1,58 @@
 <app-page-layout [title]="'Home'">
 
+  <!-- Botão de criar projeto sempre visível -->
+  <app-section-title title="Meus Projetos - Em aberto">
+    <button class="btn" type="button" (click)="showModal = true">
+      <img src="assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
+    </button>
+  </app-section-title>
+
+  <app-select-template-modal 
+      [show]="showModal" 
+      [currentUserId]="currentUserId" 
+      [currentUserName]="currentUserName"
+      (close)="showModal = false" 
+      (projectCreated)="onProjectCreatedHandler()">
+  </app-select-template-modal>
+
+  <!-- Loading -->
   <div *ngIf="loading" class="text-center py-5 text-muted">
     <div class="spinner-border" role="status"></div>
     <p class="mt-2">Carregando projetos...</p>
   </div>
 
+  <!-- Mensagem de erro ou nenhum projeto -->
   <div *ngIf="!loading && errorMessage" class="alert alert-info text-center">
     {{ errorMessage }}
   </div>
 
-  <ng-container *ngIf="!loading && !errorMessage">
-
-    <!-- ROW 1 - MEUS PROJETOS EM ABERTO -->
-    <app-section-title title="Meus Projetos - Em aberto">
-      <button class="btn" type="button" (click)="showModal = true">
-        <img src="assets/img/icons/house-add.svg" alt="Novo Projeto" width="25" height="25">
-      </button>
-    </app-section-title>
-
-    <app-select-template-modal [show]="showModal" [currentUserId]="currentUserId" [currentUserName]="currentUserName"
-      (close)="showModal = false" (projectCreated)="onProjectCreatedHandler()">
-    </app-select-template-modal>
-
-    <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
-      <div class="col" *ngFor="let project of openProjects">
-        <div class="card shadow-sm text-center project-card" (click)="goToProjects(project.id)">
-          <div class="card-img-container">
-            <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
-          </div>
-          <div class="card-body d-flex align-items-center justify-content-center">
-            <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
-          </div>
+  <!-- Projetos em aberto -->
+  <div *ngIf="!loading && openProjects.length > 0" class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
+    <div class="col" *ngFor="let project of openProjects">
+      <div class="card shadow-sm text-center project-card" (click)="goToProjects(project.id)">
+        <div class="card-img-container">
+          <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
+        </div>
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- ROW 2 - MEUS PROJETOS FECHADOS -->
-    <app-section-title title="Meus Projetos - Fechados"></app-section-title>
-
-    <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
-      <div class="col" *ngFor="let project of closedProjects">
-        <div class="card text-center project-card closed-project" (click)="goToProjects(project.id)">
-          <div class="card-img-container">
-            <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
-          </div>
-          <div class="card-body d-flex align-items-center justify-content-center">
-            <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
-          </div>
+  <!-- Projetos fechados -->
+  <app-section-title title="Meus Projetos - Fechados"></app-section-title>
+  <div *ngIf="!loading && closedProjects.length > 0" class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
+    <div class="col" *ngFor="let project of closedProjects">
+      <div class="card text-center project-card closed-project" (click)="goToProjects(project.id)">
+        <div class="card-img-container">
+          <img src="assets/img/plano1.jpg" class="card-img-top" alt="{{ project.name }}">
+        </div>
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <p class="card-title fw-bold text-dark mb-0">{{ project.name }}</p>
         </div>
       </div>
     </div>
+  </div>
 
-  </ng-container>
 </app-page-layout>

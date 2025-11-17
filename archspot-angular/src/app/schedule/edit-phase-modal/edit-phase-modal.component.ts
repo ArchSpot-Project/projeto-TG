@@ -104,7 +104,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         console.error(err);
-        this.toast.showError('Erro ao excluir a etapa. Não é possível excluir uma etapa predecessora de outra.');
+        this.toast.showError('Erro ao excluir a etapa. Não é possível excluir uma etapa predecessora de outra.' + err.error);
       }
     });
   }

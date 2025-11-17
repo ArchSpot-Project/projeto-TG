@@ -217,6 +217,14 @@ public class PhaseService {
 
     Project project = entity.getProject();
     String phaseName = entity.getName();
+
+    // Remove vínculos de predecessora de outras fases
+    List<Phase> childPhases = phaseRepository.findByPreviousPhaseId(entity.getId());
+    for (Phase child : childPhases) {
+        child.setPreviousPhase(null); // ou child.setPreviousPhase(entity.getPreviousPhase()) se quiser "encadear"
+        phaseRepository.save(child);
+    }
+
     phaseRepository.delete(entity);
 
     updateProject(project);
