@@ -117,15 +117,15 @@ public class UserProjectService {
     var association = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
         .orElseThrow(() -> new AssociationNotFoundException(userId, projectId));
 
-    User removedUser = association.getUser();
-    Project project = association.getProject();
+    // User removedUser = association.getUser();
+    // Project project = association.getProject();
 
     userProjectRepository.delete(association);
 
-    userProjectActivityHandler.removed(
-        SecurityUtils.getCurrentUser(),
-        project,
-        removedUser);
+    // userProjectActivityHandler.removed(
+    //     SecurityUtils.getCurrentUser(),
+    //     project,
+    //     removedUser);
   }
 
   private UserProjectResponseDTO toResponseDTO(UserProject entity) {
