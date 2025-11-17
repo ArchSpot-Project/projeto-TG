@@ -6,6 +6,7 @@ import { AuthService } from '../core/services/auth.service';
 import { UserProjectService } from '../core/services/user-project.service';
 import Gantt from 'frappe-gantt';
 import { ProjectResponse } from '../core/models/project.model';
+import { ToastService } from '../core/services/toast.service';
 
 @Component({
   selector: 'app-schedule',
@@ -33,7 +34,8 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     private projectService: ProjectService,
     private phaseService: PhaseService,
     private authService: AuthService,
-    private userProjectService: UserProjectService
+    private userProjectService: UserProjectService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -108,13 +110,13 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
     const prev = this.phases.find(p => p.id === prevId);
     if (!prev) return true; // fallback seguro caso dados venham inconsistentes
 
-    return !!prev.realStartDate;
+    return !!prev.realStartDate;;
   }
 
   canFinishPhase(index: number): boolean {
     if (this.isCustomerInProject) return false;
     const phase = this.phases[index];
-    return phase.status === 'IN_PROGRESS';
+    return !!phase.realStartDate && !phase.realEndDate;
   }
 
   startPhase(phase: any) {
@@ -198,46 +200,38 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
           }))
           .sort((a, b) => new Date(a.estimatedStartDate).getTime() - new Date(b.estimatedStartDate).getTime());
 
-        this.updatePhaseStatus();
         setTimeout(() => this.renderGantt(), 150);
       }
-    });
-  }
-
-  updatePhaseStatus(): void {
-    const today = new Date();
-
-    this.phases = this.phases.map(p => {
-      const realStart = p.realStartDate ? new Date(p.realStartDate) : null;
-      const realEnd = p.realEndDate ? new Date(p.realEndDate) : null;
-      const estEnd = new Date(p.estimatedEndDate);
-
-      if (realEnd) p.status = 'COMPLETED';
-      else if (realStart) p.status = 'IN_PROGRESS';
-      else if (estEnd < today) p.status = 'OVERDUE';
-      else p.status = 'NOT_STARTED';
-
-      return p;
     });
   }
 
   undoPhase(phase: any) {
     if (this.isCustomerInProject) return;
 
-    const idx = this.phases.findIndex(p => p.id === phase.id);
-    if (idx === -1) return;
+    if (!phase.realStartDate) {
+      this.toast.showInfo(`Etapa #${phase.id} não pode ser desfeita.`);
+      return;
+    }
 
-    const reset = (p: any) => ({
-      name: p.name,
-      description: p.description,
-      estimatedStartDate: p.estimatedStartDate,
-      estimatedEndDate: p.estimatedEndDate,
-      realStartDate: null,
-      realEndDate: null
-    });
+    const updatedPhase: any = { ...phase };
 
-    this.phaseService.updatePhase(phase.id, reset(phase)).subscribe({
-      next: () => this.resetSubsequentPhases(idx + 1, reset)
+    if (phase.realEndDate) {
+      // fase já finalizada → volta para "iniciada"
+      updatedPhase.status = 'IN_PROGRESS';
+      updatedPhase.realEndDate = null;
+    } else {
+      // fase iniciada → volta para "não iniciada"
+      updatedPhase.status = 'NOT_STARTED';
+      updatedPhase.realStartDate = null;
+      updatedPhase.realEndDate = null;
+    }
+
+    this.phaseService.updatePhase(phase.id, updatedPhase).subscribe({
+      next: () => this.loadPhases(),
+      error: err => {
+        console.error('Erro ao desfazer fase:', err);
+        this.toast.showError('Não foi possível desfazer a etapa.');
+      }
     });
   }
 
