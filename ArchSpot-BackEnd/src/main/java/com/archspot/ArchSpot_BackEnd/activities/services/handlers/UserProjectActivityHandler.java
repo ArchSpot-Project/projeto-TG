@@ -33,16 +33,16 @@ public class UserProjectActivityHandler {
             "actorRole", getActorRole(project, actor)));
   }
 
-  public void removed(User actor, Project project, User userRemoved) {
-    activityService.log(
-        ActivityType.USER_REMOVED_FROM_PROJECT,
-        actor,
-        project,
-        Map.of(
-            "userRemovedName", userRemoved.getName(),
-            "fileUrl", safe(userRemoved.getFileUrl()),
-            "actorRole", getActorRole(project, actor)));
-  }
+  // public void removed(User actor, Project project, User userRemoved) {
+  //   activityService.log(
+  //       ActivityType.USER_REMOVED_FROM_PROJECT,
+  //       actor,
+  //       project,
+  //       Map.of(
+  //           "userRemovedName", userRemoved.getName(),
+  //           "fileUrl", safe(userRemoved. ()),
+  //           "actorRole", getActorRole(project, actor)));
+  // }
 
   public void roleUpdated(User actor,
       Project project,
