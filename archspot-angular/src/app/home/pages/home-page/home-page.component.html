@@ -19,8 +19,8 @@
     </app-section-title>
 
     <app-select-template-modal [show]="showModal" [currentUserId]="currentUserId" [currentUserName]="currentUserName"
-    (close)="showModal = false" (projectCreated)="loadUserProjects()">
-  </app-select-template-modal>
+      (close)="showModal = false" (projectCreated)="onProjectCreatedHandler()">
+    </app-select-template-modal>
 
     <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 pb-3">
       <div class="col" *ngFor="let project of openProjects">

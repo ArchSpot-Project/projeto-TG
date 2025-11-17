@@ -45,6 +45,14 @@ export class EditInstallmentModalComponent implements OnChanges {
     input.value = input.value.replace(/[^0-9]/g, '');
 
     const raw = input.value;
+  onAmountChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input) return;
+
+    const value = input.value.replace(/\D/g, '');
+    const numeric = Number(value) / 100;
+
+    this.cloned.amount = numeric;
 
     // Remove tudo que não é número (reforço)
     const digits = raw.replace(/\D/g, '');

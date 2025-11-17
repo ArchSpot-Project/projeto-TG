@@ -18,7 +18,7 @@ export class ProjectStatusBarComponent implements OnInit, AfterViewInit {
     private phaseService: PhaseService,
     private elRef: ElementRef,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (!this.projectId) {
@@ -43,16 +43,44 @@ export class ProjectStatusBarComponent implements OnInit, AfterViewInit {
   loadPhases(): void {
     this.phaseService.getPhasesByProjectId(this.projectId).subscribe({
       next: (phases) => {
-        this.phases = phases.map(p => ({
-          ...p,
-          estimatedStartDate: new Date(p.estimatedStartDate),
-          estimatedEndDate: new Date(p.estimatedEndDate)
-        }));
+        const today = new Date();
+
+        this.phases = phases.map(p => {
+          const estimatedEnd = new Date(p.estimatedEndDate);
+          const realStart = p.realStartDate ? new Date(p.realStartDate) : null;
+          const realEnd = p.realEndDate ? new Date(p.realEndDate) : null;
+
+          let status = 'NOT_STARTED';
+          if (realEnd) status = 'COMPLETED';
+          else if (realStart) status = 'IN_PROGRESS';
+          else if (estimatedEnd < today) status = 'OVERDUE';
+
+          return {
+            ...p,
+            estimatedEndDate: estimatedEnd,
+            realStartDate: realStart,
+            realEndDate: realEnd,
+            status
+          };
+        });
+
         this.updateProgressLine();
       },
       error: (err) => console.error('Erro ao carregar fases do projeto', err)
     });
   }
+
+  getDotClass(phase: any): string {
+  const now = new Date().getTime();
+  const estimatedEnd = new Date(phase.estimatedEndDate).getTime();
+
+  if (phase.status === 'COMPLETED') return 'completed'; 
+  if (phase.status === 'IN_PROGRESS') {
+    //console.log(estimatedEnd < now ? 'in-progress-overdue' : 'in-progress');
+    return estimatedEnd < now ? 'in-progress-overdue' : 'in-progress';
+  }
+  return 'not-started';
+}
 
   updateProgressLine(): void {
     if (!this.phases.length) {
