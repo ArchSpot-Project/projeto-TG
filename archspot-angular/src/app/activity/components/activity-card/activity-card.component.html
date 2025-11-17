@@ -1,20 +1,19 @@
 <div class="card shadow-sm p-3 d-flex flex-row align-items-start">
 
-  <img 
-    *ngIf="activity.userAvatarUrl"
-    [src]="'http://localhost:8080/' + activity.userAvatarUrl"
-    class="rounded-circle me-3"
-    style="width: 50px; height: 50px; object-fit: cover;"
-  />
+  <img [src]="avatarUrl" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;"
+    alt="avatar" />
 
   <div class="flex-grow-1">
-    <strong>{{ activity.userName }}</strong>
-    <span class="badge bg-secondary ms-2">{{ activity.userRole }}</span>
+    <h5 class="fs-5 fw-medium mb-0">{{ activity.userName }}
+      <span class="fs-6 align-top"><span class="badge rounded-pill ms-1" [ngClass]="getRoleBadgeClass()">{{ activity.userRole | roleTranslate }}</span></span>
+    </h5>
+    
 
-    <p class="mt-2 mb-1">{{ description }}</p>
+    <div class="mt-2 mb-1" [innerHTML]="description"></div>
 
-    <small class="text-muted">
-      {{ activity.timestamp | date:'dd/MM/yyyy HH:mm' }}
-    </small>
+
   </div>
+  <small class="text-muted text-end">
+    {{ activity.timestamp | date:'HH:mm dd/MM/yy' }}
+  </small>
 </div>

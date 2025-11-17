@@ -106,7 +106,7 @@ public class PhaseService {
     Phase saved = phaseRepository.save(newPhase);
 
     updateProject(project);
-
+    activityService.logPhaseCreated(SecurityUtils.getCurrentUser(), saved.getProject(), saved.getName());
     return toDTO(saved);
   }
 
@@ -206,7 +206,7 @@ public class PhaseService {
     Phase updated = phaseRepository.save(entity);
 
     updateProject(updated.getProject());
-
+    activityService.logPhaseUpdated(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -265,7 +265,7 @@ public class PhaseService {
 
     // finaliza projeto se for o caso
     updateProject(updated.getProject());
-
+    activityService.logPhaseFinished(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 

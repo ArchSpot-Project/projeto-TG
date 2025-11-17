@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.ActivityService;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Installment;
@@ -9,6 +10,7 @@ import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class InstallmentService {
 
   @Autowired
   private ProjectRepository projectRepository;
+
+  @Autowired ActivityService activityService;
 
   /*
    * CRUD BÁSICO
@@ -80,6 +84,12 @@ public class InstallmentService {
 
     installmentRepository.save(installment);
     updateProjectTotal(installment.getProject().getId());
+    
+    activityService.logInstallmentCreated(
+        SecurityUtils.getCurrentUser(), 
+        installment.getProject(), 
+        installment.getDescription(), 
+        installment.getAmount());
     return toDTO(installment);
   }
 
@@ -157,6 +167,12 @@ public class InstallmentService {
 
     installment.pay(method);
     installmentRepository.save(installment);
+
+    activityService.logInstallmentPaid(
+        SecurityUtils.getCurrentUser(), 
+        installment.getProject(), 
+        installment.getDescription(), 
+        installment.getAmount());
     return toDTO(installment);
   }
 
