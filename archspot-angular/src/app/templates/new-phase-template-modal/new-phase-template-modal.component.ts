@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { PhaseTemplateDTO } from '../../core/models/project-template.model';
 
 @Component({
   selector: 'app-new-phase-template-modal',
@@ -8,7 +9,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class NewPhaseTemplateModalComponent {
   @Input() show = false;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<{ name: string; duration: number }>();
+  @Output() save = new EventEmitter<PhaseTemplateDTO>();
 
   phaseName = '';
   phaseDuration: number | null = null;
@@ -19,7 +20,10 @@ export class NewPhaseTemplateModalComponent {
 
   onSave() {
     if (!this.phaseName.trim() || !this.phaseDuration) return;
-    this.save.emit({ name: this.phaseName.trim(), duration: this.phaseDuration });
+    this.save.emit({
+      name: this.phaseName.trim(),
+      defaultDurationDays: this.phaseDuration,
+    });
     this.onClose();
   }
 }

@@ -70,12 +70,12 @@
   background-color: #ffc107;
 }
 
-.timeline-dot.not-started {
-  background-color: #ccc;
+.timeline-dot.in-progress-overdue {
+  background-color: #dc3545;
 }
 
-.timeline-dot.overdue {
-  background-color: #dc3545;
+.timeline-dot.not-started {
+  background-color: #ccc;
 }
 
 .timeline-label-top {

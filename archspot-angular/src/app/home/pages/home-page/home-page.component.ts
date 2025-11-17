@@ -85,4 +85,9 @@ export class HomePageComponent implements OnInit {
   openCreateProjectModal() {
     this.showModal = true;
   }
+
+  onProjectCreatedHandler() {
+    this.showModal = false;
+    this.loadUserProjects();
+  }
 }
