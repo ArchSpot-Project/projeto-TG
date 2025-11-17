@@ -17,6 +17,7 @@ export class EditInstallmentModalComponent implements OnChanges {
   amount: number | null = null;
   paymentMethod: PaymentMethod | null = null;
   paymentStatus: PaymentStatus | null = null;
+  displayAmount: string = '';
 
   paymentMethods: PaymentMethod[] = [
     'PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'CHECK', 'CASH'
@@ -33,9 +34,17 @@ export class EditInstallmentModalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['installment'] && this.installment) {
       this.cloned = { ...this.installment };
+      this.displayAmount = this.formatToBR(this.cloned.amount);
     }
   }
 
+  onAmountInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    // Impede qualquer letra imediatamente
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    const raw = input.value;
   onAmountChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input) return;
@@ -45,11 +54,31 @@ export class EditInstallmentModalComponent implements OnChanges {
 
     this.cloned.amount = numeric;
 
-    input.value = numeric.toLocaleString('pt-BR', {
+    // Remove tudo que não é número (reforço)
+    const digits = raw.replace(/\D/g, '');
+
+    if (digits === '') {
+      this.cloned.amount = 0;
+      this.displayAmount = '';
+      return;
+    }
+
+    // Converte para decimal
+    const numeric = Number(digits) / 100;
+
+    this.cloned.amount = numeric;
+    this.displayAmount = this.formatToBR(numeric);
+  }
+
+
+  formatToBR(n: number): string {
+    return n.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   }
+
+
 
   cancel(): void {
     this.close.emit();

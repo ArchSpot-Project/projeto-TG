@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.InstallmentActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Installment;
@@ -9,6 +10,7 @@ import com.archspot.ArchSpot_BackEnd.enums.PaymentStatus;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.repositories.InstallmentRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class InstallmentService {
 
   @Autowired
   private ProjectRepository projectRepository;
+
+  @Autowired
+  InstallmentActivityHandler installmentActivityHandler;
 
   /*
    * CRUD BÁSICO
@@ -80,6 +85,12 @@ public class InstallmentService {
 
     installmentRepository.save(installment);
     updateProjectTotal(installment.getProject().getId());
+
+    installmentActivityHandler.created(
+        SecurityUtils.getCurrentUser(),
+        installment.getProject(),
+        installment.getDescription(),
+        installment.getAmount());
     return toDTO(installment);
   }
 
@@ -98,6 +109,11 @@ public class InstallmentService {
 
     installmentRepository.save(installment);
     updateProjectTotal(installment.getProject().getId());
+    installmentActivityHandler.updated(
+        SecurityUtils.getCurrentUser(),
+        installment.getProject(),
+        installment.getDescription(),
+        installment.getAmount());
     return toDTO(installment);
   }
 
@@ -106,9 +122,18 @@ public class InstallmentService {
   public void delete(Long id) {
     Installment installment = installmentRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Installment not found"));
+    
+    Project project = installment.getProject();
+    String installmentDescription = installment.getDescription();
+    BigDecimal installmentAmount = installment.getAmount();
 
     installmentRepository.delete(installment);
-    updateProjectTotal(installment.getProject().getId());
+    updateProjectTotal(project.getId());
+    installmentActivityHandler.deleted(
+        SecurityUtils.getCurrentUser(),
+        project,
+        installmentDescription,
+        installmentAmount);
   }
 
   /*
@@ -157,6 +182,12 @@ public class InstallmentService {
 
     installment.pay(method);
     installmentRepository.save(installment);
+
+    installmentActivityHandler.paid(
+        SecurityUtils.getCurrentUser(),
+        installment.getProject(),
+        installment.getDescription(),
+        installment.getAmount());
     return toDTO(installment);
   }
 

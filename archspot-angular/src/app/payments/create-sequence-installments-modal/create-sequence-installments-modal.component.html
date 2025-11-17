@@ -6,8 +6,8 @@
 
         <div class="mb-3">
             <label class="form-label">Valor</label>
-            <input type="text" placeholder="Valor da parcela" class="form-control" [(ngModel)]="totalAmount"
-                (input)="onAmountChange($event)" />
+            <input type="text" class="form-control" [value]="displayTotalAmount" (input)="onTotalAmountInput($event)"
+                placeholder="R$ 0,00" />
         </div>
 
         <div class="mb-3">

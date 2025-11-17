@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { InstallmentService } from '../../core/services/installment.service';
-import { InstallmentResponse, PaymentMethod } from '../../core/models/payment.model';
+import { InstallmentResponse, PaymentMethod, PaymentStatus } from '../../core/models/payment.model';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
@@ -15,7 +15,9 @@ export class CreateSequenceInstallmentsModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() installmentsCreated = new EventEmitter<InstallmentResponse[]>();
 
-  totalAmount: number | null = null;
+  totalAmount: number = 0;
+  displayTotalAmount: string = '';
+
   numberOfInstallments: number | null = null;
   startDate: string | null = null;
   paymentMethod: PaymentMethod | null = null;
@@ -23,7 +25,10 @@ export class CreateSequenceInstallmentsModalComponent {
 
   paymentMethods: PaymentMethod[] = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'CHECK', 'CASH'];
 
-  constructor(private installmentService: InstallmentService, private toast: ToastService) { }
+  constructor(
+    private installmentService: InstallmentService,
+    private toast: ToastService
+  ) { }
 
   cancel() {
     this.reset();
@@ -31,73 +36,88 @@ export class CreateSequenceInstallmentsModalComponent {
   }
 
   private reset() {
-    this.totalAmount = null;
+    this.totalAmount = 0;
+    this.displayTotalAmount = '';
     this.numberOfInstallments = null;
     this.startDate = null;
     this.paymentMethod = null;
     this.sequenceDescription = null;
   }
 
-  onAmountChange(event: Event) {
-    const input = event.target as HTMLInputElement | null;
-    if (!input) return;
+  // --- CORREÇÃO DO INPUT ---
+  onTotalAmountInput(event: Event) {
+    const input = event.target as HTMLInputElement;
 
-    const value = input.value;
+    // Permite apenas números e vírgula/ponto, mas impede letras
+    input.value = input.value.replace(/[^0-9.,]/g, '');
 
-    const onlyNumbers = value.replace(/\D/g, '');
-    const numeric = Number(onlyNumbers) / 100;
+    // Continuação da sua lógica
+    const raw = input.value;
+
+    // Extrai somente números
+    const digits = raw.replace(/\D/g, '');
+
+    if (digits === '') {
+      this.totalAmount = 0;
+      this.displayTotalAmount = '';
+      return;
+    }
+
+    // número real dividido por 100
+    const numeric = Number(digits) / 100;
+
     this.totalAmount = numeric;
 
-    input.value = numeric.toLocaleString('pt-BR', {
+    // formata para BR
+    this.displayTotalAmount = numeric.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   }
 
+
   createSequence() {
-    if (!this.totalAmount || !this.numberOfInstallments || !this.startDate || !this.paymentMethod || !this.sequenceDescription) {
+    if (!this.totalAmount || !this.numberOfInstallments || !this.startDate ||
+      !this.paymentMethod || !this.sequenceDescription) {
       this.toast.showError('Preencha todos os campos.');
       return;
     }
 
-    // converte a string do input para Date usando UTC (para fornecer a data DD/MM/AAAA corretamente)
     const [year, month, day] = this.startDate.split('-').map(Number);
     const start = new Date(Date.UTC(year, month - 1, day));
 
     const amountPerInstallment = this.totalAmount / this.numberOfInstallments;
-    const installments: any[] = [];
+
+    const installments = [];
 
     for (let i = 0; i < this.numberOfInstallments; i++) {
       const date = new Date(start);
       date.setUTCMonth(date.getUTCMonth() + i);
 
-      const estimatedPaymentDate = date.toISOString().slice(0, 10);
-
       installments.push({
         projectId: this.projectId,
         amount: amountPerInstallment,
-        estimatedPaymentDate,
+        estimatedPaymentDate: date.toISOString().slice(0, 10),
         paymentMethod: this.paymentMethod,
         description: `${this.sequenceDescription} - Parcela ${i + 1} de ${this.numberOfInstallments}`,
-        paymentStatus: 'PENDING'
+        paymentStatus: 'PENDING' as PaymentStatus
       });
     }
 
     const requests = installments.map(inst => this.installmentService.createInstallment(inst));
 
     Promise.all(requests.map(r => r.toPromise()))
-      .then((createdInstallments: (InstallmentResponse | undefined)[]) => {
-        const validInstallments = createdInstallments.filter((i): i is InstallmentResponse => !!i);
-        this.installmentsCreated.emit(validInstallments);
+      .then(results => {
+        const valid = results.filter((i): i is InstallmentResponse => !!i);
+        this.installmentsCreated.emit(valid);
 
-        const formattedDate = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
-        alert(`Valor de R$${this.totalAmount?.toFixed(2)} dividido em ${this.numberOfInstallments} parcelas de R$${amountPerInstallment.toFixed(2)}, com pagamento inicial em ${formattedDate}`);
+        alert(`Criadas ${this.numberOfInstallments} parcelas.`);
 
         location.reload();
         this.cancel();
       })
       .catch(err => {
-        console.error('Erro ao criar sequência', err);
+        console.error(err);
         this.toast.showError('Erro ao criar sequência de parcelas.');
       });
   }

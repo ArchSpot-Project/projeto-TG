@@ -14,10 +14,12 @@ import com.archspot.ArchSpot_BackEnd.enums.*;
 import com.archspot.ArchSpot_BackEnd.exceptions.BusinessRuleException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.PhaseActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.*;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.templates.dtos.PhaseTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.templates.services.TemplateService;
 
@@ -32,6 +34,9 @@ public class PhaseService {
 
   @Autowired
   private TemplateService templateService;
+
+  @Autowired
+  PhaseActivityHandler phaseActivityHandler;
 
   // consultar todas as fases
   public List<PhaseDTO> findAll() {
@@ -101,7 +106,7 @@ public class PhaseService {
     Phase saved = phaseRepository.save(newPhase);
 
     updateProject(project);
-
+    phaseActivityHandler.created(SecurityUtils.getCurrentUser(), saved.getProject(), saved.getName());
     return toDTO(saved);
   }
 
@@ -201,7 +206,7 @@ public class PhaseService {
     Phase updated = phaseRepository.save(entity);
 
     updateProject(updated.getProject());
-
+    phaseActivityHandler.updated(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -211,10 +216,11 @@ public class PhaseService {
         .orElseThrow(() -> new RuntimeException("Phase not found"));
 
     Project project = entity.getProject();
-
+    String phaseName = entity.getName();
     phaseRepository.delete(entity);
 
     updateProject(project);
+    phaseActivityHandler.deleted(SecurityUtils.getCurrentUser(), project, phaseName);
   }
 
   // iniciar etapa
@@ -223,7 +229,7 @@ public class PhaseService {
         .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
 
     /*
-     * validações de etapa predecessora suspensas!
+     * validações de etapa predecessora SUSPENSAS!
      */
     // // etapa predecessora e validação - se houver e nao foi finalizada, lançar
     // erro
@@ -242,7 +248,7 @@ public class PhaseService {
 
     // inicia o projeto se for o caso
     updateProject(updated.getProject());
-
+    phaseActivityHandler.started(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -260,7 +266,7 @@ public class PhaseService {
 
     // finaliza projeto se for o caso
     updateProject(updated.getProject());
-
+    phaseActivityHandler.finished(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 

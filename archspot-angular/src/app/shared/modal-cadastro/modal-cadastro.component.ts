@@ -122,9 +122,22 @@ export class ModalCadastroComponent implements OnInit {
         this.activeModal.close();
       },
       error: err => {
-        const msg = err?.error?.message || err?.message || '';
-        this.toast.showError(msg.toLowerCase().includes('cpf') ? 'CPF inválido!' : 'Erro ao cadastrar usuário.');
-        console.error(err);
+        const backendMessage =
+          err?.error?.message ||
+          err?.error ||
+          err?.message ||
+          'Erro ao cadastrar usuário.';
+
+        // verifica se o backend já mandou mensagem clara
+        if (backendMessage.toLowerCase().includes('email')) {
+          this.toast.showError(backendMessage);
+        } else if (backendMessage.toLowerCase().includes('cpf')) {
+          this.toast.showError('CPF inválido!');
+        } else {
+          this.toast.showError(backendMessage);
+        }
+
+        console.error('Erro no cadastro:', err);
       }
     });
   }

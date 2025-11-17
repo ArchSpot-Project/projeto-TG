@@ -6,6 +6,7 @@ import { ProjectDetailsPageComponent } from './pages/project-details-page/projec
 import { LayoutModule } from "../layout/layout.module";
 import { SharedModule } from '../shared/shared.module';
 import { FormsModule } from '@angular/forms';
+import { ActivityModule } from "../activity/activity.module";
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { FormsModule } from '@angular/forms';
     ProjectsRoutingModule,
     FormsModule,
     LayoutModule,
-    SharedModule
+    SharedModule,
+    ActivityModule
 ],
   exports: [
   ]

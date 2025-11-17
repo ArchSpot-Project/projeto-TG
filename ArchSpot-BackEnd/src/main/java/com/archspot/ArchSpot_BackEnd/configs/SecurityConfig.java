@@ -33,7 +33,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             // libera login e registro
             .requestMatchers("/auth/login", "/auth/register").permitAll()
-            .requestMatchers(HttpMethod.GET, "/uploads/profile/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
             // qualquer outra rota exige token
             .anyRequest().authenticated())
         // garante que nosso filtro JWT roda ANTES do filtro padrão de login

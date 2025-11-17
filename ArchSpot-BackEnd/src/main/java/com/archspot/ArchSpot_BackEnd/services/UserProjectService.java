@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.UserProjectActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectRequestDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.userproject.UserProjectResponseDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
@@ -27,6 +28,9 @@ public class UserProjectService {
 
   @Autowired
   private ProjectRepository projectRepository;
+
+  @Autowired
+  private UserProjectActivityHandler userProjectActivityHandler;
 
   @Transactional(readOnly = true)
   public List<UserProjectResponseDTO> getAll() {
@@ -74,16 +78,37 @@ public class UserProjectService {
     // evita duplicação: se existir, atualiza role
     var existing = userProjectRepository.findByUserIdAndProjectId(user.getId(), project.getId());
     UserProject entity;
+
+    boolean isNew = false;
+    UserRole oldRole = null;
+
     if (existing.isPresent()) {
       entity = existing.get();
+      oldRole = entity.getRole();
       entity.setRole(dto.role());
     } else {
+      isNew = true;
       entity = new UserProject();
       entity.setUser(user);
       entity.setProject(project);
       entity.setRole(dto.role());
     }
     UserProject saved = userProjectRepository.save(entity);
+
+    if (isNew) {
+      userProjectActivityHandler.assigned(
+          SecurityUtils.getCurrentUser(),
+          project,
+          user,
+          dto.role());
+    } else if (oldRole != dto.role()) {
+      userProjectActivityHandler.roleUpdated(
+          SecurityUtils.getCurrentUser(),
+          project,
+          user,
+          oldRole,
+          dto.role());
+    }
     return toResponseDTO(saved);
   }
 
@@ -92,7 +117,15 @@ public class UserProjectService {
     var association = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
         .orElseThrow(() -> new AssociationNotFoundException(userId, projectId));
 
+    User removedUser = association.getUser();
+    Project project = association.getProject();
+
     userProjectRepository.delete(association);
+
+    userProjectActivityHandler.removed(
+        SecurityUtils.getCurrentUser(),
+        project,
+        removedUser);
   }
 
   private UserProjectResponseDTO toResponseDTO(UserProject entity) {
