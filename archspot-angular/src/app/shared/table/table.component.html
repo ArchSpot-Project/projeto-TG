@@ -37,13 +37,9 @@
       <td>
         <div class="dropdown">
           <img src="assets/img/icons/three-dots.svg" class="rounded-circle dropdown-toggle"
-            id="dropdownMenuButton{{ i }}" data-bs-toggle="dropdown" width="20" height="20" />
+            id="dropdownMenuButton{{ i }}" data-bs-toggle="dropdown" width="20" height="20" style="cursor:pointer;" />
 
           <ul class="dropdown-menu">
-
-            <li>
-              <a class="dropdown-item" (click)="abrirVersionamento(doc)">Últimas versões</a>
-            </li>
 
             <li>
               <a class="dropdown-item" (click)="abrirDoc(doc)">
@@ -63,6 +59,13 @@
               <a class="dropdown-item" (click)="substituirDoc(doc)">
                 <img src="assets/img/icons/upload.svg" width="15" height="15" />
                 Substituir nova versão
+              </a>
+            </li>
+
+            <li *ngIf="canEdit(doc)">
+              <a class="dropdown-item" (click)="abrirVersionamento(doc)">
+                 <img src="assets/img/icons/15-versionamento.png" width="15" height="15" />
+                Recuperar últimas versões
               </a>
             </li>
 
