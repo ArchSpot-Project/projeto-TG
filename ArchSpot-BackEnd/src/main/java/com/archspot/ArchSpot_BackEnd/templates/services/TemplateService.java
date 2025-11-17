@@ -35,7 +35,7 @@ public class TemplateService {
 
   public List<ProjectTemplateDTO> findAllProjectTemplates() {
     User currentUser = SecurityUtils.getCurrentUser();
-    return projectTemplateRepository.findAllByUserId(currentUser.getId())
+     return projectTemplateRepository.findAllByUserId(currentUser.getId())
         .stream()
         .map(this::toProjectTemplateDTO)
         .toList();

@@ -85,4 +85,9 @@ export class ProjectsPageComponent implements OnInit {
   openModal(): void {
     this.showModal = true;
   }
+
+  onProjectCreatedHandler() {
+    this.showModal = false;
+    this.loadUserProjects();
+  }
 }

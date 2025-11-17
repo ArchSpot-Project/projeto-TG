@@ -11,12 +11,12 @@
     </button>
   </app-section-title>
 
-  <div *ngIf="!loading && errorMessage" class="alert alert-warning text-center mb-4">
+  <div *ngIf="!loading && errorMessage" class="alert alert-info text-center mb-4">
     {{ errorMessage }}
   </div>
 
   <app-select-template-modal [show]="showModal" [currentUserId]="currentUserId" [currentUserName]="currentUserName"
-    (close)="showModal = false" (projectCreated)="loadUserProjects()">
+    (close)="showModal = false" (projectCreated)="onProjectCreatedHandler()">
   </app-select-template-modal>
 
   <ng-container *ngIf="!loading && !errorMessage">

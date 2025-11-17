@@ -12,8 +12,6 @@
 
     <!-- menu do projeto -->
     <ng-container *ngIf="activeProject">
-      <li class="fw-semibold text-secondary mb-2">{{ activeProject.name }}</li>
-
       <li *ngFor="let item of projectMenuItems" class="mb-3">
         <a (click)="goToProjectSubItem(item.key)" role="button"
           class="d-flex align-items-center link-dark link-opacity-50-hover link-underline-opacity-0 fs-5">

@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.PhotoActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.photo.PhotoDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Album;
 import com.archspot.ArchSpot_BackEnd.entities.Photo;
@@ -35,10 +36,13 @@ public class PhotoService {
   @Autowired
   private AlbumRepository albumRepository;
 
+  @Autowired
+  private PhotoActivityHandler photoActivityHandler;
+
   // listar por álbum
   public List<PhotoDTO> findByAlbum(Long albumId) {
     albumRepository.findById(albumId)
-        .orElseThrow(() -> new ResourceNotFoundException( "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
 
     return photoRepository.findByAlbumId(albumId).stream()
         .map(this::toDTO)
@@ -52,7 +56,7 @@ public class PhotoService {
     User currentUser = SecurityUtils.getCurrentUser();
 
     Album album = albumRepository.findById(albumId)
-        .orElseThrow(() -> new ResourceNotFoundException( "Album not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
 
     if (file.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
@@ -85,6 +89,13 @@ public class PhotoService {
         .build();
 
     Photo saved = photoRepository.save(photo);
+
+    photoActivityHandler.uploaded(
+        SecurityUtils.getCurrentUser(),
+        album.getProject(),
+        photo.getName(),
+        album.getName(),
+        photo.getFileUrl());
     return toDTO(saved);
   }
 
@@ -93,10 +104,20 @@ public class PhotoService {
     Photo photo = photoRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Photo not found"));
 
+    String oldName = photo.getName();
+
     if (newName != null && !newName.isBlank()) {
       photo.setName(newName);
     }
     Photo updated = photoRepository.save(photo);
+
+    photoActivityHandler.updated(
+        SecurityUtils.getCurrentUser(),
+        photo.getAlbum().getProject(),
+        oldName,
+        photo.getName(),
+        photo.getAlbum().getName(),
+        photo.getFileUrl());
     return toDTO(updated);
   }
 
@@ -111,6 +132,9 @@ public class PhotoService {
 
     // Resgata o projeto associado (documento > diretório > projeto)
     Project project = photo.getAlbum().getProject();
+
+    String albumName = photo.getAlbum().getName();
+    String photoName = photo.getName();
 
     // Verifica se o usuário é dono do comentário
     boolean isOwner = photo.getUploadedBy().getId().equals(currentUser.getId());
@@ -129,6 +153,11 @@ public class PhotoService {
     }
 
     photoRepository.delete(photo);
+    photoActivityHandler.deleted(
+        SecurityUtils.getCurrentUser(),
+        project,
+        photoName,
+        albumName);
   }
 
   // buscar por id

@@ -1,6 +1,8 @@
 package com.archspot.ArchSpot_BackEnd.entities;
 
+import com.archspot.ArchSpot_BackEnd.activities.entities.Activity;
 import com.archspot.ArchSpot_BackEnd.enums.ProjectStatus;
+import com.archspot.ArchSpot_BackEnd.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -53,6 +55,10 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Directory> directories = new ArrayList<>();
+
+    // associação com feed de atividades
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Activity> activities;
 
     // Métodos de negócio
     public void startProject() {
@@ -126,5 +132,17 @@ public class Project {
             this.status = ProjectStatus.IN_PROGRESS; // fallback
             this.realEndDate = null;
         }
+    }
+
+    // busca userrole no projeto (nao sei se vai dar certo)
+    public UserRole getUserRole(User user) {
+        if (this.userProjects == null)
+            return null;
+
+        return this.userProjects.stream()
+                .filter(up -> up.getUser().getId().equals(user.getId()))
+                .map(UserProject::getRole)
+                .findFirst()
+                .orElse(null);
     }
 }

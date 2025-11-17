@@ -33,16 +33,16 @@
         </div>
       </div>
 
-      <!-- Datas reais - so podem ser alteradas se a etapa ja foi finalizada -->
+      <!-- Datas reais - final so pode ser alterada se a etapa ja foi finalizada -->
       <div class="row mb-4">
         <div class="col-md-6">
           <label class="fs-6 fw-semibold modal-label2">Início real</label>
-          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealStartDate" [disabled]="disableRealDates"
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealStartDate" [disabled]="disableRealStartDate"
             [max]="phaseRealEndDate || null" />
         </div>
         <div class="col-md-6">
           <label class="fs-6 fw-semibold modal-label2">Término real</label>
-          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealEndDate" [disabled]="disableRealDates"
+          <input type="date" class="form-control mt-1" [(ngModel)]="phaseRealEndDate" [disabled]="disableRealEndDate"
             [min]="phaseRealStartDate || null" />
         </div>
       </div>

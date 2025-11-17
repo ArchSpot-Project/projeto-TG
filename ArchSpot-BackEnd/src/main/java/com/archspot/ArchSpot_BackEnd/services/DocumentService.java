@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.DocumentActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.document.DocumentUpdateDTO;
 import com.archspot.ArchSpot_BackEnd.entities.*;
@@ -33,6 +34,9 @@ public class DocumentService {
 
   @Autowired
   private DocumentVersionRepository documentVersionRepository;
+
+  @Autowired
+  private DocumentActivityHandler documentActivityHandler;
 
   private static final String UPLOAD_BASE_PATH = "./uploads";
 
@@ -86,52 +90,7 @@ public class DocumentService {
     return toDTO(documentRepository.save(document));
   }
 
-  // atualizar metadados de um documento (nome, descriçao e modifDate) sem alterar
-  // o arquivo
-  public DocumentDTO update(Long id, DocumentUpdateDTO dto) {
-    Document document = documentRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-
-    if (dto.name() != null)
-      document.setName(dto.name());
-    if (dto.description() != null)
-      document.setDescription(dto.description());
-    document.setModificationDate(LocalDateTime.now());
-
-    return toDTO(documentRepository.save(document));
-  }
-
-  // excluir um documento
-  @Transactional
-  public void delete(Long id) {
-    Document document = documentRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-
-    User currentUser = SecurityUtils.getCurrentUser();
-
-    // valida permissao do usuário
-    validateDeletePermission(document, currentUser);
-
-    // Excluir arquivos físicos das versões antigas
-    List<DocumentVersion> versions = documentVersionRepository.findByDocumentId(id);
-    for (DocumentVersion version : versions) {
-      safeDeleteFile(version.getFileUrl());
-    }
-
-    // remove o arquivo físico
-    safeDeleteFile(document.getFileUrl());
-
-    // Remove versões associadas (garantia adicional ao cascade)
-    documentVersionRepository.deleteAllByDocumentId(id);
-
-    // remove do banco
-    documentRepository.deleteById(id);
-  }
-
-  /*
-   * SALVAR NOVO DOCUMENTO
-   */
-
+  // SALVAR NOVO DOCUMENTO
   public DocumentDTO uploadDocument(Long directoryId, MultipartFile file, String description)
       throws IOException {
     User currentUser = SecurityUtils.getCurrentUser();
@@ -166,13 +125,17 @@ public class DocumentService {
     document.setDirectory(directory);
     document.setUploadedBy(currentUser);
 
+    documentActivityHandler.uploaded(
+        currentUser,
+        document.getDirectory().getProject(),
+        document.getName(),
+        document.getDescription(),
+        document.getFileUrl(),
+        document.getDirectory().getName());
     return toDTO(documentRepository.save(document));
   }
 
-  /*
-   * ATUALIZAÇÃO / NOVA VERSÃO
-   */
-
+  // ATUALIZAÇÃO / NOVA VERSÃO
   public DocumentDTO updateDocumentVersion(Long documentId, MultipartFile newFile) throws IOException {
     Document existing = documentRepository.findById(documentId)
         .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
@@ -206,13 +169,75 @@ public class DocumentService {
     existing.setSize(newFile.getSize());
     existing.setVersion(existing.getVersion() != null ? existing.getVersion() + 1 : 1);
 
+    documentActivityHandler.versioned(
+        SecurityUtils.getCurrentUser(),
+        existing.getDirectory().getProject(),
+        existing.getName(),
+        existing.getVersion(),
+        existing.getFileUrl(),
+        existing.getDirectory().getName());
     return toDTO(documentRepository.save(existing));
   }
 
-  /*
-   * DOWNLOAD
-   */
+  // atualizar apenas metadados de um documento (nome, descriçao e modifDate)
+  public DocumentDTO update(Long id, DocumentUpdateDTO dto) {
+    Document document = documentRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+    String oldName = document.getName();
+    String oldDescription = document.getDescription();
 
+    if (dto.name() != null)
+      document.setName(dto.name());
+    if (dto.description() != null)
+      document.setDescription(dto.description());
+    document.setModificationDate(LocalDateTime.now());
+
+    documentActivityHandler.infoUpdated(
+        SecurityUtils.getCurrentUser(),
+        document.getDirectory().getProject(),
+        document.getName(),
+        oldName,
+        document.getDescription(),
+        oldDescription,
+        document.getFileUrl(),
+        document.getDirectory().getName());
+    return toDTO(documentRepository.save(document));
+  }
+
+  // excluir um documento
+  @Transactional
+  public void delete(Long id) {
+    Document document = documentRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+    User currentUser = SecurityUtils.getCurrentUser();
+
+    // valida permissao do usuário
+    validateDeletePermission(document, currentUser);
+
+    Project project = document.getDirectory().getProject();
+    String fileName = document.getName();
+    String directoryName = document.getDirectory().getName();
+    
+    // Excluir arquivos físicos das versões antigas
+    List<DocumentVersion> versions = documentVersionRepository.findByDocumentId(id);
+    for (DocumentVersion version : versions) {
+      safeDeleteFile(version.getFileUrl());
+    }
+
+    // remove o arquivo físico
+    safeDeleteFile(document.getFileUrl());
+
+    // Remove versões associadas (garantia adicional ao cascade)
+    documentVersionRepository.deleteAllByDocumentId(id);
+
+    // remove do banco
+    documentRepository.deleteById(id);
+
+    documentActivityHandler.deleted(currentUser, project, fileName, directoryName);
+  }
+
+  // DOWNLOAD
   public Path getFilePath(Long documentId) {
     Document document = documentRepository.findById(documentId)
         .orElseThrow(() -> new ResourceNotFoundException("Document not found"));

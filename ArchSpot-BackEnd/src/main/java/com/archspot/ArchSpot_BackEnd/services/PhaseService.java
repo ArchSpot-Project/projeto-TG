@@ -14,10 +14,12 @@ import com.archspot.ArchSpot_BackEnd.enums.*;
 import com.archspot.ArchSpot_BackEnd.exceptions.BusinessRuleException;
 import com.archspot.ArchSpot_BackEnd.exceptions.ResourceNotFoundException;
 import com.archspot.ArchSpot_BackEnd.entities.Project;
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.PhaseActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.*;
 import com.archspot.ArchSpot_BackEnd.entities.Phase;
 import com.archspot.ArchSpot_BackEnd.repositories.PhaseRepository;
 import com.archspot.ArchSpot_BackEnd.repositories.ProjectRepository;
+import com.archspot.ArchSpot_BackEnd.security.SecurityUtils;
 import com.archspot.ArchSpot_BackEnd.templates.dtos.PhaseTemplateDTO;
 import com.archspot.ArchSpot_BackEnd.templates.services.TemplateService;
 
@@ -32,6 +34,9 @@ public class PhaseService {
 
   @Autowired
   private TemplateService templateService;
+
+  @Autowired
+  PhaseActivityHandler phaseActivityHandler;
 
   // consultar todas as fases
   public List<PhaseDTO> findAll() {
@@ -101,7 +106,7 @@ public class PhaseService {
     Phase saved = phaseRepository.save(newPhase);
 
     updateProject(project);
-
+    phaseActivityHandler.created(SecurityUtils.getCurrentUser(), saved.getProject(), saved.getName());
     return toDTO(saved);
   }
 
@@ -201,7 +206,7 @@ public class PhaseService {
     Phase updated = phaseRepository.save(entity);
 
     updateProject(updated.getProject());
-
+    phaseActivityHandler.updated(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -211,10 +216,19 @@ public class PhaseService {
         .orElseThrow(() -> new RuntimeException("Phase not found"));
 
     Project project = entity.getProject();
+    String phaseName = entity.getName();
+
+    // Remove vínculos de predecessora de outras fases
+    List<Phase> childPhases = phaseRepository.findByPreviousPhaseId(entity.getId());
+    for (Phase child : childPhases) {
+        child.setPreviousPhase(null); // ou child.setPreviousPhase(entity.getPreviousPhase()) se quiser "encadear"
+        phaseRepository.save(child);
+    }
 
     phaseRepository.delete(entity);
 
     updateProject(project);
+    phaseActivityHandler.deleted(SecurityUtils.getCurrentUser(), project, phaseName);
   }
 
   // iniciar etapa
@@ -223,7 +237,7 @@ public class PhaseService {
         .orElseThrow(() -> new ResourceNotFoundException("Etapa não encontrada."));
 
     /*
-     * validações de etapa predecessora suspensas!
+     * validações de etapa predecessora SUSPENSAS!
      */
     // // etapa predecessora e validação - se houver e nao foi finalizada, lançar
     // erro
@@ -242,7 +256,7 @@ public class PhaseService {
 
     // inicia o projeto se for o caso
     updateProject(updated.getProject());
-
+    phaseActivityHandler.started(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -260,7 +274,7 @@ public class PhaseService {
 
     // finaliza projeto se for o caso
     updateProject(updated.getProject());
-
+    phaseActivityHandler.finished(SecurityUtils.getCurrentUser(), updated.getProject(), updated.getName());
     return toDTO(updated);
   }
 
@@ -283,23 +297,25 @@ public class PhaseService {
   public static PhaseStatus calculateStatus(Phase phase) {
     LocalDate today = LocalDate.now();
 
+        // fase concluída
     if (phase.getRealEndDate() != null) {
-      return PhaseStatus.COMPLETED;
+        return PhaseStatus.COMPLETED;
     }
 
+    // fase em andamento
     if (phase.getRealStartDate() != null) {
-      if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
+        if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
+            return PhaseStatus.OVERDUE;
+        }
+        return PhaseStatus.IN_PROGRESS;
+    }
+
+    // fase não iniciada: atrasada se data de início estimada já passou
+    if (phase.getEstimatedStartDate() != null && today.isAfter(phase.getEstimatedStartDate())) {
         return PhaseStatus.OVERDUE;
-      }
-      return PhaseStatus.IN_PROGRESS;
     }
 
-    // etapa ainda não COMPLETED = em atraso se a data atual está após a data de
-    // término estimada
-    if (phase.getEstimatedEndDate() != null && today.isAfter(phase.getEstimatedEndDate())) {
-      return PhaseStatus.OVERDUE;
-    }
-
+    // fase não iniciada e dentro do prazo
     return PhaseStatus.NOT_STARTED;
   }
 
