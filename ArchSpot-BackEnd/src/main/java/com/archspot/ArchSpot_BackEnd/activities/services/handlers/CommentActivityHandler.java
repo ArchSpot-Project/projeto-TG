@@ -21,13 +21,14 @@ public class CommentActivityHandler {
     return role != null ? role.name() : "UNKNOWN";
   }
 
-  public void added(User actor, Project project, String text) {
+  public void added(User actor, Project project, String text, String documentName) {
     activityService.log(
         ActivityType.COMMENT_ADDED,
         actor,
         project,
         Map.of(
             "commentText", text,
+            "documentName", documentName,
             "actorRole", getActorRole(project, actor)));
   }
 

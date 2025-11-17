@@ -51,7 +51,8 @@ public class CommentService {
     commentActivityHandler.added(
         currentUser,
         project,
-        saved.getText());
+        saved.getText(),
+        document.getName());
     return toDTO(commentRepository.save(saved));
   }
 

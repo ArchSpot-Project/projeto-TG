@@ -27,8 +27,8 @@ public class UserProjectActivityHandler {
         actor,
         project,
         Map.of(
-            "userAssignedId", userAssigned.getId(),
             "userAssignedName", userAssigned.getName(),
+            "fileUrl", safe(userAssigned.getFileUrl()),
             "assignedRole", role.name(),
             "actorRole", getActorRole(project, actor)));
   }
@@ -39,8 +39,8 @@ public class UserProjectActivityHandler {
         actor,
         project,
         Map.of(
-            "userRemovedId", userRemoved.getId(),
             "userRemovedName", userRemoved.getName(),
+            "fileUrl", safe(userRemoved.getFileUrl()),
             "actorRole", getActorRole(project, actor)));
   }
 
@@ -55,10 +55,14 @@ public class UserProjectActivityHandler {
         actor,
         project,
         Map.of(
-            "userAssignedId", userAssigned.getId(),
             "userAssignedName", userAssigned.getName(),
-            "oldRole", oldRole != null ? oldRole.name() : "NONE",
+            "fileUrl", safe(userAssigned.getFileUrl()),
+            "oldRole", safe(oldRole != null ? oldRole.name() : "NONE"),
             "newRole", newRole.name(),
             "actorRole", getActorRole(project, actor)));
+  }
+
+  private String safe(Object value) {
+    return value != null ? value.toString() : "";
   }
 }
