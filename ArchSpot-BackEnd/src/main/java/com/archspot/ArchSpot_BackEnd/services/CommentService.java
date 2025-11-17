@@ -1,5 +1,6 @@
 package com.archspot.ArchSpot_BackEnd.services;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.CommentActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentCreateDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.comment.CommentDTO;
 import com.archspot.ArchSpot_BackEnd.entities.Comment;
@@ -28,11 +29,12 @@ public class CommentService {
 
   private final CommentRepository commentRepository;
   private final DocumentRepository documentRepository;
+  private final CommentActivityHandler commentActivityHandler;
 
   // Criar comentário
   public CommentDTO createComment(Long documentId, CommentCreateDTO dto) {
     User currentUser = SecurityUtils.getCurrentUser();
-    
+
     Document document = documentRepository.findById(documentId)
         .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
@@ -43,7 +45,14 @@ public class CommentService {
         .user(currentUser)
         .build();
 
-    return toDTO(commentRepository.save(comment));
+    Comment saved = commentRepository.save(comment);
+
+    Project project = document.getDirectory().getProject();
+    commentActivityHandler.added(
+        currentUser,
+        project,
+        saved.getText());
+    return toDTO(commentRepository.save(saved));
   }
 
   // Buscar comentários de um documento
@@ -80,6 +89,10 @@ public class CommentService {
     }
 
     commentRepository.delete(comment);
+
+    commentActivityHandler.deleted(
+        currentUser,
+        project);
   }
 
   // Mapper para DTO

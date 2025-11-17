@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.archspot.ArchSpot_BackEnd.activities.services.handlers.ProjectActivityHandler;
 import com.archspot.ArchSpot_BackEnd.dtos.installment.InstallmentResponseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.phase.PhaseDTO;
 import com.archspot.ArchSpot_BackEnd.dtos.project.ProjectCreateFromTemplateDTO;
@@ -40,6 +41,9 @@ public class ProjectService {
 
   @Autowired
   private DirectoryService directoryService;
+
+  @Autowired
+  private ProjectActivityHandler projectActivityHandler;
 
   public List<ProjectResponseDTO> findAll() {
     return projectRepository.findAll()
@@ -87,7 +91,13 @@ public class ProjectService {
     project.setTotalValue(dto.getTotalValue());
     project.updateDatesAndStatus();
 
-    return toResponseDTO(projectRepository.save(project));
+    Project saved = projectRepository.save(project);
+
+    projectActivityHandler.updated(
+        SecurityUtils.getCurrentUser(),
+        saved, dto.getName(),
+        dto.getDescription());
+    return toResponseDTO(saved);
   }
 
   // deletar projeto
@@ -122,10 +132,13 @@ public class ProjectService {
     for (Long phaseId : fasesAEncerrar) {
       phaseService.finishPhase(phaseId);
     }
-    
+
     project.updateDatesAndStatus();
     project.finalizeProject();
-    return toResponseDTO(projectRepository.save(project));
+    Project saved = projectRepository.save(project);
+
+    projectActivityHandler.finalized(SecurityUtils.getCurrentUser(), saved);
+    return toResponseDTO(saved);
   }
 
   // cancelar projeto
@@ -134,7 +147,11 @@ public class ProjectService {
         .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
     project.updateDatesAndStatus();
     project.cancelProject();
-    return toResponseDTO(projectRepository.save(project));
+    Project saved = projectRepository.save(project);
+
+    projectActivityHandler.cancelled(SecurityUtils.getCurrentUser(), saved);
+
+    return toResponseDTO(saved);
   }
 
   // atualizar nome e descriçao
