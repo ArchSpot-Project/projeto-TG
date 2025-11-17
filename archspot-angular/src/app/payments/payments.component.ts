@@ -137,9 +137,9 @@ export class PaymentsComponent implements OnInit {
     this.showCreateModal = true;
   }
 
-  openCreateSequenceModal(): void {
-    this.showCreateSequenceModal = true;
-  }
+  // openCreateSequenceModal(): void {
+  //   this.showCreateSequenceModal = true;
+  // }
 
   onInstallmentCreated(newInstallment: InstallmentResponse): void {
     this.loadInstallments();

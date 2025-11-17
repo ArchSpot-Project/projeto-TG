@@ -55,7 +55,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
       const start = new Date(this.phaseEstimatedStartDate);
       const end = new Date(this.phaseEstimatedEndDate);
       if (end < start) {
-        alert('A data de término prevista não pode ser anterior à data de início prevista.');
+        this.toast.showWarning('A data de término prevista não pode ser anterior à data de início prevista.');
         return;
       }
     }
@@ -73,17 +73,17 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
     const updatedPhase = {
       name: this.phaseName,
       description: this.phaseDescription || null,
-      estimatedStartDate: this.normalizeDate(this.phaseEstimatedStartDate), 
-      estimatedEndDate: this.normalizeDate(this.phaseEstimatedEndDate),   
-      realStartDate: this.disableRealDates ? null : this.normalizeDateTime(this.phaseRealStartDate), 
-      realEndDate: this.disableRealDates ? null : this.normalizeDateTime(this.phaseRealEndDate),
+      estimatedStartDate: this.normalizeDate(this.phaseEstimatedStartDate),
+      estimatedEndDate: this.normalizeDate(this.phaseEstimatedEndDate),
+      realStartDate: this.phaseRealStartDate ? this.normalizeDateTime(this.phaseRealStartDate) : this.phaseRealStartDate,
+      realEndDate: this.phaseRealEndDate ? this.normalizeDateTime(this.phaseRealEndDate) : this.phaseRealEndDate,
       duration: duration,
-      projectId: this.originalPhase.projectId 
+      projectId: this.originalPhase.projectId
     };
 
     this.phaseService.updatePhase(this.phaseId, updatedPhase).subscribe({
       next: () => {
-        alert('Etapa atualizada com sucesso!');
+        this.toast.showSuccess('Etapa atualizada com sucesso!');
         this.close.emit();
         location.reload();
       },
@@ -98,7 +98,7 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
     if (!confirm('Deseja realmente excluir esta etapa?')) return;
     this.phaseService.deletePhase(this.phaseId).subscribe({
       next: () => {
-        alert('Etapa excluída com sucesso!');
+        this.toast.showSuccess('Etapa excluída com sucesso!');
         this.close.emit();
         location.reload();
       },
@@ -126,7 +126,12 @@ export class EditPhaseModalComponent implements OnInit, OnChanges {
   }
 
   // verifica se os campos de data real devem estar bloqueados
-  get disableRealDates(): boolean {
+  // só bloqueia o término real se a fase não estiver concluída
+  get disableRealStartDate(): boolean {
+    return false; // sempre editável
+  }
+
+  get disableRealEndDate(): boolean {
     return this.phaseStatus?.toUpperCase() !== 'COMPLETED';
   }
 

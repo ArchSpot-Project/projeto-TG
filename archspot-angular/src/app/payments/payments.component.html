@@ -15,8 +15,8 @@
           </button>
           <button *ngIf="!isAssociateInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
             (click)="openCreateInstallmentModal()">+ Nova parcela</button>
-          <button *ngIf="!isAssociateInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
-            (click)="openCreateSequenceModal()">+ Nova sequência de parcelas</button>
+          <!-- <button *ngIf="!isAssociateInProject" class="btn btn-outline-dark rounded-pill px-4 py-2"
+            (click)="openCreateSequenceModal()">+ Nova sequência de parcelas</button> vai ficar pro futuro-->
         </div>
       </div>
     </div>
@@ -94,9 +94,9 @@
       (close)="closeEditModal()" (updated)="onInstallmentUpdated($event)">
     </app-edit-installment-modal>
 
-    <app-create-sequence-installments-modal *ngIf="showCreateSequenceModal" [show]="showCreateSequenceModal"
+    <!-- <app-create-sequence-installments-modal *ngIf="showCreateSequenceModal" [show]="showCreateSequenceModal"
       [projectId]="projectId" (close)="showCreateSequenceModal = false"
       (installmentsCreated)="handleInstallmentsCreated($event)">
-    </app-create-sequence-installments-modal>
+    </app-create-sequence-installments-modal> -->
   </div>
 </app-page-layout>
