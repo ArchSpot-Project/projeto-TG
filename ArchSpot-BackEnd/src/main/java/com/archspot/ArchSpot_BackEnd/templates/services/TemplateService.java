@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class TemplateService {
@@ -36,19 +35,10 @@ public class TemplateService {
 
   public List<ProjectTemplateDTO> findAllProjectTemplates() {
     User currentUser = SecurityUtils.getCurrentUser();
-
-    List<ProjectTemplate> userProjects = projectTemplateRepository.findAllByUserId(currentUser.getId());
-    List<ProjectTemplate> defaultProjects = projectTemplateRepository.findByIsDefaultTrue();
-
-    // filtra templates default que já foram clonados para o usuário (sugestao porque nao aparecia nenhum template)
-    List<ProjectTemplate> filteredDefaults = defaultProjects.stream()
-        .filter(dp -> userProjects.stream().noneMatch(up -> up.getName().equals(dp.getName())))
+     return projectTemplateRepository.findAllByUserId(currentUser.getId())
+        .stream()
+        .map(this::toProjectTemplateDTO)
         .toList();
-
-    List<ProjectTemplate> combined = Stream.concat(userProjects.stream(), filteredDefaults.stream())
-        .toList();
-
-    return combined.stream().map(this::toProjectTemplateDTO).toList();
   }
 
   public ProjectTemplateDTO findProjectTemplateById(Long id) {
@@ -106,15 +96,8 @@ public class TemplateService {
 
   public List<PhaseTemplateDTO> findAllPhaseTemplates() {
     User currentUser = SecurityUtils.getCurrentUser();
-    List<PhaseTemplate> userPhases = phaseTemplateRepository.findAllByUserId(currentUser.getId());
-    List<PhaseTemplate> defaultPhases = phaseTemplateRepository.findByIsDefaultTrue();
-
-    // filtra templates default que já foram clonados para o usuário (sugestao porque nao aparecia nenhum template)
-    List<PhaseTemplate> filteredDefaults = defaultPhases.stream()
-        .filter(df -> userPhases.stream().noneMatch(up -> up.getName().equals(df.getName())))
-        .toList();
-
-    return Stream.concat(userPhases.stream(), filteredDefaults.stream())
+    return phaseTemplateRepository.findAllByUserId(currentUser.getId())
+        .stream()
         .map(this::toPhaseTemplateDTO)
         .toList();
   }

@@ -52,7 +52,7 @@
                   <div *ngIf="canFinishPhase(i)">
                     <button class="btn btn-sm btn-success" (click)="finishPhase(phase)">Finalizar</button>
                   </div>
-                  <div *ngIf="phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED'">
+                  <div *ngIf="!isCustomerInProject && (phase.status === 'IN_PROGRESS' || phase.status === 'COMPLETED')">
                     <button class="btn btn-sm btn-warning mt-1" (click)="undoPhase(phase)">Desfazer</button>
                   </div>
                   <div
